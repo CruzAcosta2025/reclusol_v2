@@ -60,7 +60,7 @@
                             
                             <!-- USUARIO -->
                             <div class="space-y-2">
-                                <x-input-label for="usuario" class="block text-sm font-semibold text-gray-700">
+                                <x-input-label for="usuario" class="block text-x1 font-semibold text-blue-700">
                                     <i class="fas fa-user mr-2 text-blue-500"></i>
                                     {{ __('Usuario') }}
                                 </x-input-label>
@@ -78,8 +78,8 @@
                             </div>
 
                             <!-- CONTRASEÑA -->
-                            <div class="space-y-2">
-                                <x-input-label for="contrasena" class="block text-sm font-semibold text-gray-700">
+                            <div class="space-y-4">
+                                <x-input-label for="contrasena" class="block text-x1 font-semibold text-blue-700">
                                     <i class="fas fa-lock mr-2 text-blue-500"></i>
                                     {{ __('Contraseña') }}
                                 </x-input-label>
@@ -210,6 +210,6 @@
         document.getElementById('usuario').value = '';
         document.getElementById('contrasena').value = '';
     };
-    </script>
+     </script>
 
 </x-guest-layout>

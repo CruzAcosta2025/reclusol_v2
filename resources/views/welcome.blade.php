@@ -56,9 +56,9 @@
                         <i class="fas fa-sign-in-alt"></i>
                         <span>Iniciar Sesión</span>
                     </a>
-                    <a href="{{ route('register') }}" class="btn-primary text-white px-6 py-2 rounded-lg font-medium">
-                        <i class="fas fa-user-plus mr-2"></i>
-                        Postular
+                    <a href="{{ route('postulantes.registroPrimario') }}" class="btn-primary text-white px-6 py-2 rounded-lg font-medium">
+                      <i class="fas fa-user-plus mr-2"></i>
+                      Postular
                     </a>
                 </div>
             </div>
@@ -175,12 +175,6 @@
             <p class="text-xl text-blue-100 mb-8 leading-relaxed">
                 Únete a miles de profesionales que ya encontraron su trabajo ideal
             </p>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="{{ route('register') }}" class="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors inline-flex items-center justify-center">
-                    <i class="fas fa-user-plus mr-2"></i>
-                    Crear Cuenta Gratis
-                </a>
-            </div>
         </div>
     </section>
 
