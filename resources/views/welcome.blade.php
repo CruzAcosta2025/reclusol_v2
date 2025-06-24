@@ -6,6 +6,8 @@
     <title>RECLUSOL - Plataforma de Reclutamiento</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="{{ asset('imagenes/logo_app.png') }}">
+
     <style>
         .gradient-bg {
             background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #1d4ed8 100%);
@@ -56,7 +58,7 @@
                     </a>
                     <a href="{{ route('register') }}" class="btn-primary text-white px-6 py-2 rounded-lg font-medium">
                         <i class="fas fa-user-plus mr-2"></i>
-                        Registrarse
+                        Postular
                     </a>
                 </div>
             </div>
@@ -177,10 +179,6 @@
                 <a href="{{ route('register') }}" class="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors inline-flex items-center justify-center">
                     <i class="fas fa-user-plus mr-2"></i>
                     Crear Cuenta Gratis
-                </a>
-                <a href="{{ route('jobs.index') }}" class="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors inline-flex items-center justify-center">
-                    <i class="fas fa-search mr-2"></i>
-                    Ver Empleos
                 </a>
             </div>
         </div>
