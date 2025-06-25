@@ -65,7 +65,17 @@
             </div>
         </div>
 
-        <form id="application-form" method="POST" action="{{ route('postulantes.store') }}" enctype="multipart/form-data" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- @if ($errors->any())
+        <div class="bg-red-100 text-red-800 p-4 rounded mb-6">
+          <ul class="list-disc pl-5">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+          </ul>
+         </div>
+          @endif -->
+
+        <form method="POST" action="{{ route('postulantes.store') }}" enctype="multipart/form-data" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"  id="postulanteForm">
             @csrf
             
             <!-- Step 1: Información Personal -->
@@ -292,13 +302,13 @@
                     <div class="grid md:grid-cols-2 gap-6">
                         <!-- Cargo al que postula -->
                         <div class="space-y-2">
-                            <label for="cargo_postula" class="block text-sm font-semibold text-gray-700">
+                            <label for="cargo" class="block text-sm font-semibold text-gray-700">
                                 <i class="fas fa-user-tie mr-2 text-green-500"></i>
                                 Cargo al que postula *
                             </label>
                             <select 
-                                id="cargo_postula" 
-                                name="cargo_postula" 
+                                id="cargo" 
+                                name="cargo" 
                                 required 
                                 class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all duration-300"
                             >
@@ -335,8 +345,8 @@
                                 Tiempo de experiencia en el cargo *
                             </label>
                             <select 
-                                id="experiencia" 
-                                name="experiencia" 
+                                id="experiencia_rubro" 
+                                name="experiencia_rubro" 
                                 required 
                                 class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all duration-300"
                             >
@@ -351,25 +361,24 @@
                         </div>
 
                         <!-- SUCAMEC -->
-                        <div class="space-y-2">
-                            <label for="sucamec" class="block text-sm font-semibold text-gray-700">
-                                <i class="fas fa-shield-alt mr-2 text-green-500"></i>
-                                SUCAMEC vigente o no vigente *
-                            </label>
-                            <select 
-                                id="sucamec" 
-                                name="sucamec" 
-                                required 
-                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all duration-300"
-                            >
-                                <option value="">Selecciona estado SUCAMEC</option>
-                                <option value="vigente">Vigente</option>
-                                <option value="no_vigente">No vigente</option>
-                                <option value="no_tiene">No tiene</option>
-                            </select>
-                            <span class="error-message text-red-500 text-sm hidden"></span>
-                        </div>
-
+                    <div class="space-y-2">
+                        <label for="sucamec" class="block text-sm font-semibold text-gray-700">
+                         <i class="fas fa-shield-alt mr-2 text-green-500"></i>
+                          SUCAMEC vigente o no vigente *
+                          </label>
+                        <select 
+                          id="sucamec" 
+                          name="sucamec" 
+                          required 
+                          class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all duration-300"
+                        >
+                         <option value="">Selecciona estado SUCAMEC</option>
+                         <option value="vigente">Vigente</option>
+                         <option value="no_vigente">No vigente</option>
+                          <option value="no_tiene">No tiene</option>
+                        </select>
+                          <x-input-error :messages="$errors->get('sucamec')" class="mt-2" />
+                    </div>
                         <!-- Grado de instrucción -->
                         <div class="space-y-2">
                             <label for="grado_instruccion" class="block text-sm font-semibold text-gray-700">
@@ -491,11 +500,11 @@
                                 Curriculum Vitae/CV *
                             </label>
                             <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-purple-400 transition-colors">
-                                <input type="file" id="cv" name="cv" accept=".pdf,.doc,.docx" required class="hidden" onchange="handleFileUpload(this, 'cv-preview')">
+                                <input type="file" id="cv" name="cv" accept=".pdf" data-max=5 required class="hidden" onchange="handleFileUpload(this, 'cv-preview')" >
                                 <label for="cv" class="cursor-pointer">
                                     <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
                                     <p class="text-gray-600 mb-2">Haz clic para subir tu CV</p>
-                                    <p class="text-sm text-gray-500">PDF, DOC, DOCX (máx. 5MB)</p>
+                                    <p class="text-sm text-gray-500">PDF(máx. 5MB)</p>
                                 </label>
                                 <div id="cv-preview" class="mt-4 hidden">
                                     <div class="flex items-center justify-center space-x-2 text-green-600">
@@ -506,20 +515,20 @@
                             </div>
                         </div>
 
-                        <!-- DUL Upload -->
+                        <!-- CUL Upload -->
                         <div class="space-y-4">
                             <label class="block text-sm font-semibold text-gray-700">
                                 <i class="fas fa-certificate mr-2 text-purple-500"></i>
                                 Certificado Único Laboral (DUL) *
                             </label>
                             <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-purple-400 transition-colors">
-                                <input type="file" id="dul" name="dul" accept=".pdf,.jpg,.jpeg,.png" required class="hidden" onchange="handleFileUpload(this, 'dul-preview')">
-                                <label for="dul" class="cursor-pointer">
+                                <input type="file" id="cul" name="cul" accept=".pdf" data-max=5 required class="hidden" onchange="handleFileUpload(this, 'cul-preview')">
+                                <label for="cul" class="cursor-pointer">
                                     <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
-                                    <p class="text-gray-600 mb-2">Haz clic para subir tu DUL</p>
-                                    <p class="text-sm text-gray-500">PDF, JPG, PNG (máx. 5MB)</p>
+                                    <p class="text-gray-600 mb-2">Haz clic para subir tu CUL</p>
+                                    <p class="text-sm text-gray-500">PDF(máx. 5MB)</p>
                                 </label>
-                                <div id="dul-preview" class="mt-4 hidden">
+                                <div id="cul-preview" class="mt-4 hidden">
                                     <div class="flex items-center justify-center space-x-2 text-green-600">
                                         <i class="fas fa-check-circle"></i>
                                         <span class="file-name"></span>
@@ -554,6 +563,8 @@
                 </div>
             </div>
         </form>
+        <x-alerts />   {{-- SweetAlert success / error --}}
+
 
         <!-- Loading Overlay -->
         <div id="loading-overlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
@@ -631,23 +642,40 @@
             }
         }
 
-        // Form submission
-        document.getElementById('application-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            if (validateCurrentStep()) {
-                document.getElementById('loading-overlay').classList.remove('hidden');
-                
-                // Simulate form submission
-                setTimeout(() => {
-                    document.getElementById('loading-overlay').classList.add('hidden');
-                    alert('¡Postulación enviada exitosamente! Te contactaremos pronto.');
-                    // Here you would normally submit the form
-                    // this.submit();
-                }, 2000);
-            }
-        });
+         function handleFileUpload(input, previewId) {
+         const file      = input.files[0];
+         const maxMB     = parseInt(input.dataset.max || "5", 10);
+         const maxBytes  = maxMB * 1024 * 1024;
+         const preview   = document.getElementById(previewId);
+         const fileName  = preview.querySelector(".file-name");
 
+         // Reiniciar estado
+         preview.classList.add("hidden");
+         input.classList.remove("border-red-500");
+         if (fileName) fileName.textContent = "";
+
+         if (!file) return;          // usuario canceló el diálogo
+
+         if (file.size > maxBytes) {
+         Swal.fire({
+            icon: "error",
+            title: "Archivo demasiado grande",
+            text: `El archivo supera el límite de ${maxMB} MB. Por favor elige otro.`,
+            width: 500,          // ancho exacto — 500 px
+            heightAuto: true,    // (por defecto) ajusta alto al contenido
+            padding: '2rem',     // espacio interior (≈ 32 px)
+            confirmButtonColor: "#d33",
+        }).then(() => {
+            input.value = "";                   // forzar nueva selección
+            input.classList.add("border-red-500");
+        });
+        return;
+        }
+
+        // Tamaño válido → mostrar nombre
+        if (fileName) fileName.textContent = file.name;
+        preview.classList.remove("hidden");
+        }
         // Initialize
         updateProgressBar();
     </script>

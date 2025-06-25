@@ -19,7 +19,6 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::get('/postulantes/registro', [PostulanteController::class, 'mostrar'])->name('postulantes.registroPrimario');
-
 Route::post('/postulantes', [PostulanteController::class, 'store'])->name('postulantes.store');
 
 
