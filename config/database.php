@@ -112,6 +112,17 @@ return [
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
 
+        'si_solmar' => [
+        'driver'   => 'sqlsrv',
+        'host'     => env('SI_SOLMAR_HOST', '192.168.10.21'),
+        'port'     => env('SI_SOLMAR_PORT', '1433'),
+        'database' => env('SI_SOLMAR_DB',  'si_solm_2020'),
+        'username' => env('SI_SOLMAR_USER','usr_solmar_vb'),
+        'password' => env('SI_SOLMAR_PASS','11hotelbravo'),
+        'charset'  => 'utf8',
+        'prefix'   => '',
+    ],
+
     ],
 
     /*

@@ -10,8 +10,8 @@
                             <i class="fas fa-user text-white text-sm"></i>
                         </div>
                         <div class="text-white cursor-pointer" onclick="toggleUserDropdown()">
-                            <h2 class="font-semibold text-sm">{{ Auth::user()->name ?? 'RUBEN CRUZ ACOSTA' }}</h2>
-                            <p class="text-xs text-blue-100">{{ Auth::user()->role ?? 'ASISTENTE DE SISTEMAS' }}</p>
+                            <h2 class="font-semibold text-sm"> {{ Auth::user()->name ?? 'INVITADO' }} </h2>
+                            <p class="text-xs text-blue-100"> {{ Auth::user()->cargoInfo?->DESC_TIPO_CARG ?? 'Sin rol' }} </p>
                         </div>
                         
                         <!-- User Dropdown -->
@@ -23,8 +23,8 @@
                                         <i class="fas fa-user text-blue-600 text-lg"></i>
                                     </div>
                                     <div>
-                                        <h3 class="font-semibold text-gray-800">{{ Auth::user()->name ?? 'RUBEN CRUZ ACOSTA' }}</h3>
-                                        <p class="text-sm text-gray-600">{{ Auth::user()->role ?? 'ASISTENTE DE SISTEMAS' }}</p>
+                                        <h3 class="font-semibold text-gray-800">{{ Auth::user()->name ?? 'INVITADO' }}</h3>
+                                        <p class="text-sm text-gray-600"> {{ Auth::user()->cargoInfo?->DESC_TIPO_CARG ?? 'Sin rol' }} </p>
                                     </div>
                                 </div>
                             </div>
@@ -151,15 +151,20 @@
                 <!-- KPI Cards -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
                     <!-- Total Postulantes -->
-                    <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow card-hover">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-users text-blue-600 text-xl"></i>
-                            </div>
-                            <span class="text-green-500 text-sm font-medium">+12%</span>
+                   <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow card-hover">
+                      <div class="flex items-center justify-between mb-4">
+                         <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                              <i class="fas fa-users text-blue-600 text-xl"></i>
+                         </div>
+
+                         {{-- porcentaje de cambio --}}
+                         <span class="text-green-500 text-sm font-medium">
+                          {{ $variacionPostulantes > 0 ? '+' : '' }}{{ $variacionPostulantes }}%
+                         </span>
                         </div>
-                        <h3 class="text-3xl font-bold text-gray-800 mb-1">248</h3>
-                        <p class="text-gray-600 text-sm">Total de postulantes registrados</p>
+                            {{-- total real de postulantes --}}
+                        <h3 class="text-3xl font-bold text-gray-800 mb-1">{{ $totalPostulantes }}</h3>
+                     <p class="text-gray-600 text-sm">Total de postulantes registrados</p>
                     </div>
 
                     <!-- Requerimientos Activos -->
@@ -168,9 +173,9 @@
                             <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
                                 <i class="fas fa-briefcase text-orange-600 text-xl"></i>
                             </div>
-                            <span class="text-green-500 text-sm font-medium">+3</span>
+                            <span class="text-green-500 text-sm font-medium">{{ $variacionRequerimientos > 0 ? '+' : '' }}{{ $variacionRequerimientos }}%</span>
                         </div>
-                        <h3 class="text-3xl font-bold text-gray-800 mb-1">12</h3>
+                        <h3 class="text-3xl font-bold text-gray-800 mb-1">{{ $totalRequerimientos }}</h3>
                         <p class="text-gray-600 text-sm">Requerimientos activos</p>
                         <p class="text-xs text-gray-500 mt-1">Vacantes abiertas</p>
                     </div>
@@ -217,49 +222,44 @@
                 <div class="grid lg:grid-cols-2 gap-6 mb-8">
                     <!-- Postulaciones por Sede -->
                     <div class="bg-white rounded-2xl p-6 shadow-lg">
-                        <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-xl font-bold text-gray-800">Postulaciones por Sede</h3>
-                            <i class="fas fa-chart-bar text-blue-500"></i>
+                       <div class="flex items-center justify-between mb-6">
+                          <h3 class="text-xl font-bold text-gray-800">Postulaciones por Sede</h3>
+                           <i class="fas fa-chart-bar text-blue-500"></i>
                         </div>
-                        <div class="space-y-4">
-                            <div class="flex items-center justify-between">
-                                <span class="text-gray-600">Chimbote</span>
-                                <div class="flex items-center space-x-3 flex-1 mx-4">
-                                    <div class="flex-1 bg-gray-200 rounded-full h-3">
-                                        <div class="bg-blue-500 h-3 rounded-full" style="width: 95%"></div>
-                                    </div>
-                                    <span class="text-sm font-semibold text-gray-800 w-8">95</span>
-                                </div>
+
+                    <div class="space-y-4">
+                   @php
+                   /* Colores tailwind para las barras (cicla si hay más sedes) */
+                   $colores = ['blue-500', 'green-500', 'yellow-500', 'red-500', 'purple-500', 'orange-500'];
+                   @endphp
+
+                     @foreach ($porSede as $idx => $sede)
+                    @php
+                    $porcentaje = $maxTotalSede
+                       ? round(($sede->total / $maxTotalSede) * 100)
+                       : 0;
+                       $color = $colores[$idx % count($colores)];
+                    @endphp
+
+                    <div class="flex items-center justify-between">
+                     <span class="text-gray-600 capitalize">
+                         {{ strtolower($sede->ciudad) }}
+                      </span>
+
+                     <div class="flex items-center space-x-3 flex-1 mx-4">
+                        <div class="flex-1 bg-gray-200 rounded-full h-3 overflow-hidden">
+                           <div class="bg-{{ $color }} h-3" style="width: {{ $porcentaje }}%"></div>
+                               </div>
+                             <span class="text-sm font-semibold text-gray-800 w-8">
+                               {{ $sede->total }}
+                             </span>
                             </div>
-                            <div class="flex items-center justify-between">
-                                <span class="text-gray-600">Chimbote</span>
-                                <div class="flex items-center space-x-3 flex-1 mx-4">
-                                    <div class="flex-1 bg-gray-200 rounded-full h-3">
-                                        <div class="bg-green-500 h-3 rounded-full" style="width: 75%"></div>
-                                    </div>
-                                    <span class="text-sm font-semibold text-gray-800 w-8">75</span>
-                                </div>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <span class="text-gray-600">Trujillo</span>
-                                <div class="flex items-center space-x-3 flex-1 mx-4">
-                                    <div class="flex-1 bg-gray-200 rounded-full h-3">
-                                        <div class="bg-yellow-500 h-3 rounded-full" style="width: 52%"></div>
-                                    </div>
-                                    <span class="text-sm font-semibold text-gray-800 w-8">52</span>
-                                </div>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <span class="text-gray-600">Moquegua</span>
-                                <div class="flex items-center space-x-3 flex-1 mx-4">
-                                    <div class="flex-1 bg-gray-200 rounded-full h-3">
-                                        <div class="bg-red-500 h-3 rounded-full" style="width: 33%"></div>
-                                    </div>
-                                    <span class="text-sm font-semibold text-gray-800 w-8">33</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                         </div>
+                    @endforeach
+                  </div>
+                 </div>
+
+                    
 
                     <!-- Estado de Postulantes -->
                     <div class="bg-white rounded-2xl p-6 shadow-lg">
