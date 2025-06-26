@@ -114,7 +114,7 @@
                         <!-- Divider -->
                         <div class="my-8 flex items-center">
                             <div class="flex-1 border-t border-gray-300"></div>
-                            <span class="px-4 text-gray-500 text-sm">o</span>
+                            <!-- <span class="px-4 text-gray-500 text-sm">o</span> -->
                             <div class="flex-1 border-t border-gray-300"></div>
                         </div>
                     </div>

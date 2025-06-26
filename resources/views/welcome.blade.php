@@ -41,9 +41,7 @@
             <div class="flex justify-between items-center h-16">
                 <!-- Logo -->
                 <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-crown text-white text-lg"></i>
-                    </div>
+                        <img src="{{ asset('imagenes/logo_app.png') }}" alt="Logo RECLUSOL" class="w-12 h-12 rounded-lg object-cover">
                     <div>
                         <h1 class="text-xl font-bold text-blue-600">RECLUSOL</h1>
                         <p class="text-xs text-gray-500">Plataforma de Reclutamiento</p>
@@ -79,7 +77,7 @@
                         Miles de personas ya forman parte de nuestra comunidad laboral. ¡Súmate!
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4 pt-4">
-                        <a href="{{ route('register') }}" class="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors inline-flex items-center justify-center">
+                        <a href="{{ route('login') }}" class="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors inline-flex items-center justify-center">
                             <i class="fas fa-rocket mr-2"></i>
                             Comenzar Ahora
                         </a>
@@ -95,7 +93,7 @@
                     <div class="bg-white rounded-3xl p-8 shadow-2xl max-w-md w-full">
                         <div class="text-center space-y-6">
                             <div class="avatar-container w-32 h-32 rounded-full mx-auto flex items-center justify-center">
-                                <i class="fas fa-hard-hat text-4xl text-white"></i>
+                                <img src="{{ asset('imagenes/SOLMAR_1.png') }}" alt="Logo RECLUSOL" class="w-28 h-28 rounded-lg object-cover">
                             </div>
                             <div>
                                 <h3 class="text-2xl font-bold text-gray-800 mb-2">
@@ -184,8 +182,8 @@
             <div class="grid md:grid-cols-4 gap-8">
                 <div class="col-span-2">
                     <div class="flex items-center space-x-3 mb-4">
-                        <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-crown text-white"></i>
+                        <div class="w-10 h-10 bg-white-600 rounded-lg flex items-center justify-center">
+                            <img src="{{ asset('imagenes/logo_app.png') }}" alt="Logo RECLUSOL" class="w-10 h-10 rounded-lg object-cover">
                         </div>
                         <div>
                             <h3 class="text-xl font-bold">RECLUSOL</h3>
