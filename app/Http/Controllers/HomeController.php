@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use App\Models\Requerimiento;     
 
 
+
 class HomeController extends Controller
 {
     public function index()
@@ -45,6 +46,9 @@ class HomeController extends Controller
 
         $maxTotalSede = $porSede->max('total');    // para calcular porcentajes
 
+        $requerimientos = Requerimiento::orderByDesc('created_at')->get(); // Puedes agregar filtros si deseas solo los activos o validados
+
+
         /* ---------- Enviar a la vista ---------- */
         return view('dashboard', compact(
             'totalPostulantes',
@@ -52,7 +56,8 @@ class HomeController extends Controller
             'totalRequerimientos',
             'variacionRequerimientos',
             'porSede',
-            'maxTotalSede'
+            'maxTotalSede',
+            'requerimientos'
         ));
     }
 

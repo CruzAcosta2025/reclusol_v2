@@ -7,7 +7,8 @@ use App\Http\Controllers\PostulanteSecundarioController;
 use App\Http\Controllers\RequerimientoController;
 use App\Http\Controllers\CargoController;
 use App\Http\Controllers\HomeController;
-
+//use App\Http\Controllers\AficheController;
+use App\Http\Controllers\PosterController;
 
  Route::get('/', function () {
   return view('welcome');
@@ -29,7 +30,18 @@ Route::middleware('auth')->group(function () {
     Route::post('/requerimientos', [RequerimientoController::class, 'store'])->name('requerimientos.store');
     Route::get('/cargos', [CargoController::class, 'index']);
     Route::get('/cargos/{id}', [CargoController::class, 'show']);
+    /* Vista del módulo de afiches */
+    Route::get('/afiches', [PosterController::class, 'index']) ->name('afiches.index');
+    /* Obtener / descargar un afiche */
+    Route::get('/poster/{req}/{template}', [PosterController::class, 'show']) ->name('poster.show');
+    //Route::get('/poster/{req}/{template}', [PosterController::class, 'show'])->name('poster.show');  
+    //Route::get('/afiche', [AficheController::class, 'mostrar'])->name('afiches.afiche');
+
 });
+
+
+
+//Route::get('/afiche', [AficheController::class, 'generar']);
 
 Route::get('/postulantes/registro', [PostulanteController::class, 'mostrar'])->name('postulantes.registroPrimario');
 Route::post('/postulantes', [PostulanteController::class, 'store'])->name('postulantes.store');

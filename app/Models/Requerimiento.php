@@ -30,6 +30,10 @@ use Illuminate\Database\Eloquent\Model;
         'escala_remunerativa',
         'prioridad',
     ];
+
+    protected $casts = [
+        'fecha_limite' => 'date', 
+    ];
 }
 
 
