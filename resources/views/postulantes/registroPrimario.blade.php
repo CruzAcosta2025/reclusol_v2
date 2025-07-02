@@ -40,7 +40,7 @@
 <body class="font-sans antialiased">
     <div class="min-h-screen gradient-bg py-8">
         <!-- Back to Home Button -->
-        <a href="{{ route('welcome') }}" class="absolute top-6 left-6 text-white hover:text-yellow-300 transition-colors flex items-center space-x-2 group z-10">
+        <a href="{{ route('dashboard') }}" class="absolute top-6 left-6 text-white hover:text-yellow-300 transition-colors flex items-center space-x-2 group z-10">
             <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i>
             <span class="font-medium">Volver al inicio</span>
         </a>

@@ -18,6 +18,10 @@ class RequerimientoController extends Controller
         return view('requerimientos.requerimiento');
     }
 
+    public function index () {
+        return view('requerimientos.filtrar');
+    }
+
     /*-------------------------------------------------
     |  Guardar requerimiento
     *------------------------------------------------*/

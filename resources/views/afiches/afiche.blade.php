@@ -19,14 +19,10 @@ use Illuminate\Support\Str;
                         <p class="text-gray-600 mt-1">Crea afiches automáticamente basados en los requerimientos activos</p>
                     </div>
                     <div class="flex items-center space-x-4">
-                        <button onclick="generateAllPosters()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center space-x-2 transition-all duration-300 hover:-translate-y-1">
-                            <i class="fas fa-magic"></i>
-                            <span>Generar Todos</span>
-                        </button>
-                        <button onclick="showHistory()" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center space-x-2 transition-all duration-300 hover:-translate-y-1">
+                        <a href="{{ route('afiches.historial') }}" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center space-x-2 transition-all duration-300 hover:-translate-y-1">
                             <i class="fas fa-history"></i>
                             <span>Historial</span>
-                        </button>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -324,9 +320,6 @@ use Illuminate\Support\Str;
                 </div>
             </div>
         </div>
-
-        <!-- Modal de Historial, Loading, etc... IGUAL que tu versión anterior -->
-
     </div>
 
     <style>

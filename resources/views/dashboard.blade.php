@@ -117,15 +117,61 @@
                         <i class="fas fa-tachometer-alt"></i>
                         <span>DASHBOARD</span>
                     </a>
-                    <a href="{{ route('requerimientos.requerimiento') }}" class="flex items-center space-x-3 text-white/80 hover:text-white hover:bg-white/10 px-4 py-3 rounded-lg transition-colors">
-                        <i class="fas fa-file-alt"></i>
-                        <span>REQUERIMIENTOS</span>
-                    </a>
 
-                    <a href="{{ route('postulantes.registroSecundario') }}" class="flex items-center space-x-3 text-white/80 hover:text-white hover:bg-white/10 px-4 py-3 rounded-lg transition-colors">
-                        <i class="fas fa-users"></i>
-                        <span>POSTULANTES</span>
-                    </a>
+                    <div x-data="{ open: false }" class="relative">
+                        <!-- Botón principal -->
+                        <button @click="open = !open"
+                            class="flex items-center justify-between w-full space-x-3 text-white/80 hover:text-white hover:bg-white/10 px-4 py-3 rounded-lg transition-colors">
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-file-alt"></i>
+                                <span>REQUERIMIENTOS</span>
+                            </div>
+                            <i :class="open ? 'fa-chevron-up' : 'fa-chevron-down'" class="fas"></i>
+                        </button>
+
+                        <!-- Menú desplegable -->
+                        <div x-show="open"
+                            @click.away="open = false"
+                            x-transition
+                            class="absolute left-0 mt-1 w-48 bg-white rounded-lg shadow-lg z-20">
+                            <a href="{{ route('requerimientos.requerimiento') }}"
+                                class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors">
+                                <i class="fas fa-plus mr-2"></i> Crear Requerimiento
+                            </a>
+                            <a href="{{ route('requerimientos.filtrar') }}"
+                                class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors">
+                                <i class="fas fa-users mr-2"></i> Ver Requerimientos
+                            </a>
+                        </div>
+                    </div>
+
+                    <div x-data="{ open: false }" class="relative">
+                        <!-- Botón principal -->
+                        <button @click="open = !open"
+                            class="flex items-center justify-between w-full space-x-3 text-white/80 hover:text-white hover:bg-white/10 px-4 py-3 rounded-lg transition-colors">
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-users"></i>
+                                <span>POSTULANTES</span>
+                            </div>
+                            <i :class="open ? 'fa-chevron-up' : 'fa-chevron-down'" class="fas"></i>
+                        </button>
+
+                        <!-- Menú desplegable -->
+                        <div x-show="open"
+                            @click.away="open = false"
+                            x-transition
+                            class="absolute left-0 mt-1 w-48 bg-white rounded-lg shadow-lg z-20">
+                            <a href="{{ route('postulantes.crear') }}"
+                                class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors">
+                                <i class="fas fa-plus mr-2"></i> Crear Postulante
+                            </a>
+                            <a href="{{ route('postulantes.filtrar') }}"
+                                class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors">
+                                <i class="fas fa-users mr-2"></i> Ver Postulantes
+                            </a>
+                        </div>
+                    </div>
+
 
                     <a href="#" class="flex items-center space-x-3 text-white/80 hover:text-white hover:bg-white/10 px-4 py-3 rounded-lg transition-colors">
                         <i class="fas fa-calendar-check"></i>
@@ -211,9 +257,9 @@
                         <div class="text-center">
                             <i class="fas fa-plus-circle text-3xl mb-3"></i>
                             <h3 class="font-semibold mb-2">Acciones Rápidas</h3>
-                            <button class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg text-sm transition-colors">
-                                Nuevo Requerimiento
-                            </button>
+                            <a href="{{ route('requerimientos.requerimiento') }}" class="flex items-center space-x-3 text-white/80 hover:text-white hover:bg-white/10 px-4 py-3 rounded-lg transition-colors">
+                                <span> + Nuevo Requerimiento</span>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -258,8 +304,6 @@
                             @endforeach
                         </div>
                     </div>
-
-
 
                     <!-- Estado de Postulantes -->
                     <div class="bg-white rounded-2xl p-6 shadow-lg">
