@@ -9,6 +9,7 @@ use App\Http\Controllers\CargoController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\HistorialController;
 use App\Http\Controllers\PosterController;
+use App\Models\Requerimiento;
 
 Route::get('/', function () {
   return view('welcome');
@@ -31,6 +32,7 @@ Route::middleware('auth')->group(function () {
   Route::get('/postulantes/filtrar', [PostulanteController::class, 'filtrar'])->name('postulantes.filtrar');
   Route::post('/postulantesInterno', [PostulanteController::class, 'store'])->name('postulantes.store');
   Route::get('/postulantes/registro', [PostulanteController::class, 'mostrar'])->name('postulantes.registroPrimario');
+  Route::get('/postulantes/ver', [PostulanteController::class, 'ver'])->name('postulantes.ver');
   Route::delete('/postulantes/{postulante}', [PostulanteController::class, 'destroy'])->name('postulantes.destroy');
   Route::get('/postulantes/{postulante}/edit', [PostulanteController::class, 'edit'])->name('postulantes.edit');
   Route::put('/postulantes/{postulante}', [PostulanteController::class, 'update'])->name('postulantes.update');
@@ -39,7 +41,12 @@ Route::middleware('auth')->group(function () {
  // RUTAS PARA REQUERIMIENTOS
   Route::get('/requerimientos/registro', [RequerimientoController::class, 'mostrar'])->name('requerimientos.requerimiento');
   Route::post('/requerimientos', [RequerimientoController::class, 'store'])->name('requerimientos.store');
-  Route::get('/requerimientos/filtrar', [RequerimientoController::class, 'index'])->name('requerimientos.filtrar');
+  Route::get('/requerimientos/filtrar', [RequerimientoController::class, 'filtrar'])->name('requerimientos.filtrar');
+   Route::delete('/requerimientos/{requerimiento}', [RequerimientoController::class, 'destroy'])->name('requerimientos.destroy');
+  Route::get('/requerimientos/{requerimiento}/edit', [RequerimientoController::class, 'edit'])->name('requerimientos.edit');
+  Route::put('/requerimientos/{requerimiento}', [RequerimientoController::class, 'update'])->name('requerimientos.update');
+
+
    
 
   Route::get('/cargos', [CargoController::class, 'index']);

@@ -172,6 +172,10 @@
                         </div>
                     </div>
 
+                    <a href="{{ route('afiches.index') }}" class="flex items-center space-x-3 text-white/80 hover:text-white hover:bg-white/10 px-4 py-3 rounded-lg transition-colors">
+                        <i class="fas fa-image"></i>
+                        <span>AFICHES</span>
+                    </a>
 
                     <a href="#" class="flex items-center space-x-3 text-white/80 hover:text-white hover:bg-white/10 px-4 py-3 rounded-lg transition-colors">
                         <i class="fas fa-calendar-check"></i>
@@ -180,10 +184,6 @@
                     <a href="#" class="flex items-center space-x-3 text-white/80 hover:text-white hover:bg-white/10 px-4 py-3 rounded-lg transition-colors">
                         <i class="fas fa-handshake"></i>
                         <span>CONTRATACIONES</span>
-                    </a>
-                    <a href="{{ route('afiches.index') }}" class="flex items-center space-x-3 text-white/80 hover:text-white hover:bg-white/10 px-4 py-3 rounded-lg transition-colors">
-                        <i class="fas fa-image"></i>
-                        <span>AFICHES</span>
                     </a>
                     <a href="#" class="flex items-center space-x-3 text-white/80 hover:text-white hover:bg-white/10 px-4 py-3 rounded-lg transition-colors">
                         <i class="fas fa-cog"></i>

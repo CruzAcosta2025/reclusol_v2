@@ -26,6 +26,11 @@ class PostulanteController extends Controller
         return view('postulantes.registroPrimario');
     }
 
+    public function ver()
+    {
+        return view('postulantes.selection');
+    }
+
     /*-------------------------------------------------
     |  Guardar postulante
     *------------------------------------------------*/
