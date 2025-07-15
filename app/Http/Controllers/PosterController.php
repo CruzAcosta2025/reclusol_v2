@@ -9,17 +9,163 @@ use Illuminate\Support\Facades\Response;
 use Intervention\Image\Laravel\Facades\Image;
 use Intervention\Image\Encoders\PngEncoder;
 use Intervention\Image\Encoders\JpegEncoder;
+use Illuminate\Support\Facades\DB;
 
 class PosterController extends Controller
 {
     public function index()
     {
+        // Traer requerimientos
         $requerimientos = Requerimiento::orderByDesc('created_at')->get();
+
+        // Cargar catálogos
+        $cargos = DB::connection('si_solmar')
+            ->table('CARGOS')
+            ->select('CODI_CARG', 'DESC_CARGO')
+            ->where('CARG_VIGENCIA', 'SI')
+            ->get()
+            ->keyBy(function ($item) {
+                return ltrim($item->CODI_CARG, '0');
+            });
+
+        $sucursales = DB::connection('si_solmar')
+            ->table('SISO_SUCURSAL')
+            ->select('SUCU_CODIGO', 'SUCU_DESCRIPCION')
+            ->where('SUCU_VIGENCIA', 'SI')
+            ->get()
+            ->keyBy(function ($item) {
+                return ltrim($item->SUCU_CODIGO, '0');
+            });
+
+        $departamentos = DB::connection('si_solmar')
+            ->table('ADMI_DEPARTAMENTO')
+            ->select('DEPA_CODIGO', 'DEPA_DESCRIPCION')
+            ->where('DEPA_VIGENCIA', 'SI')
+            ->orderBy('DEPA_DESCRIPCION')
+            ->get()
+            ->keyBy(function ($item) {
+                return ltrim($item->DEPA_CODIGO, '0');
+            });
+
+        $provincias = DB::connection('si_solmar')
+            ->table('ADMI_PROVINCIA')
+            ->select('PROVI_CODIGO', 'PROVI_DESCRIPCION', 'DEPA_CODIGO')
+            ->where('PROVI_VIGENCIA', 'SI')
+            ->orderBy('PROVI_DESCRIPCION')
+            ->get()
+            ->keyBy(function ($item) {
+                return ltrim($item->PROVI_CODIGO, '0');
+            });
+
+        $distritos = DB::connection('si_solmar')
+            ->table('ADMI_DISTRITO')
+            ->select('DIST_CODIGO', 'DIST_DESCRIPCION', 'PROVI_CODIGO')
+            ->where('DIST_VIGENCIA', 'SI')
+            ->orderBy('DIST_DESCRIPCION')
+            ->get()
+            ->keyBy('DIST_CODIGO');
+             
+
+
+        // Mapear nombres legibles
+        foreach ($requerimientos as $r) {
+            $codigoCargo = ltrim((string)$r->cargo_solicitado, '0');
+            $codigoSucursal = ltrim((string)$r->sucursal, '0');
+            $codigoDepartamento = ltrim((string)$r->departamento, '0');
+            $codigoProvincia = ltrim((string)$r->provincia, '0');
+            $codigoDistrito = (string)$r->distrito;
+            
+
+            $r->cargo_nombre = $cargos->get($codigoCargo)?->DESC_CARGO ?? $r->cargo_solicitado;
+            $r->sucursal_nombre = $sucursales->get($codigoSucursal)?->SUCU_DESCRIPCION ?? $r->sucursal;
+            $r->departamento_nombre = $departamentos->get($codigoDepartamento)?->DEPA_DESCRIPCION ?? $r->departamento;
+            $r->provincia_nombre = $provincias->get($codigoProvincia)?->PROVI_DESCRIPCION ?? $r->provincia;
+            $r->distrito_nombre = $distritos->get($codigoDistrito)?->DIST_DESCRIPCION ?? $r->distrito;
+
+        }
+
         return view('afiches.afiche', compact('requerimientos'));
     }
 
+
     public function show(Request $request, Requerimiento $req, string $template)
     {
+        // Cargar catálogos
+        $cargos = DB::connection('si_solmar')
+            ->table('CARGOS')
+            ->select('CODI_CARG', 'DESC_CARGO')
+            ->where('CARG_VIGENCIA', 'SI')
+            ->get()
+            ->keyBy(function ($item) {
+                return ltrim($item->CODI_CARG, '0');
+            });
+
+        $sucursales = DB::connection('si_solmar')
+            ->table('SISO_SUCURSAL')
+            ->select('SUCU_CODIGO', 'SUCU_DESCRIPCION')
+            ->where('SUCU_VIGENCIA', 'SI')
+            ->get()
+            ->keyBy(function ($item) {
+                return ltrim($item->SUCU_CODIGO, '0');
+            });
+
+        $nivelEducativo = DB::connection('si_solmar')
+            ->table('SUNAT_NIVEL_EDUCATIVO')
+            ->select('NIED_CODIGO', 'NIED_DESCRIPCION')
+            ->get()
+            ->keyBy('NIED_CODIGO');
+
+        $departamentos = DB::connection('si_solmar')
+            ->table('ADMI_DEPARTAMENTO')
+            ->select('DEPA_CODIGO', 'DEPA_DESCRIPCION')
+            ->where('DEPA_VIGENCIA', 'SI')
+            ->orderBy('DEPA_DESCRIPCION')
+            ->get()
+            ->keyBy(function ($item) {
+                return ltrim($item->DEPA_CODIGO, '0');
+            });
+
+
+        $provincias = DB::connection('si_solmar')
+            ->table('ADMI_PROVINCIA')
+            ->select('PROVI_CODIGO', 'PROVI_DESCRIPCION', 'DEPA_CODIGO')
+            ->where('PROVI_VIGENCIA', 'SI')
+            ->orderBy('PROVI_DESCRIPCION')
+            ->get()
+            ->keyBy(function ($item) {
+                return ltrim($item->PROVI_CODIGO, '0');
+            });
+
+
+
+        $distritos = DB::connection('si_solmar')
+            ->table('ADMI_DISTRITO')
+            ->select('DIST_CODIGO', 'DIST_DESCRIPCION', 'PROVI_CODIGO')
+            ->where('DIST_VIGENCIA', 'SI')
+            ->orderBy('DIST_DESCRIPCION')
+            ->get()
+            ->keyBy(function ($item) {
+                return ltrim($item->DIST_CODIGO, '0');
+            });
+
+
+
+        // Mapear nombres legibles
+        $codigoCargo = ltrim((string)$req->cargo_solicitado, '0');
+        $codigoSucursal = ltrim((string)$req->sucursal, '0');
+        $codigoNivelEducativo = (string)$req->nivel_estudios;
+        $codigoDepartamento = ltrim((string)$req->departamento, '0');
+        $codigoProvincia = ltrim((string)$req->provincia, '0');
+        $codigoDistrito = ltrim((string)$req->distrito, '0');
+
+        $req->cargo_nombre = $cargos->get($codigoCargo)?->DESC_CARGO ?? $req->cargo_solicitado;
+        $req->sucursal_nombre = $sucursales->get($codigoSucursal)?->SUCU_DESCRIPCION ?? $req->sucursal;
+        $req->nivel_estudio = $nivelEducativo->get($codigoNivelEducativo)?->NIED_DESCRIPCION ?? $req->nivel_estudios;
+        $req->nombre_departamento = $departamentos->get($codigoDepartamento)?->DEPA_DESCRIPCION ?? $req->departamento;
+        $req->nombre_provincia = $provincias->get($codigoProvincia)?->PROVI_DESCRIPCION ?? $req->provinca;
+        $req->nombre_distrito = $distritos->get($codigoDistrito)?->DIST_DESCRIPCION ?? $req->distrito;
+
+
         // Recoger íconos y fuente (con valores por defecto)
         $iconGPath     = $request->string('iconG',    'assets/images/guardia.png');          // Ícono grande principal
         $iconCheckPath = $request->string('iconCheck', 'assets/icons/icon_check1.png');        // Ícono de check (requisitos)
@@ -78,7 +224,7 @@ class PosterController extends Controller
             140
         );
         $bg->text(
-            "{$req->cliente} – {$req->sucursal}",
+            "{$req->nombre_provincia} – {$req->nombre_distrito}",
             200,
             170,
             fn($f) => $this->font($f, $fontFull, 36, '#FFFFFF')
@@ -99,8 +245,8 @@ class PosterController extends Controller
 
         // Cargo
         $bg->text(
-            "REQUIERE {$req->cargo_solicitado}",
-            600,
+            "REQUIERE {$req->cargo_nombre}",
+            620,
             350,
             fn($f) => $this->font($f, $fontFull, 38, '#ccd1d1')
         );
@@ -112,7 +258,7 @@ class PosterController extends Controller
         // Título requisitos
         $bg->text(
             'Requisitos:',
-            520,
+            510,
             400,
             fn($f) => $this->font($f, $fontFull, 35, '#f4d03f')
         );
@@ -183,7 +329,7 @@ class PosterController extends Controller
     private function dibujarRequisitos($bg, Requerimiento $req, string $fontFull, string $iconCheckFull): void
     {
         $lines = [
-            "Estudios mínimos: {$req->nivel_estudios}",
+            "Estudios mínimos: {$req->nivel_estudio}",
             "Vacantes: {$req->cantidad_requerida}",
             "Fecha límite: " . ($req->fecha_limite?->format('d/m/Y') ?? 'No definida'),
             "Edad: {$req->edad_minima} - {$req->edad_maxima}",

@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Requerimiento;
+use App\Models\EstadoRequerimiento;
+use App\Models\PrioridadRequerimiento;
 use Illuminate\Http\Request;
 //use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+
 
 class RequerimientoController extends Controller
 {
@@ -15,7 +18,9 @@ class RequerimientoController extends Controller
     *------------------------------------------------*/
     public function mostrar()
     {
-        return view('requerimientos.requerimiento');
+        $estados = EstadoRequerimiento::all();
+        $prioridades = PrioridadRequerimiento::all();
+        return view('requerimientos.requerimiento', compact('estados','prioridades'));
     }
 
     public function index()
@@ -32,7 +37,11 @@ class RequerimientoController extends Controller
         $validated = $request->validate([
             'area_solicitante'           => 'required|string|max:50',
             'sucursal'                   => 'required|string|max:50',
+            'distrito'                   => 'required|string|max:50',
+            'provincia'                  => 'required|string|max:50',
+            'departamento'               => 'required|string|max:50',
             'cliente'                    => 'required|string|max:50',
+            'tipo_cargo'                 => 'required|string|max:50',
             'cargo_solicitado'           => 'required|string|max:50',
             'cantidad_requerida'         => 'required|integer|min:1|max:255',
             'fecha_limite'               => 'required|date|after_or_equal:today',
@@ -45,7 +54,8 @@ class RequerimientoController extends Controller
             'requisitos_adicionales'     => 'nullable|string',
             'validado_rrhh'              => 'boolean',
             'escala_remunerativa'        => 'required|string|max:10',
-            'prioridad'                  => 'nullable|string|max:50',
+            'prioridad'                  => 'required|exists:prioridad_requerimiento,id',
+            'estado'                     => 'required|exists:estado_requerimiento,id',
         ]);
 
         /* ---------- 2. TRANSFORMAR CHECKBOX ---------- */
@@ -70,9 +80,14 @@ class RequerimientoController extends Controller
         }
     }
 
+
+    //REVIEW FILTRAR
+
     public function filtrar(Request $request)
     {
-        $query = Requerimiento::query();
+        //$query = Requerimiento::query();
+        $query = Requerimiento::with('estado');
+
 
         // Filtros dinámicos
         if ($request->filled('sucursal')) {
@@ -87,6 +102,9 @@ class RequerimientoController extends Controller
             $query->where('area_solicitante', $request->area_solicitante);
         }
 
+        if ($request->filled('tipo_cargo')) {
+            $query->where('tipo_Cargo', $request->tipo_cargo);
+        }
 
         if ($request->filled('cargo_solicitado')) {
             $query->where('cargo_solicitado', $request->cargo_solicitado);
@@ -95,6 +113,17 @@ class RequerimientoController extends Controller
         if ($request->filled('estado')) {
             $query->where('estado', $request->estado);
         }
+
+        if ($request->filled('departamento')) {
+            $query->where('departamento', $request->departamento);
+        }
+        if ($request->filled('provincia')) {
+            $query->where('provincia', $request->provincia);
+        }
+        if ($request->filled('distrito')) {
+            $query->where('distrito', $request->distrito);
+        }
+
 
         if ($request->filled('buscar')) {
             $search = $request->buscar;
@@ -110,13 +139,169 @@ class RequerimientoController extends Controller
         // Paginación
         $requerimientos = $query->paginate(15)->withQueryString();
 
-        return view('requerimientos.filtrar', compact('requerimientos'));
+        /*-------------------------------------------------
+        |   Mapeo de nombres legibles
+        -------------------------------------------------*/
+        // Cargar catálogos
+
+        $tipoCargos = DB::connection('si_solmar')
+            ->table('TIPO_CARGO')
+            ->select('CODI_TIPO_CARG', 'DESC_TIPO_CARG')
+            //>where('CARG_VIGENCIA', 'SI')
+            ->get()
+            ->keyBy('CODI_TIPO_CARG');
+
+        $cargos = DB::connection('si_solmar')
+            ->table('CARGOS')
+            ->select('CODI_CARG', 'DESC_CARGO', 'TIPO_CARG')
+            ->where('CARG_VIGENCIA', 'SI')
+            ->get()
+            ->keyBy('CODI_CARG');
+
+        $sucursales = DB::connection('si_solmar')
+            ->table('SISO_SUCURSAL')
+            ->select('SUCU_CODIGO', 'SUCU_DESCRIPCION')
+            ->where('SUCU_VIGENCIA', 'SI')
+            ->get()
+            ->keyBy('SUCU_CODIGO');
+
+        $departamentos = DB::connection('si_solmar')
+            ->table('ADMI_DEPARTAMENTO')
+            ->select('DEPA_CODIGO', 'DEPA_DESCRIPCION')
+            ->where('DEPA_VIGENCIA', 'SI')
+            ->orderBy('DEPA_DESCRIPCION')
+            ->get()
+            ->keyBy('DEPA_CODIGO');
+
+
+        $provincias = DB::connection('si_solmar')
+            ->table('ADMI_PROVINCIA')
+            ->select('PROVI_CODIGO', 'PROVI_DESCRIPCION', 'DEPA_CODIGO')
+            ->where('PROVI_VIGENCIA', 'SI')
+            ->orderBy('PROVI_DESCRIPCION')
+            ->get()
+            ->keyBy('PROVI_CODIGO');
+
+        $distritos = DB::connection('si_solmar')
+            ->table('ADMI_DISTRITO')
+            ->select('DIST_CODIGO', 'DIST_DESCRIPCION', 'PROVI_CODIGO')
+            ->where('DIST_VIGENCIA', 'SI')
+            ->orderBy('DIST_DESCRIPCION')
+            ->get()
+            ->keyBy('DIST_CODIGO');
+
+
+        // Mapear nombres legibles con str_pad
+        foreach ($requerimientos as $r) {
+            // Convertir a string sin ceros a la izquierda
+            $codigoTipoCargo = (string) $r->tipo_cargo;
+            $codigoCargo = (string)$r->cargo_solicitado;
+            $codigoSucursal = (string)$r->sucursal;
+            $codigoDepartamento = (string)$r->departamento;
+            $codigoProvincia = (string)$r->provincia;
+            $codigoDistrito = (string)$r->distrito;
+
+
+            // Buscar normalizado
+            $r->tipo_cargo_nombre = $tipoCargos->get($codigoTipoCargo)?->DESC_TIPO_CARG ?? $r->tipo_cargo;
+            $r->cargo_nombre = $cargos->get($codigoCargo)?->DESC_CARGO ?? $r->cargo_solicitado;
+            $r->sucursal_nombre = $sucursales->get($codigoSucursal)?->SUCU_DESCRIPCION ?? $r->sucursal;
+            $r->departamento_nombre = $departamentos->get($codigoDepartamento)?->DEPA_DESCRIPCION ?? $r->departamento;
+            $r->provincia_nombre = $provincias->get($codigoProvincia)?->PROVI_DESCRIPCION ?? $r->provincia;
+            $r->distrito_nombre = $distritos->get($codigoDistrito)?->DIST_DESCRIPCION ?? $r->distrito;
+        }
+
+        // Contar total general
+        $requerimientosProcesos = Requerimiento::where('estado', 1)->count();
+
+        // Contar cubiertos
+        $requerimientosCubiertos = Requerimiento::where('estado', 2)->count(); // suponiendo que estado 2 = Cubierto
+
+        // Contar cancelados
+        $requerimientosCancelados = Requerimiento::where('estado', 3)->count(); // estado 3 = Cancelado
+
+        // Contar vencidos
+        $requerimientosVencidos = Requerimiento::where('estado', 4)->count(); // estado 4 = Vencido
+
+
+        return view('requerimientos.filtrar', compact(
+            'requerimientos',
+            'tipoCargos',
+            'cargos',
+            'sucursales',
+            'departamentos',
+            'provincias',
+            'distritos',
+            'requerimientosProcesos',
+            'requerimientosCubiertos',
+            'requerimientosCancelados',
+            'requerimientosVencidos'
+        ));
     }
+
 
     public function edit(Requerimiento $requerimiento)
     {
-        // resources/views/postulantes/partials/form-edit.blade.php
-        return view('requerimientos.partials.form-edit', compact('requerimiento'));
+        $estados = EstadoRequerimiento::all();
+
+        $sucursales = DB::connection('si_solmar')
+            ->table('SISO_SUCURSAL')
+            ->select('SUCU_CODIGO', 'SUCU_DESCRIPCION')
+            ->where('SUCU_VIGENCIA', 'SI')
+            ->get();
+
+        $tipoCargos = DB::connection('si_solmar')
+            ->table('TIPO_CARGO')
+            ->select('CODI_TIPO_CARG', 'DESC_TIPO_CARG')
+            ->get();
+
+        $cargos = DB::connection('si_solmar')
+            ->table('CARGOS')
+            ->select('CODI_CARG', 'DESC_CARGO', 'TIPO_CARG')
+            ->where('CARG_VIGENCIA', 'SI')
+            ->get();
+
+        $nivelEducativo = DB::connection('si_solmar')
+            ->table('SUNAT_NIVEL_EDUCATIVO')
+            ->select('NIED_CODIGO', 'NIED_DESCRIPCION')
+            ->get();
+
+        $departamentos = DB::connection('si_solmar')
+            ->table('ADMI_DEPARTAMENTO')
+            ->select('DEPA_CODIGO', 'DEPA_DESCRIPCION')
+            ->where('DEPA_VIGENCIA', 'SI')
+            ->orderBy('DEPA_DESCRIPCION')
+            ->get()
+            ->keyBy('DEPA_CODIGO');
+
+
+        $provincias = DB::connection('si_solmar')
+            ->table('ADMI_PROVINCIA')
+            ->select('PROVI_CODIGO', 'PROVI_DESCRIPCION', 'DEPA_CODIGO')
+            ->where('PROVI_VIGENCIA', 'SI')
+            ->orderBy('PROVI_DESCRIPCION')
+            ->get()
+            ->keyBy('PROVI_CODIGO');
+
+        $distritos = DB::connection('si_solmar')
+            ->table('ADMI_DISTRITO')
+            ->select('DIST_CODIGO', 'DIST_DESCRIPCION', 'PROVI_CODIGO')
+            ->where('DIST_VIGENCIA', 'SI')
+            ->orderBy('DIST_DESCRIPCION')
+            ->get()
+            ->keyBy('DIST_CODIGO');
+
+        return view('requerimientos.partials.form-edit', compact(
+            'requerimiento',
+            'estados',
+            'sucursales',
+            'tipoCargos',
+            'cargos',
+            'nivelEducativo',
+            'departamentos',
+            'provincias',
+            'distritos'
+        ));
     }
 
     /**
@@ -127,8 +312,12 @@ class RequerimientoController extends Controller
         // 1. Validar sólo los campos editables
         $data = $request->validate([
             'area_solicitante'           => 'required|string|max:50',
-            'sucursal'                   => 'required|string|max:50',
+            'distrito'                   => 'required|string|max:50',
+            'provincia'                  => 'required|string|max:50',
+            'departamento'               => 'required|string|max:50',
             'cliente'                    => 'required|string|max:50',
+            'tipo_cargo'                 => 'required|string|max:50',
+            'sucursal'                   => 'required|string|max:50',
             'cargo_solicitado'           => 'required|string|max:50',
             'cantidad_requerida'         => 'required|integer|min:1|max:255',
             'fecha_limite'               => 'required|date|after_or_equal:today',
@@ -141,7 +330,9 @@ class RequerimientoController extends Controller
             'requisitos_adicionales'     => 'nullable|string',
             //'validado_rrhh'              => 'boolean',
             //'escala_remunerativa'        => 'required|string|max:10',
-            'prioridad'                  => 'nullable|string|max:50',
+            'prioridad'                  => 'required|exists:prioridad_requerimiento,id',
+            'estado'                     => 'required|exists:estado_requerimiento,id',
+
         ]);
 
         // 2. Actualizar

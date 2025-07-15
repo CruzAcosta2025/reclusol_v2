@@ -289,7 +289,7 @@
 
                             <div class="flex items-center justify-between">
                                 <span class="text-gray-600 capitalize">
-                                    {{ strtolower($sede->ciudad) }}
+                                    {{ strtolower($sede->nombre_departamento) }}
                                 </span>
 
                                 <div class="flex items-center space-x-3 flex-1 mx-4">

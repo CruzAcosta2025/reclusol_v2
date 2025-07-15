@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,10 +11,10 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-    
+
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    
+
     <!-- Tailwind CSS -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 
@@ -21,22 +22,27 @@
         .gradient-bg {
             background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #1d4ed8 100%);
         }
+
         .form-input {
             transition: all 0.3s ease;
         }
+
         .form-input:focus {
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(59, 130, 246, 0.15);
         }
+
         .btn-primary {
             transition: all 0.3s ease;
         }
+
         .btn-primary:hover {
             transform: translateY(-1px);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
         }
     </style>
 </head>
+
 <body class="font-sans antialiased">
     <div class="min-h-screen gradient-bg py-8">
         <!-- Back to Home Button -->
@@ -75,9 +81,9 @@
          </div>
           @endif -->
 
-        <form method="POST" action="{{ route('postulantes.store') }}" enctype="multipart/form-data" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"  id="postulanteForm">
+        <form method="POST" action="{{ route('postulantes.store') }}" enctype="multipart/form-data" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" id="postulanteForm">
             @csrf
-            
+
             <!-- Step 1: Información Personal -->
             <div id="step-1" class="form-step">
                 <div class="bg-white rounded-3xl shadow-2xl p-8 mb-8">
@@ -98,14 +104,13 @@
                                 <i class="fas fa-user mr-2 text-blue-500"></i>
                                 Nombres *
                             </label>
-                            <input 
-                                type="text" 
-                                id="nombres" 
-                                name="nombres" 
-                                required 
+                            <input
+                                type="text"
+                                id="nombres"
+                                name="nombres"
+                                required
                                 class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300"
-                                placeholder="Ingresa tus nombres"
-                            >
+                                placeholder="Ingresa tus nombres">
                             <span class="error-message text-red-500 text-sm hidden"></span>
                         </div>
 
@@ -115,14 +120,13 @@
                                 <i class="fas fa-user mr-2 text-blue-500"></i>
                                 Apellidos *
                             </label>
-                            <input 
-                                type="text" 
-                                id="apellidos" 
-                                name="apellidos" 
-                                required 
+                            <input
+                                type="text"
+                                id="apellidos"
+                                name="apellidos"
+                                required
                                 class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300"
-                                placeholder="Ingresa tus apellidos"
-                            >
+                                placeholder="Ingresa tus apellidos">
                             <span class="error-message text-red-500 text-sm hidden"></span>
                         </div>
 
@@ -132,16 +136,15 @@
                                 <i class="fas fa-id-card mr-2 text-blue-500"></i>
                                 DNI *
                             </label>
-                            <input 
-                                type="text" 
-                                id="dni" 
-                                name="dni" 
-                                required 
+                            <input
+                                type="text"
+                                id="dni"
+                                name="dni"
+                                required
                                 maxlength="8"
                                 pattern="[0-9]{8}"
                                 class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300"
-                                placeholder="12345678"
-                            >
+                                placeholder="12345678">
                             <span class="error-message text-red-500 text-sm hidden"></span>
                         </div>
 
@@ -151,31 +154,49 @@
                                 <i class="fas fa-calendar mr-2 text-blue-500"></i>
                                 Edad *
                             </label>
-                            <input 
-                                type="number" 
-                                id="edad" 
-                                name="edad" 
-                                required 
-                                min="18" 
+                            <input
+                                type="number"
+                                id="edad"
+                                name="edad"
+                                required
+                                min="18"
                                 max="65"
                                 class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300"
-                                placeholder="25"
-                            >
+                                placeholder="25">
                             <span class="error-message text-red-500 text-sm hidden"></span>
                         </div>
 
-                        <!-- Ciudad -->
+
+                        <!-- Departamento -->
+                        <div class="space-y-2">
+                            <label for="departamento" class="block text-sm font-semibold text-gray-700">
+                                <i class="fas fa-city mr-2 text-blue-500"></i>
+                                Departamento *
+                            </label>
+                            <select
+                                id="departamento"
+                                name="departamento"
+                                required
+                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300">
+                                <option value="">Selecciona un departamento</option>
+                                @foreach($departamentos as $dep)
+                                <option value="{{ $dep->DEPA_CODIGO }}">{{ $dep->DEPA_DESCRIPCION }}</option>
+                                @endforeach
+                            </select>
+                            <span class="error-message text-red-500 text-sm hidden"></span>
+                        </div>
+
+                        <!-- Ciudad 
                         <div class="space-y-2">
                             <label for="ciudad" class="block text-sm font-semibold text-gray-700">
                                 <i class="fas fa-city mr-2 text-blue-500"></i>
-                                Ciudad *
+                                Departamento *
                             </label>
-                            <select 
-                                id="ciudad" 
-                                name="ciudad" 
-                                required 
-                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300"
-                            >
+                            <select
+                                id="ciudad"
+                                name="ciudad"
+                                required
+                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300">
                                 <option value="">Selecciona tu ciudad</option>
                                 <option value="lima">Lima</option>
                                 <option value="chimbote">Chimbote</option>
@@ -183,22 +204,37 @@
                                 <option value="moquegua">Moquegua</option>
                             </select>
                             <span class="error-message text-red-500 text-sm hidden"></span>
-                        </div>
+                        </div> -->
 
-                        <!-- Distrito -->
+                        <!-- Distrito 
                         <div class="space-y-2">
                             <label for="distrito" class="block text-sm font-semibold text-gray-700">
                                 <i class="fas fa-map-marker-alt mr-2 text-blue-500"></i>
-                                Distrito *
+                                Provincia *
                             </label>
-                            <input 
-                                type="text" 
-                                id="distrito" 
-                                name="distrito" 
-                                required 
+                            <input
+                                type="text"
+                                id="distrito"
+                                name="distrito"
+                                required
                                 class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300"
-                                placeholder="Ingresa tu distrito"
-                            >
+                                placeholder="Ingresa tu distrito">
+                            <span class="error-message text-red-500 text-sm hidden"></span>
+                        </div> -->
+
+                        <!-- Provincia -->
+                        <div class="space-y-2">
+                            <label for="provincia" class="block text-sm font-semibold text-gray-700">
+                                <i class="fas fa-map-marker-alt mr-2 text-blue-500"></i>
+                                Provincia *
+                            </label>
+                            <select
+                                id="provincia"
+                                name="provincia"
+                                required
+                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300">
+                                <option value="">Selecciona una provincia</option>
+                            </select>
                             <span class="error-message text-red-500 text-sm hidden"></span>
                         </div>
 
@@ -208,15 +244,14 @@
                                 <i class="fas fa-phone mr-2 text-blue-500"></i>
                                 Celular *
                             </label>
-                            <input 
-                                type="tel" 
-                                id="celular" 
-                                name="celular" 
-                                required 
+                            <input
+                                type="tel"
+                                id="celular"
+                                name="celular"
+                                required
                                 pattern="[0-9]{9}"
                                 class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300"
-                                placeholder="987654321"
-                            >
+                                placeholder="987654321">
                             <span class="error-message text-red-500 text-sm hidden"></span>
                         </div>
 
@@ -226,14 +261,13 @@
                                 <i class="fas fa-phone-alt mr-2 text-blue-500"></i>
                                 Celular de Referencia
                             </label>
-                            <input 
-                                type="tel" 
-                                id="celular_referencia" 
-                                name="celular_referencia" 
+                            <input
+                                type="tel"
+                                id="celular_referencia"
+                                name="celular_referencia"
                                 pattern="[0-9]{9}"
                                 class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300"
-                                placeholder="987654321"
-                            >
+                                placeholder="987654321">
                         </div>
 
                         <!-- Estado Civil -->
@@ -242,12 +276,11 @@
                                 <i class="fas fa-heart mr-2 text-blue-500"></i>
                                 Estado Civil *
                             </label>
-                            <select 
-                                id="estado_civil" 
-                                name="estado_civil" 
-                                required 
-                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300"
-                            >
+                            <select
+                                id="estado_civil"
+                                name="estado_civil"
+                                required
+                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300">
                                 <option value="">Selecciona tu estado civil</option>
                                 <option value="soltero">Soltero(a)</option>
                                 <option value="casado">Casado(a)</option>
@@ -263,12 +296,11 @@
                                 <i class="fas fa-flag mr-2 text-blue-500"></i>
                                 Nacionalidad *
                             </label>
-                            <select 
-                                id="nacionalidad" 
-                                name="nacionalidad" 
-                                required 
-                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300"
-                            >
+                            <select
+                                id="nacionalidad"
+                                name="nacionalidad"
+                                required
+                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300">
                                 <option value="">Selecciona tu nacionalidad</option>
                                 <option value="peruana">Peruana</option>
                                 <option value="extranjera">Extranjera</option>
@@ -306,12 +338,11 @@
                                 <i class="fas fa-user-tie mr-2 text-green-500"></i>
                                 Cargo al que postula *
                             </label>
-                            <select 
-                                id="cargo" 
-                                name="cargo" 
-                                required 
-                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all duration-300"
-                            >
+                            <select
+                                id="cargo"
+                                name="cargo"
+                                required
+                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all duration-300">
                                 <option value="">Selecciona el cargo</option>
                                 <option value="agente_seguridad">Agente de Seguridad</option>
                                 <option value="supervisor">Supervisor</option>
@@ -327,14 +358,13 @@
                                 <i class="fas fa-calendar-alt mr-2 text-green-500"></i>
                                 Fecha que postula *
                             </label>
-                            <input 
-                                type="date" 
-                                id="fecha_postula" 
-                                name="fecha_postula" 
-                                required 
+                            <input
+                                type="date"
+                                id="fecha_postula"
+                                name="fecha_postula"
+                                required
                                 value="{{ date('Y-m-d') }}"
-                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all duration-300"
-                            >
+                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all duration-300">
                             <span class="error-message text-red-500 text-sm hidden"></span>
                         </div>
 
@@ -344,12 +374,11 @@
                                 <i class="fas fa-clock mr-2 text-green-500"></i>
                                 Tiempo de experiencia en el cargo *
                             </label>
-                            <select 
-                                id="experiencia_rubro" 
-                                name="experiencia_rubro" 
-                                required 
-                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all duration-300"
-                            >
+                            <select
+                                id="experiencia_rubro"
+                                name="experiencia_rubro"
+                                required
+                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all duration-300">
                                 <option value="">Selecciona tu experiencia</option>
                                 <option value="sin_experiencia">Sin experiencia</option>
                                 <option value="menos_1_año">Menos de 1 año</option>
@@ -361,36 +390,34 @@
                         </div>
 
                         <!-- SUCAMEC -->
-                    <div class="space-y-2">
-                        <label for="sucamec" class="block text-sm font-semibold text-gray-700">
-                         <i class="fas fa-shield-alt mr-2 text-green-500"></i>
-                          SUCAMEC vigente o no vigente *
-                          </label>
-                        <select 
-                          id="sucamec" 
-                          name="sucamec" 
-                          required 
-                          class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all duration-300"
-                        >
-                         <option value="">Selecciona estado SUCAMEC</option>
-                         <option value="vigente">Vigente</option>
-                         <option value="no_vigente">No vigente</option>
-                          <option value="no_tiene">No tiene</option>
-                        </select>
-                          <x-input-error :messages="$errors->get('sucamec')" class="mt-2" />
-                    </div>
+                        <div class="space-y-2">
+                            <label for="sucamec" class="block text-sm font-semibold text-gray-700">
+                                <i class="fas fa-shield-alt mr-2 text-green-500"></i>
+                                SUCAMEC vigente o no vigente *
+                            </label>
+                            <select
+                                id="sucamec"
+                                name="sucamec"
+                                required
+                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all duration-300">
+                                <option value="">Selecciona estado SUCAMEC</option>
+                                <option value="vigente">Vigente</option>
+                                <option value="no_vigente">No vigente</option>
+                                <option value="no_tiene">No tiene</option>
+                            </select>
+                            <x-input-error :messages="$errors->get('sucamec')" class="mt-2" />
+                        </div>
                         <!-- Grado de instrucción -->
                         <div class="space-y-2">
                             <label for="grado_instruccion" class="block text-sm font-semibold text-gray-700">
                                 <i class="fas fa-graduation-cap mr-2 text-green-500"></i>
                                 Grado de instrucción *
                             </label>
-                            <select 
-                                id="grado_instruccion" 
-                                name="grado_instruccion" 
-                                required 
-                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all duration-300"
-                            >
+                            <select
+                                id="grado_instruccion"
+                                name="grado_instruccion"
+                                required
+                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all duration-300">
                                 <option value="">Selecciona tu grado de instrucción</option>
                                 <option value="primaria">Primaria</option>
                                 <option value="secundaria">Secundaria</option>
@@ -407,12 +434,11 @@
                                 <i class="fas fa-medal mr-2 text-green-500"></i>
                                 Servicio militar *
                             </label>
-                            <select 
-                                id="servicio_militar" 
-                                name="servicio_militar" 
-                                required 
-                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all duration-300"
-                            >
+                            <select
+                                id="servicio_militar"
+                                name="servicio_militar"
+                                required
+                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all duration-300">
                                 <option value="">Selecciona estado del servicio militar</option>
                                 <option value="cumplido">Cumplido</option>
                                 <option value="no_cumplido">No cumplido</option>
@@ -427,12 +453,11 @@
                                 <i class="fas fa-certificate mr-2 text-green-500"></i>
                                 Licencia de arma LA *
                             </label>
-                            <select 
-                                id="licencia_arma" 
-                                name="licencia_arma" 
-                                required 
-                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all duration-300"
-                            >
+                            <select
+                                id="licencia_arma"
+                                name="licencia_arma"
+                                required
+                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all duration-300">
                                 <option value="">Selecciona estado de licencia</option>
                                 <option value="vigente">Vigente</option>
                                 <option value="vencida">Vencida</option>
@@ -447,12 +472,11 @@
                                 <i class="fas fa-id-card-alt mr-2 text-green-500"></i>
                                 Licencia de conducir *
                             </label>
-                            <select 
-                                id="licencia_conducir" 
-                                name="licencia_conducir" 
-                                required 
-                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all duration-300"
-                            >
+                            <select
+                                id="licencia_conducir"
+                                name="licencia_conducir"
+                                required
+                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all duration-300">
                                 <option value="">Selecciona tipo de licencia</option>
                                 <option value="a1">A-I</option>
                                 <option value="a2a">A-IIa</option>
@@ -500,7 +524,7 @@
                                 Curriculum Vitae/CV *
                             </label>
                             <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-purple-400 transition-colors">
-                                <input type="file" id="cv" name="cv" accept=".pdf" data-max=5 required class="hidden" onchange="handleFileUpload(this, 'cv-preview')" >
+                                <input type="file" id="cv" name="cv" accept=".pdf" data-max=5 required class="hidden" onchange="handleFileUpload(this, 'cv-preview')">
                                 <label for="cv" class="cursor-pointer">
                                     <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
                                     <p class="text-gray-600 mb-2">Haz clic para subir tu CV</p>
@@ -563,7 +587,7 @@
                 </div>
             </div>
         </form>
-        <x-alerts />   {{-- SweetAlert success / error --}}
+        <x-alerts /> {{-- SweetAlert success / error --}}
 
 
         <!-- Loading Overlay -->
@@ -578,6 +602,9 @@
     <script>
         let currentStep = 1;
         const totalSteps = 3;
+        // Todas las provincias cargadas desde el backend
+        const provincias = @json($provincias);
+        const distritos = @json($distritos);
 
         function updateProgressBar() {
             const progress = (currentStep / totalSteps) * 100;
@@ -642,42 +669,71 @@
             }
         }
 
-         function handleFileUpload(input, previewId) {
-         const file      = input.files[0];
-         const maxMB     = parseInt(input.dataset.max || "5", 10);
-         const maxBytes  = maxMB * 1024 * 1024;
-         const preview   = document.getElementById(previewId);
-         const fileName  = preview.querySelector(".file-name");
+        // Filtrar provincias al cambiar departamento
+        document.getElementById('departamento').addEventListener('change', function() {
+            const depaId = this.value.padStart(2, '0');
+            const provinciaSelect = document.getElementById('provincia');
 
-         // Reiniciar estado
-         preview.classList.add("hidden");
-         input.classList.remove("border-red-500");
-         if (fileName) fileName.textContent = "";
+            provinciaSelect.innerHTML = '<option value="">Selecciona una provincia</option>';
 
-         if (!file) return;          // usuario canceló el diálogo
+            if (depaId) {
+                const provinciasFiltradas = provincias.filter(p => p.DEPA_CODIGO === depaId);
 
-         if (file.size > maxBytes) {
-         Swal.fire({
-            icon: "error",
-            title: "Archivo demasiado grande",
-            text: `El archivo supera el límite de ${maxMB} MB. Por favor elige otro.`,
-            width: 500,          // ancho exacto — 500 px
-            heightAuto: true,    // (por defecto) ajusta alto al contenido
-            padding: '2rem',     // espacio interior (≈ 32 px)
-            confirmButtonColor: "#d33",
-        }).then(() => {
-            input.value = "";                   // forzar nueva selección
-            input.classList.add("border-red-500");
+                provinciasFiltradas.forEach(p => {
+                    const option = document.createElement('option');
+                    option.value = p.PROVI_CODIGO;
+                    option.textContent = p.PROVI_DESCRIPCION;
+                    provinciaSelect.appendChild(option);
+                });
+
+                if (provinciasFiltradas.length === 0) {
+                    const option = document.createElement('option');
+                    option.value = "";
+                    option.textContent = "No hay provincias para este departamento";
+                    provinciaSelect.appendChild(option);
+                }
+            }
         });
-        return;
-        }
 
-        // Tamaño válido → mostrar nombre
-        if (fileName) fileName.textContent = file.name;
-        preview.classList.remove("hidden");
+        
+
+        function handleFileUpload(input, previewId) {
+            const file = input.files[0];
+            const maxMB = parseInt(input.dataset.max || "5", 10);
+            const maxBytes = maxMB * 1024 * 1024;
+            const preview = document.getElementById(previewId);
+            const fileName = preview.querySelector(".file-name");
+
+            // Reiniciar estado
+            preview.classList.add("hidden");
+            input.classList.remove("border-red-500");
+            if (fileName) fileName.textContent = "";
+
+            if (!file) return; // usuario canceló el diálogo
+
+            if (file.size > maxBytes) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Archivo demasiado grande",
+                    text: `El archivo supera el límite de ${maxMB} MB. Por favor elige otro.`,
+                    width: 500, // ancho exacto — 500 px
+                    heightAuto: true, // (por defecto) ajusta alto al contenido
+                    padding: '2rem', // espacio interior (≈ 32 px)
+                    confirmButtonColor: "#d33",
+                }).then(() => {
+                    input.value = ""; // forzar nueva selección
+                    input.classList.add("border-red-500");
+                });
+                return;
+            }
+
+            // Tamaño válido → mostrar nombre
+            if (fileName) fileName.textContent = file.name;
+            preview.classList.remove("hidden");
         }
         // Initialize
         updateProgressBar();
     </script>
 </body>
+
 </html>

@@ -1,121 +1,31 @@
-<!DOCTYPE html>
-<html lang="es">
+<x-app-layout>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Historial de Afiches - RECLUSOL</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        .gradient-bg {
-            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #1d4ed8 100%);
-        }
+    <div class="min-h-screen gradient-bg py-8">
 
-        .card-hover {
-            transition: all 0.3s ease;
-        }
+        <a href="{{ route('dashboard') }}" class="absolute top-6 left-6 text-white hover:text-yellow-300 transition-colors flex items-center space-x-2 group z-10">
+            <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i>
+            <span class="font-medium">Volver al Dashboard</span>
+        </a>
 
-        .card-hover:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #1d4ed8, #1e40af);
-            transform: translateY(-1px);
-        }
-
-        .status-activo {
-            background: linear-gradient(135deg, #10b981, #059669);
-        }
-
-        .status-pausado {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-        }
-
-        .status-finalizado {
-            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-        }
-
-        .status-borrador {
-            background: linear-gradient(135deg, #6b7280, #4b5563);
-        }
-
-        .afiche-card {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .timeline-line {
-            background: linear-gradient(to bottom, #3b82f6, #1d4ed8);
-        }
-
-        .glassmorphism {
-            background: rgba(255, 255, 255, 0.25);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-        }
-    </style>
-</head>
-
-<body class="bg-gray-50">
-    <!-- Header -->
-    <header class="bg-white shadow-sm border-b sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <!-- Logo -->
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-crown text-white text-lg"></i>
-                    </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+                <div class="flex justify-between items-center">
                     <div>
-                        <h1 class="text-xl font-bold text-blue-600">RECLUSOL</h1>
-                        <p class="text-xs text-gray-500">Plataforma de Reclutamiento</p>
+                        <h1 class="text-3xl font-bold text-gray-800">Historial de Afiches</h1>
+                        <p class="text-gray-600 mt-1">Gestiona y revisa el historial completo de todos los afiches publicados</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <a href="{{ route('afiches.historial') }}" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center space-x-2 transition-all duration-300 hover:-translate-y-1">
+                            <i class="fas fa-history"></i>
+                            <span>Historial</span>
+                        </a>
                     </div>
                 </div>
-
-                <!-- Navigation -->
-                <div class="flex items-center space-x-4">
-                    <a href="/" class="text-gray-600 hover:text-blue-600 transition-colors">
-                        <i class="fas fa-home mr-2"></i>
-                        Inicio
-                    </a>
-                    <a href="#" class="text-blue-600 font-medium">
-                        <i class="fas fa-images mr-2"></i>
-                        Historial de Afiches
-                    </a>
-                    <button class="btn-primary text-white px-4 py-2 rounded-lg font-medium">
-                        <i class="fas fa-plus mr-2"></i>
-                        Nuevo Afiche
-                    </button>
-                </div>
             </div>
         </div>
-    </header>
 
-    <!-- Hero Section -->
-    <section class="gradient-bg py-16">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center text-white">
-                <h1 class="text-4xl lg:text-5xl font-bold mb-4">
-                    Historial de Afiches
-                </h1>
-                <p class="text-xl text-blue-100 max-w-2xl mx-auto">
-                    Gestiona y revisa el historial completo de todos los afiches publicados
-                </p>
-            </div>
-        </div>
-    </section>
+        <!-- Stats Dashboard -->
 
-    <!-- Stats Dashboard -->
-    <section class="py-8 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid md:grid-cols-5 gap-6">
                 <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-6 text-white">
@@ -146,7 +56,7 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-orange-100 text-sm font-medium">En Pausa</p>
-                           {{--  <p class="text-3xl font-bold">{{ $afiches Pausados ?? 23 }}</p> --}}
+                            {{-- <p class="text-3xl font-bold">{{ $afiches Pausados ?? 23 }}</p> --}}
                         </div>
                         <div class="w-12 h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
                             <i class="fas fa-pause-circle text-xl"></i>
@@ -179,10 +89,10 @@
                 </div>
             </div>
         </div>
-    </section>
 
-    <!-- Filters Section -->
-    <section class="py-6 bg-gradient-to-r from-blue-600 to-blue-800">
+
+        <!-- Filters Section -->
+
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="glassmorphism rounded-2xl p-6 shadow-lg">
                 <div class="grid md:grid-cols-6 gap-4 items-center">
@@ -240,10 +150,9 @@
                 </div>
             </div>
         </div>
-    </section>
 
-    <!-- Timeline View Toggle -->
-    <section class="py-4 bg-gray-100 border-b">
+
+        <!-- Timeline View Toggle -->
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-4">
@@ -273,122 +182,122 @@
                 </div>
             </div>
         </div>
-    </section>
 
-    <!-- Grid View (Default) -->
-    <section id="gridContent" class="py-8 bg-gray-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                @forelse($afiches ?? collect([
-                (object)['id' => 1, 'titulo' => 'Desarrollador Full Stack Senior', 'empresa' => 'TechCorp', 'categoria' => 'tecnologia', 'fecha_creacion' => '2024-01-15', 'fecha_expiracion' => '2024-02-15', 'estado' => 'activo', 'visualizaciones' => 1247, 'postulaciones' => 45, 'imagen' => 'tech-job.jpg'],
-                (object)['id' => 2, 'titulo' => 'Especialista en Marketing Digital', 'empresa' => 'MarketPro', 'categoria' => 'marketing', 'fecha_creacion' => '2024-01-14', 'fecha_expiracion' => '2024-02-14', 'estado' => 'activo', 'visualizaciones' => 892, 'postulaciones' => 32, 'imagen' => 'marketing-job.jpg'],
-                (object)['id' => 3, 'titulo' => 'Gerente de Ventas Regional', 'empresa' => 'SalesCorp', 'categoria' => 'ventas', 'fecha_creacion' => '2024-01-12', 'fecha_expiracion' => '2024-02-12', 'estado' => 'pausado', 'visualizaciones' => 634, 'postulaciones' => 28, 'imagen' => 'sales-job.jpg'],
-                (object)['id' => 4, 'titulo' => 'Analista de Recursos Humanos', 'empresa' => 'HR Solutions', 'categoria' => 'recursos-humanos', 'fecha_creacion' => '2024-01-10', 'fecha_expiracion' => '2024-02-10', 'estado' => 'finalizado', 'visualizaciones' => 445, 'postulaciones' => 67, 'imagen' => 'hr-job.jpg'],
-                (object)['id' => 5, 'titulo' => 'Coordinador Administrativo', 'empresa' => 'AdminCorp', 'categoria' => 'administracion', 'fecha_creacion' => '2024-01-08', 'fecha_expiracion' => '2024-02-08', 'estado' => 'activo', 'visualizaciones' => 823, 'postulaciones' => 51, 'imagen' => 'admin-job.jpg'],
-                (object)['id' => 6, 'titulo' => 'Diseñador UX/UI', 'empresa' => 'CreativeStudio', 'categoria' => 'tecnologia', 'fecha_creacion' => '2024-01-05', 'fecha_expiracion' => '2024-02-05', 'estado' => 'borrador', 'visualizaciones' => 156, 'postulaciones' => 12, 'imagen' => 'design-job.jpg']
-                ]) as $afiche)
-                <div class="afiche-card card-hover rounded-2xl p-6 shadow-lg">
-                    <!-- Afiche Image/Preview -->
-                    <div class="relative mb-4">
-                        <div class="w-full h-48 bg-gradient-to-br from-blue-100 to-purple-100 rounded-xl flex items-center justify-center overflow-hidden">
-                            <div class="text-center">
-                                <i class="fas fa-briefcase text-4xl text-blue-500 mb-2"></i>
-                                <p class="text-sm text-gray-600 font-medium">{{ ucfirst($afiche->categoria) }}</p>
+        <!-- Grid View (Default) -->
+        <div id="gridContent" class="py-8 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    @forelse($afiches ?? collect([
+                    (object)['id' => 1, 'titulo' => 'Desarrollador Full Stack Senior', 'empresa' => 'TechCorp', 'categoria' => 'tecnologia', 'fecha_creacion' => '2024-01-15', 'fecha_expiracion' => '2024-02-15', 'estado' => 'activo', 'visualizaciones' => 1247, 'postulaciones' => 45, 'imagen' => 'tech-job.jpg'],
+                    (object)['id' => 2, 'titulo' => 'Especialista en Marketing Digital', 'empresa' => 'MarketPro', 'categoria' => 'marketing', 'fecha_creacion' => '2024-01-14', 'fecha_expiracion' => '2024-02-14', 'estado' => 'activo', 'visualizaciones' => 892, 'postulaciones' => 32, 'imagen' => 'marketing-job.jpg'],
+                    (object)['id' => 3, 'titulo' => 'Gerente de Ventas Regional', 'empresa' => 'SalesCorp', 'categoria' => 'ventas', 'fecha_creacion' => '2024-01-12', 'fecha_expiracion' => '2024-02-12', 'estado' => 'pausado', 'visualizaciones' => 634, 'postulaciones' => 28, 'imagen' => 'sales-job.jpg'],
+                    (object)['id' => 4, 'titulo' => 'Analista de Recursos Humanos', 'empresa' => 'HR Solutions', 'categoria' => 'recursos-humanos', 'fecha_creacion' => '2024-01-10', 'fecha_expiracion' => '2024-02-10', 'estado' => 'finalizado', 'visualizaciones' => 445, 'postulaciones' => 67, 'imagen' => 'hr-job.jpg'],
+                    (object)['id' => 5, 'titulo' => 'Coordinador Administrativo', 'empresa' => 'AdminCorp', 'categoria' => 'administracion', 'fecha_creacion' => '2024-01-08', 'fecha_expiracion' => '2024-02-08', 'estado' => 'activo', 'visualizaciones' => 823, 'postulaciones' => 51, 'imagen' => 'admin-job.jpg'],
+                    (object)['id' => 6, 'titulo' => 'Diseñador UX/UI', 'empresa' => 'CreativeStudio', 'categoria' => 'tecnologia', 'fecha_creacion' => '2024-01-05', 'fecha_expiracion' => '2024-02-05', 'estado' => 'borrador', 'visualizaciones' => 156, 'postulaciones' => 12, 'imagen' => 'design-job.jpg']
+                    ]) as $afiche)
+                    <div class="afiche-card card-hover rounded-2xl p-6 shadow-lg">
+                        <!-- Afiche Image/Preview -->
+                        <div class="relative mb-4">
+                            <div class="w-full h-48 bg-gradient-to-br from-blue-100 to-purple-100 rounded-xl flex items-center justify-center overflow-hidden">
+                                <div class="text-center">
+                                    <i class="fas fa-briefcase text-4xl text-blue-500 mb-2"></i>
+                                    <p class="text-sm text-gray-600 font-medium">{{ ucfirst($afiche->categoria) }}</p>
+                                </div>
                             </div>
-                        </div>
-                        <div class="absolute top-3 right-3">
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium text-white
+                            <div class="absolute top-3 right-3">
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium text-white
                                     @if($afiche->estado === 'activo') status-activo
                                     @elseif($afiche->estado === 'pausado') status-pausado
                                     @elseif($afiche->estado === 'finalizado') status-finalizado
                                     @else status-borrador
                                     @endif">
-                                @if($afiche->estado === 'activo') <i class="fas fa-play mr-1"></i> @endif
-                                @if($afiche->estado === 'pausado') <i class="fas fa-pause mr-1"></i> @endif
-                                @if($afiche->estado === 'finalizado') <i class="fas fa-check mr-1"></i> @endif
-                                @if($afiche->estado === 'borrador') <i class="fas fa-edit mr-1"></i> @endif
-                                {{ ucfirst($afiche->estado) }}
-                            </span>
-                        </div>
-                    </div>
-
-                    <!-- Afiche Info -->
-                    <div class="space-y-3">
-                        <div>
-                            <h3 class="font-bold text-gray-800 text-lg leading-tight">{{ $afiche->titulo }}</h3>
-                            <p class="text-blue-600 font-medium">{{ $afiche->empresa }}</p>
-                        </div>
-
-                        <div class="flex items-center justify-between text-sm text-gray-600">
-                            <span class="flex items-center">
-                                <i class="fas fa-calendar mr-1"></i>
-                                {{ \Carbon\Carbon::parse($afiche->fecha_creacion)->format('d/m/Y') }}
-                            </span>
-                            <span class="flex items-center">
-                                <i class="fas fa-clock mr-1"></i>
-                                {{ \Carbon\Carbon::parse($afiche->fecha_expiracion)->diffForHumans() }}
-                            </span>
-                        </div>
-
-                        <!-- Stats -->
-                        <div class="grid grid-cols-2 gap-4 pt-3 border-t border-gray-200">
-                            <div class="text-center">
-                                <div class="text-2xl font-bold text-blue-600">{{ number_format($afiche->visualizaciones) }}</div>
-                                <div class="text-xs text-gray-500">Visualizaciones</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="text-2xl font-bold text-green-600">{{ $afiche->postulaciones }}</div>
-                                <div class="text-xs text-gray-500">Postulaciones</div>
+                                    @if($afiche->estado === 'activo') <i class="fas fa-play mr-1"></i> @endif
+                                    @if($afiche->estado === 'pausado') <i class="fas fa-pause mr-1"></i> @endif
+                                    @if($afiche->estado === 'finalizado') <i class="fas fa-check mr-1"></i> @endif
+                                    @if($afiche->estado === 'borrador') <i class="fas fa-edit mr-1"></i> @endif
+                                    {{ ucfirst($afiche->estado) }}
+                                </span>
                             </div>
                         </div>
 
-                        <!-- Actions -->
-                        <div class="flex space-x-2 pt-3">
-                            <button class="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2 px-3 rounded-lg text-sm font-medium transition-colors">
-                                <i class="fas fa-eye mr-1"></i>Ver
-                            </button>
-                            <button class="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 px-3 rounded-lg text-sm font-medium transition-colors">
-                                <i class="fas fa-edit mr-1"></i>Editar
-                            </button>
-                            <button class="bg-gray-500 hover:bg-gray-600 text-white py-2 px-3 rounded-lg text-sm transition-colors">
-                                <i class="fas fa-chart-bar"></i>
-                            </button>
+                        <!-- Afiche Info -->
+                        <div class="space-y-3">
+                            <div>
+                                <h3 class="font-bold text-gray-800 text-lg leading-tight">{{ $afiche->titulo }}</h3>
+                                <p class="text-blue-600 font-medium">{{ $afiche->empresa }}</p>
+                            </div>
+
+                            <div class="flex items-center justify-between text-sm text-gray-600">
+                                <span class="flex items-center">
+                                    <i class="fas fa-calendar mr-1"></i>
+                                    {{ \Carbon\Carbon::parse($afiche->fecha_creacion)->format('d/m/Y') }}
+                                </span>
+                                <span class="flex items-center">
+                                    <i class="fas fa-clock mr-1"></i>
+                                    {{ \Carbon\Carbon::parse($afiche->fecha_expiracion)->diffForHumans() }}
+                                </span>
+                            </div>
+
+                            <!-- Stats -->
+                            <div class="grid grid-cols-2 gap-4 pt-3 border-t border-gray-200">
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-blue-600">{{ number_format($afiche->visualizaciones) }}</div>
+                                    <div class="text-xs text-gray-500">Visualizaciones</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-green-600">{{ $afiche->postulaciones }}</div>
+                                    <div class="text-xs text-gray-500">Postulaciones</div>
+                                </div>
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="flex space-x-2 pt-3">
+                                <button class="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2 px-3 rounded-lg text-sm font-medium transition-colors">
+                                    <i class="fas fa-eye mr-1"></i>Ver
+                                </button>
+                                <button class="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 px-3 rounded-lg text-sm font-medium transition-colors">
+                                    <i class="fas fa-edit mr-1"></i>Editar
+                                </button>
+                                <button class="bg-gray-500 hover:bg-gray-600 text-white py-2 px-3 rounded-lg text-sm transition-colors">
+                                    <i class="fas fa-chart-bar"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-                @empty
-                <div class="col-span-full text-center py-12">
-                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-images text-2xl text-gray-400"></i>
+                    @empty
+                    <div class="col-span-full text-center py-12">
+                        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-images text-2xl text-gray-400"></i>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-700 mb-2">No hay afiches en el historial</h3>
+                        <p class="text-gray-500">Aún no se han creado afiches.</p>
                     </div>
-                    <h3 class="text-lg font-medium text-gray-700 mb-2">No hay afiches en el historial</h3>
-                    <p class="text-gray-500">Aún no se han creado afiches.</p>
+                    @endforelse
                 </div>
-                @endforelse
-            </div>
 
-            <!-- Pagination -->
-            <div class="mt-8 flex items-center justify-between">
-                <div class="text-sm text-gray-600">
-                    Mostrando <span class="font-medium">1</span> a <span class="font-medium">6</span> de <span class="font-medium">{{ $totalAfiches ?? 156 }}</span> resultados
-                </div>
-                <div class="flex items-center space-x-2">
-                    <button class="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                        <i class="fas fa-chevron-left mr-1"></i>Anterior
-                    </button>
-                    <button class="px-3 py-2 text-sm bg-blue-600 text-white rounded-lg">1</button>
-                    <button class="px-3 py-2 text-sm text-gray-700 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">2</button>
-                    <button class="px-3 py-2 text-sm text-gray-700 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">3</button>
-                    <button class="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                        Siguiente<i class="fas fa-chevron-right ml-1"></i>
-                    </button>
+                <!-- Pagination -->
+                <div class="mt-8 flex items-center justify-between">
+                    <div class="text-sm text-gray-600">
+                        Mostrando <span class="font-medium">1</span> a <span class="font-medium">6</span> de <span class="font-medium">{{ $totalAfiches ?? 156 }}</span> resultados
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button class="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                            <i class="fas fa-chevron-left mr-1"></i>Anterior
+                        </button>
+                        <button class="px-3 py-2 text-sm bg-blue-600 text-white rounded-lg">1</button>
+                        <button class="px-3 py-2 text-sm text-gray-700 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">2</button>
+                        <button class="px-3 py-2 text-sm text-gray-700 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">3</button>
+                        <button class="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                            Siguiente<i class="fas fa-chevron-right ml-1"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 
     <!-- Timeline View (Hidden by default) -->
-    <section id="timelineContent" class="py-8 bg-gray-50 hidden">
+    <div id="timelineContent" class="py-8 bg-gray-50 hidden">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="relative">
                 <!-- Timeline Line -->
@@ -439,10 +348,10 @@
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 
     <!-- List View (Hidden by default) -->
-    <section id="listContent" class="py-8 bg-gray-50 hidden">
+    <div id="listContent" class="py-8 bg-gray-50 hidden">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
                 <table class="w-full">
@@ -507,25 +416,64 @@
                 </table>
             </div>
         </div>
-    </section>
+    </div>
 
-    <!-- Footer -->
-    <footer class="bg-gray-800 text-white py-8 mt-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-center space-x-3">
-                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-crown text-white"></i>
-                </div>
-                <div>
-                    <h3 class="font-bold">RECLUSOL</h3>
-                    <p class="text-gray-400 text-xs">Plataforma de Reclutamiento</p>
-                </div>
-            </div>
-            <div class="text-center text-gray-400 mt-4">
-                <p>&copy; {{ date('Y') }} RECLUSOL. Todos los derechos reservados.</p>
-            </div>
-        </div>
-    </footer>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #1d4ed8 100%);
+        }
+
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #1d4ed8, #1e40af);
+            transform: translateY(-1px);
+        }
+
+        .status-activo {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .status-pausado {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+
+        .status-finalizado {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+        }
+
+        .status-borrador {
+            background: linear-gradient(135deg, #6b7280, #4b5563);
+        }
+
+        .afiche-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .timeline-line {
+            background: linear-gradient(to bottom, #3b82f6, #1d4ed8);
+        }
+
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+    </style>
 
     <!-- Scripts -->
     <script>
@@ -571,6 +519,4 @@
             // Implement sort logic here
         });
     </script>
-</body>
-
-</html>
+</x-app-layout>

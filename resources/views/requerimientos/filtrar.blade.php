@@ -47,10 +47,11 @@
                     <label class="block text-sm font-medium text-gray-700 mb-1">Sucursal</label>
                     <select name="sucursal" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 bg-white/80">
                         <option value="">Todas</option>
-                        <option value="lima" {{ request('sucursal') == 'lima' ? 'selected' : '' }}>Lima</option>
-                        <option value="chimbote" {{ request('sucursal') == 'chimbote' ? 'selected' : '' }}>Chimbote</option>
-                        <option value="trujillo" {{ request('sucursal') == 'trujillo' ? 'selected' : '' }}>Trujillo</option>
-                        <option value="moquegua" {{ request('sucursal') == 'moquegua' ? 'selected' : '' }}>Moquegua</option>
+                        @foreach($sucursales as $codigo => $sucursal)
+                        <option value="{{ $codigo }}" {{ request('sucursal') == $codigo ? 'selected' : '' }}>
+                            {{ $sucursal->SUCU_DESCRIPCION }}
+                        </option>
+                        @endforeach
                     </select>
                 </div>
                 <div>
@@ -62,15 +63,69 @@
                         <option value="cliente_c">Cliente C</option>
                     </select>
                 </div>
+
+                <!-- Tipo de Cargo -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">Cargo Solicitado</label>
-                    <select name="cargo_solicitado" class="mt-1 w-full border-gray-300 rounded-md">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Cargo</label>
+                    <select name="tipo_cargo" id="tipo_cargo" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 bg-white/80">
                         <option value="">Todos</option>
-                        <option value="agente_seguridad" {{ request('cargo_solicitado') == 'agente_seguridad' ? 'selected' : '' }}>Agente Seguridad</option>
-                        <option value="supervisor" {{ request('cargo_solicitado') == 'supervisor' ? 'selected' : '' }}>Supervisor</option>
-                        <option value="analista" {{ request('cargo_solicitado') == 'analista' ? 'selected' : '' }}>Analista</option>
-                        <option value="secretaria" {{ request('cargo_solicitado') == 'secretaria' ? 'selected' : '' }}>Secretaria</option>
-                        <option value="coordinador" {{ request('cargo_solicitado') == 'coordinador' ? 'selected' : '' }}>Coordinador</option>
+                        @foreach($tipoCargos as $codigo => $tipo_cargo)
+                        <option value="{{ $codigo }}" {{ request('tipo_cargo') == $codigo ? 'selected' : '' }}>
+                            {{ $tipo_cargo->DESC_TIPO_CARG }}
+                        </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Cargo Solicitado</label>
+                    <select name="cargo_solicitado" id="cargo_solicitado" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 bg-white/80">
+                        <option value="">Todos</option>
+                        @foreach($cargos as $codigo => $cargo)
+                        <option value="{{ $codigo }}" {{ request('cargo_solicitado') == $codigo ? 'selected' : '' }}>
+                            {{ $cargo->DESC_CARGO }}
+                        </option>
+                        @endforeach
+                    </select>
+                </div>
+
+
+                {{-- Departamento --}}
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Departamento</label>
+                    <select name="departamento" id="departamento" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 bg-white/80">
+                        <option value="">Todos</option>
+                        @foreach($departamentos as $codigo => $departamento)
+                        <option value="{{ $codigo }}" {{ request('departamento') == $codigo ? 'selected' : '' }}>
+                            {{ $departamento->DEPA_DESCRIPCION }}
+                        </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                {{-- Provincia --}}
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Provincia</label>
+                    <select name="provincia" id="provincia" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 bg-white/80">
+                        <option value="">Todas</option>
+                        @foreach($provincias as $codigo => $provincia)
+                        <option value="{{ $codigo }}" {{ request('provincia') == $codigo ? 'selected' : '' }}>
+                            {{ $provincia->PROVI_DESCRIPCION }}
+                        </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                {{-- Distrito --}}
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Distrito</label>
+                    <select name="distrito" id="distrito" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 bg-white/80">
+                        <option value="">Todos</option>
+                        @foreach($distritos as $codigo => $distrito)
+                        <option value="{{ $codigo }}" {{ request('distrito') == $codigo ? 'selected' : '' }}>
+                            {{ $distrito->DIST_DESCRIPCION }}
+                        </option>
+                        @endforeach
                     </select>
                 </div>
 
@@ -93,27 +148,27 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div class="bg-yellow-100 p-4 rounded-lg text-center flex flex-col items-center">
-                    <i class="fas fa-clipboard-list text-yellow-500 mb-2"></i>
-                    <h3 class="text-sm text-gray-600">Total Requerimientos</h3>
-                    <p class="text-2xl font-bold">{{ $totalRequerimientos ?? 0 }} </p>
+                    <i class="fas fa-hourglass-half text-yellow-500 mb-2"></i>
+                    <h3 class="text-sm text-gray-600">En Proceso</h3>
+                    <p class="text-2xl font-bold">{{ $requerimientosProcesos ?? 0 }} </p>
                 </div>
 
                 <div class="bg-green-100 p-4 rounded-lg text-center flex flex-col items-center">
                     <i class="fas fa-check-circle text-green-500 mb-2"></i>
-                    <h3 class="text-sm text-gray-600">Activos</h3>
-                    <p class="text-2xl font-bold">{{ $requerimientosActivos ?? 0 }}</p>
+                    <h3 class="text-sm text-gray-600">Cubiertos</h3>
+                    <p class="text-2xl font-bold">{{ $requerimientosCubiertos ?? 0 }}</p>
                 </div>
 
                 <div class="bg-blue-100 p-4 rounded-lg text-center flex flex-col items-center">
-                    <i class="fas fa-clock text-blue-500 mb-2"></i>
-                    <h3 class="text-sm text-gray-600">Pendientes</h3>
-                    <p class="text-2xl font-bold">{{ $requerimientosPendientes ?? 0 }}</p>
+                    <i class="fas fa-times-circle text-blue-500 mb-2"></i>
+                    <h3 class="text-sm text-gray-600">Cancelados</h3>
+                    <p class="text-2xl font-bold">{{ $requerimientosCancelados ?? 0 }}</p>
                 </div>
 
                 <div class="bg-red-100 p-4 rounded-lg text-center flex flex-col items-center">
-                    <i class="fas fa-close text-red-500 mb-2"></i>
-                    <h3 class="text-sm text-gray-600">Cerrados</h3>
-                    <p class="text-2xl font-bold">{{ $requerimientosCerrados ?? 6 }} </p>
+                    <i class="fas fa-clock text-red-500 mb-2"></i>
+                    <h3 class="text-sm text-gray-600">Vencidos</h3>
+                    <p class="text-2xl font-bold">{{ $requerimientosVencidos ?? 0 }} </p>
                 </div>
             </div>
         </div>
@@ -133,26 +188,24 @@
                     <table class="w-full">
                         <thead class="bg-gradient-to-r from-blue-50 to-blue-100">
                             <tr class="text-left">
-                                <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase">#</th>
-                                <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase">Cargo Solicitado</th>
-                                <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase">Área</th>
-                                <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase">Sucursal</th>
-                                <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase">Cliente</th>
-                                <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase">Prioridad</th>
-                                <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase">Estado</th>
-                                <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase">Fecha Límite</th>
-                                <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase">Acciones</th>
+                                <th class="px-6 py-4 text-center font-bold text-gray-600 uppercase">Cargo Solicitado</th>
+                                <th class="px-6 py-4 text-center font-bold text-gray-600 uppercase">Área</th>
+                                <th class="px-6 py-4 text-center font-bold text-gray-600 uppercase">Sucursal</th>
+                                <th class="px-6 py-4 text-center font-bold text-gray-600 uppercase">Cliente</th>
+                                <th class="px-6 py-4 text-center font-bold text-gray-600 uppercase">Prioridad</th>
+                                <th class="px-6 py-4 text-center font-bold text-gray-600 uppercase">Estado</th>
+                                <th class="px-6 py-4 text-center font-bold text-gray-600 uppercase">Fecha Límite</th>
+                                <th class="px-6 py-4 text-center font-bold text-gray-600 uppercase">Acciones</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
                             @forelse($requerimientos as $req)
                             <tr class="hover:bg-blue-50 transition">
-                                <td class="px-6 py-4">{{ $req->id }}</td>
-                                <td class="px-6 py-4">{{ $req->cargo_solicitado }}</td>
-                                <td class="px-6 py-4">{{ ucfirst($req->area_solicitante) }}</td>
-                                <td class="px-6 py-4">{{ ucfirst($req->sucursal) }}</td>
-                                <td class="px-6 py-4">{{ ucfirst($req->cliente) }}</td>
-                                <td class="px-6 py-4">
+                                <td class="px-6 py-4 text-center">{{ $req->cargo_nombre }}</td>
+                                <td class="px-6 py-4 text-center">{{ ucfirst($req->area_solicitante) }}</td>
+                                <td class="px-6 py-4 text-center">{{ ucfirst($req->sucursal_nombre) }}</td>
+                                <td class="px-6 py-4 text-center">{{ ucfirst($req->cliente) }}</td>
+                                <td class="px-6 py-4 text-center">
                                     @php
                                     $priorityColors = [
                                     'alta' => 'bg-red-100 text-red-800',
@@ -166,20 +219,23 @@
                                         {{ ucfirst($req->prioridad ?? 'N/A') }}
                                     </span>
                                 </td>
-                                <td class="px-6 py-4">
+                                <td class="px-6 py-4 text-center">
                                     @php
+                                    $estadoNombre = is_object($req->estado) ? $req->estado->nombre : null;
                                     $statusColors = [
-                                    'activo' => 'bg-green-100 text-green-800',
-                                    'pendiente' => 'bg-yellow-100 text-yellow-800',
-                                    'cerrado' => 'bg-red-100 text-red-800',
-                                    null => 'bg-gray-100 text-gray-600'
+                                    'en proceso' => 'bg-yellow-100 text-yellow-800',
+                                    'cubierto' => 'bg-green-100 text-green-800',
+                                    'cancelado' => 'bg-red-100 text-red-800',
+                                    'vencido' => 'bg-gray-200 text-gray-700',
+                                    null => 'bg-gray-100 text-gray-600',
                                     ];
-                                    $statusClass = $statusColors[$req->estado ?? null] ?? 'bg-gray-100 text-gray-600';
+                                    $statusClass = $statusColors[strtolower($estadoNombre)] ?? 'bg-gray-100 text-gray-600';
                                     @endphp
                                     <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium {{ $statusClass }}">
-                                        {{ ucfirst($req->estado ?? 'N/A') }}
+                                        {{ ucfirst($estadoNombre ?? 'N/A') }}
                                     </span>
                                 </td>
+
                                 <td class="px-6 py-4">
                                     {{ \Carbon\Carbon::parse($req->fecha_limite)->format('d/m/Y') }}
                                 </td>
@@ -285,8 +341,13 @@
             background: linear-gradient(135deg, #6b7280, #4b5563);
         }
     </style>
+
     <script>
         let deleteRequerimientoId = null;
+
+        const cargos = Object.values(@json($cargos));
+        const provincias = Object.values(@json($provincias));
+        const distritos = Object.values(@json($distritos));
 
         function limpiarFiltros() {
             document.getElementById('filter-form').reset();
@@ -315,13 +376,196 @@
                     })
                     .then(response => response.json())
                     .then(data => {
-                        if (data.success) location.reload();
-                        else alert('Error al eliminar');
+                        if (data.success) {
+                            location.reload();
+                        } else {
+                            alert('Error al eliminar');
+                        }
                     })
                     .catch(() => alert('Error al eliminar'));
             }
             closeDeleteModal();
         }
+
+        // Filtrar cargos dinámicamente en el filtro principal
+        document.getElementById('tipo_cargo').addEventListener('change', function() {
+            const tipoCargoId = this.value;
+            const cargoSelect = document.getElementById('cargo_solicitado');
+
+            cargoSelect.innerHTML = '<option value="">Selecciona un cargo</option>';
+
+            const cargosFiltrados = cargos.filter(p => p.TIPO_CARG === tipoCargoId);
+
+            cargosFiltrados.forEach(p => {
+                const option = document.createElement('option');
+                option.value = p.CODI_CARG;
+                option.textContent = p.DESC_CARGO;
+                cargoSelect.appendChild(option);
+            });
+
+            if (cargosFiltrados.length === 0) {
+                const option = document.createElement('option');
+                option.value = "";
+                option.textContent = "No hay cargos para este tipo";
+                cargoSelect.appendChild(option);
+            }
+        });
+
+        // Filtrar provincias al cambiar departamento
+        document.getElementById('departamento').addEventListener('change', function() {
+            const depaId = this.value.padStart(2, '0');
+            const provinciaSelect = document.getElementById('provincia');
+
+            provinciaSelect.innerHTML = '<option value="">Selecciona una provincia</option>';
+
+            if (depaId) {
+                const provinciasFiltradas = provincias.filter(p => p.DEPA_CODIGO === depaId);
+
+                provinciasFiltradas.forEach(p => {
+                    const option = document.createElement('option');
+                    option.value = p.PROVI_CODIGO;
+                    option.textContent = p.PROVI_DESCRIPCION;
+                    provinciaSelect.appendChild(option);
+                });
+            }
+        });
+
+        // Filtrar distritos al cambiar provincia
+        document.getElementById('provincia').addEventListener('change', function() {
+            const provId = this.value.padStart(2, '0');
+            const distritoSelect = document.getElementById('distrito');
+
+            distritoSelect.innerHTML = '<option value="">Selecciona un distrito</option>';
+
+            if (provId) {
+                const distritosFiltrados = distritos.filter(p => p.PROVI_CODIGO === provId);
+
+                distritosFiltrados.forEach(p => {
+                    const option = document.createElement('option');
+                    option.value = p.DIST_CODIGO;
+                    option.textContent = p.DIST_DESCRIPCION;
+                    distritoSelect.appendChild(option);
+                });
+            }
+        });
+
+        // Función global para inicializar el filtrado del modal de edición
+        window.inicializarFiltroCargosModal = function() {
+            const modal = document.getElementById('edit-modal');
+            const tipoCargoSelect = modal.querySelector('#tipo_cargo');
+            const cargoSelect = modal.querySelector('#cargo_solicitado');
+            const cargoSeleccionado = cargoSelect.dataset.selected;
+
+            function filtrarCargos(tipoCargoId, cargoSeleccionado = null) {
+                cargoSelect.innerHTML = '<option value="">Selecciona un cargo</option>';
+
+                const cargosFiltrados = cargos.filter(p => p.TIPO_CARG === tipoCargoId);
+
+                cargosFiltrados.forEach(p => {
+                    const option = document.createElement('option');
+                    option.value = p.CODI_CARG;
+                    option.textContent = p.DESC_CARGO;
+                    if (cargoSeleccionado && cargoSeleccionado === p.CODI_CARG) {
+                        option.selected = true;
+                    }
+                    cargoSelect.appendChild(option);
+                });
+
+                if (cargosFiltrados.length === 0) {
+                    const option = document.createElement('option');
+                    option.value = "";
+                    option.textContent = "No hay cargos para este tipo";
+                    cargoSelect.appendChild(option);
+                }
+            }
+
+            // Evento de cambio
+            tipoCargoSelect.addEventListener('change', function() {
+                filtrarCargos(this.value);
+            });
+
+            // Filtrar al cargar si hay valor
+            if (tipoCargoSelect.value) {
+                filtrarCargos(tipoCargoSelect.value, cargoSeleccionado);
+            }
+        };
+
+        // Función global para inicializar el filtrado dinámico de Departamento/Provincia/Distrito en el modal de edición
+        window.inicializarFiltroUbicacionModal = function() {
+            const modal = document.getElementById('edit-modal');
+
+            const departamentoSelect = modal.querySelector('#departamento');
+            const provinciaSelect = modal.querySelector('#provincia');
+            const distritoSelect = modal.querySelector('#distrito');
+
+            const provinciaSeleccionada = provinciaSelect.dataset.selected;
+            const distritoSeleccionado = distritoSelect.dataset.selected;
+
+            // Al cambiar Departamento
+            departamentoSelect.addEventListener('change', function() {
+                const depaId = this.value.padStart(2, '0');
+                provinciaSelect.innerHTML = '<option value="">Selecciona una provincia</option>';
+                distritoSelect.innerHTML = '<option value="">Selecciona un distrito</option>';
+
+                if (depaId) {
+                    const provinciasFiltradas = provincias.filter(p => p.DEPA_CODIGO === depaId);
+                    provinciasFiltradas.forEach(p => {
+                        const option = document.createElement('option');
+                        option.value = p.PROVI_CODIGO;
+                        option.textContent = p.PROVI_DESCRIPCION;
+                        provinciaSelect.appendChild(option);
+                    });
+                }
+            });
+
+            // Al cambiar Provincia
+            provinciaSelect.addEventListener('change', function() {
+                const provId = this.value.padStart(2, '0');
+                distritoSelect.innerHTML = '<option value="">Selecciona un distrito</option>';
+
+                if (provId) {
+                    const distritosFiltrados = distritos.filter(d => d.PROVI_CODIGO === provId);
+                    distritosFiltrados.forEach(d => {
+                        const option = document.createElement('option');
+                        option.value = d.DIST_CODIGO;
+                        option.textContent = d.DIST_DESCRIPCION;
+                        distritoSelect.appendChild(option);
+                    });
+                }
+            });
+
+            // Si hay valores seleccionados al cargar, inicializar Provincias y Distritos
+            if (departamentoSelect.value) {
+                const depaId = departamentoSelect.value.padStart(2, '0');
+                provinciaSelect.innerHTML = '<option value="">Selecciona una provincia</option>';
+                const provinciasFiltradas = provincias.filter(p => p.DEPA_CODIGO === depaId);
+                provinciasFiltradas.forEach(p => {
+                    const option = document.createElement('option');
+                    option.value = p.PROVI_CODIGO;
+                    option.textContent = p.PROVI_DESCRIPCION;
+                    if (provinciaSeleccionada === p.PROVI_CODIGO) {
+                        option.selected = true;
+                    }
+                    provinciaSelect.appendChild(option);
+                });
+            }
+
+            if (provinciaSelect.value) {
+                const provId = provinciaSelect.value.padStart(2, '0');
+                distritoSelect.innerHTML = '<option value="">Selecciona un distrito</option>';
+                const distritosFiltrados = distritos.filter(d => d.PROVI_CODIGO === provId);
+                distritosFiltrados.forEach(d => {
+                    const option = document.createElement('option');
+                    option.value = d.DIST_CODIGO;
+                    option.textContent = d.DIST_DESCRIPCION;
+                    if (distritoSeleccionado === d.DIST_CODIGO) {
+                        option.selected = true;
+                    }
+                    distritoSelect.appendChild(option);
+                });
+            }
+        };
+
 
         // Abrir modal y cargar el form-edit
         document.querySelectorAll('.btn-edit').forEach(btn => {
@@ -332,6 +576,9 @@
                     .then(html => {
                         document.getElementById('edit-modal-content').innerHTML = html;
                         document.getElementById('edit-modal').classList.remove('hidden');
+                        // Inicializar el filtrado dinámico
+                        inicializarFiltroCargosModal();
+                        inicializarFiltroUbicacionModal();
                     });
             });
         });
@@ -341,16 +588,16 @@
             document.getElementById('edit-modal').classList.add('hidden');
         }
 
-        // Capturar submit y enviar por AJAX usando POST + override
+        // Capturar submit y enviar por AJAX
         document.addEventListener('submit', function(e) {
             if (e.target.id === 'form-edit') {
                 e.preventDefault();
                 const form = e.target;
                 fetch(form.action, {
-                        method: 'POST', // enviamos como POST
+                        method: 'POST',
                         headers: {
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                            'X-HTTP-Method-Override': 'PUT', // override a PUT
+                            'X-HTTP-Method-Override': 'PUT',
                             'Accept': 'application/json'
                         },
                         body: new FormData(form)

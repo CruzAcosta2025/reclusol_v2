@@ -3,7 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostulanteController;
-use App\Http\Controllers\PostulanteSecundarioController;
+// use App\Http\Controllers\PostulanteSecundarioController;
 use App\Http\Controllers\RequerimientoController;
 use App\Http\Controllers\CargoController;
 use App\Http\Controllers\HomeController;
@@ -26,7 +26,7 @@ Route::middleware('auth')->group(function () {
   Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
   Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-  
+
   // RUTAS PARA POSTULANTES
   Route::get('/postulantes/crear', [PostulanteController::class, 'crear'])->name('postulantes.crear');
   Route::get('/postulantes/filtrar', [PostulanteController::class, 'filtrar'])->name('postulantes.filtrar');
@@ -38,25 +38,23 @@ Route::middleware('auth')->group(function () {
   Route::put('/postulantes/{postulante}', [PostulanteController::class, 'update'])->name('postulantes.update');
 
 
- // RUTAS PARA REQUERIMIENTOS
+  // RUTAS PARA REQUERIMIENTOS
   Route::get('/requerimientos/registro', [RequerimientoController::class, 'mostrar'])->name('requerimientos.requerimiento');
   Route::post('/requerimientos', [RequerimientoController::class, 'store'])->name('requerimientos.store');
   Route::get('/requerimientos/filtrar', [RequerimientoController::class, 'filtrar'])->name('requerimientos.filtrar');
-   Route::delete('/requerimientos/{requerimiento}', [RequerimientoController::class, 'destroy'])->name('requerimientos.destroy');
+  Route::delete('/requerimientos/{requerimiento}', [RequerimientoController::class, 'destroy'])->name('requerimientos.destroy');
   Route::get('/requerimientos/{requerimiento}/edit', [RequerimientoController::class, 'edit'])->name('requerimientos.edit');
   Route::put('/requerimientos/{requerimiento}', [RequerimientoController::class, 'update'])->name('requerimientos.update');
 
-
-   
 
   Route::get('/cargos', [CargoController::class, 'index']);
   Route::get('/cargos/{id}', [CargoController::class, 'show']);
 
   // RUTAS PARA AFICHES 
   Route::get('/afiches', [PosterController::class, 'index'])->name('afiches.index');
+
   Route::get('/poster/{req}/{template}', [PosterController::class, 'show'])->name('poster.show');
   Route::get('/historial-afiches', [HistorialController::class, 'index'])->name('afiches.historial');
-
 });
 
 

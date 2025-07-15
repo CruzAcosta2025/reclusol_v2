@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\DB; 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Postulante;     
-use Carbon\Carbon; 
-use App\Models\Requerimiento;     
+use App\Models\Postulante;
+use App\Models\Catalogo;
+use Carbon\Carbon;
+use App\Models\Requerimiento;
 
 
 
@@ -39,14 +40,27 @@ class HomeController extends Controller
             : 0;
 
         /* ---------- Postulantes agrupados por ciudad (sede) ---------- */
-        $porSede = Postulante::select('ciudad', DB::raw('COUNT(*) as total'))
-           ->groupBy('ciudad')
-           ->orderByDesc('total')          // la barra más larga primero
-           ->get();
+        $porSede = Postulante::select('departamento', DB::raw('COUNT(*) as total'))
+            ->groupBy('departamento')
+            ->orderByDesc('total')
+            ->get();
 
         $maxTotalSede = $porSede->max('total');    // para calcular porcentajes
 
+        // Traer catálogo
+        $departamentos = Catalogo::obtenerDepartamentos()->keyBy('DEPA_CODIGO');
+
+        // Mapear nombres
+        foreach ($porSede as $sede) {
+            $codigo = str_pad($sede->departamento, 2, '0', STR_PAD_LEFT);
+            $sede->nombre_departamento = $departamentos[$codigo]->DEPA_DESCRIPCION ?? 'Sin nombre';
+        }
+
+
         $requerimientos = Requerimiento::orderByDesc('created_at')->get(); // Puedes agregar filtros si deseas solo los activos o validados
+
+        $departamentos = Catalogo::obtenerDepartamentos()->keyBy('DEPA_CODIGO');
+
 
 
         /* ---------- Enviar a la vista ---------- */
@@ -60,5 +74,4 @@ class HomeController extends Controller
             'requerimientos'
         ));
     }
-
 }

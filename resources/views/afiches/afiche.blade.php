@@ -18,12 +18,12 @@ use Illuminate\Support\Str;
                         <h1 class="text-3xl font-bold text-gray-800">Generador de Afiches</h1>
                         <p class="text-gray-600 mt-1">Crea afiches automáticamente basados en los requerimientos activos</p>
                     </div>
-                    <div class="flex items-center space-x-4">
+                    <!-- <div class="flex items-center space-x-4">
                         <a href="{{ route('afiches.historial') }}" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center space-x-2 transition-all duration-300 hover:-translate-y-1">
                             <i class="fas fa-history"></i>
                             <span>Historial</span>
                         </a>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>
@@ -45,25 +45,35 @@ use Illuminate\Support\Str;
                             @foreach ($requerimientos as $req)
                             @php
                             $color = match (strtolower($req->prioridad)) {
-                            'urgente' => 'bg-red-100 text-red-800',
-                            'alta' => 'bg-red-50 text-red-600',
-                            'media' => 'bg-yellow-100 text-yellow-800',
-                            'baja' => 'bg-green-100 text-green-800',
-                            default => 'bg-gray-100 text-gray-800',
+                            'urgente' => 'bg-red-700 text-white',
+                            'alta' => 'bg-red-600 text-white',
+                            'media' => 'bg-yellow-600 text-white',
+                            'baja' => 'bg-green-600 text-white',
+                            default => 'bg-gray-600 text-white',
                             };
+
                             @endphp
                             <div class="requirement-item p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all duration-300"
                                 onclick="selectRequirement({{ $req->id }}, this)">
                                 <div class="flex justify-between items-start mb-2">
-                                    <h4 class="font-semibold text-gray-800">{{ str($req->cargo_solicitado)->upper() }}</h4>
-                                    <span class="{{ $color }} text-xs px-2 py-1 rounded-full capitalize">{{ $req->prioridad }}</span>
+                                    <h4 class="font-semibold text-gray-800">{{ $req->cargo_nombre }}</h4>
+                                    <span class="{{ $color }} text-sm font-semibold tracking-widest px-3 py-1 rounded-full uppercase shadow-sm border border-opacity-40 border-current">
+                                        {{ strtoupper($req->prioridad) }}
+                                    </span>
                                 </div>
-                                <p class="text-sm text-gray-600 mb-2">
-                                    Cliente: {{ $req->cliente }} – {{ str($req->sucursal)->title() }}
+                                <p class="text-xs text-gray-600 mb-2">
+                                    Sucursal: {{ $req->sucursal_nombre }} - Cliente: {{ $req->cliente }}
                                 </p>
-                                <div class="flex justify-between text-xs text-gray-500">
+                                <p class="text-xs text-gray-600 mb-2">
+                                    Area: {{ $req->area_solicitante}}
+                                </p>
+                                <p class="text-xs text-gray-600 mb-2">
+                                    Provincia: {{ $req->provincia_nombre }} - Distrito: {{ $req->distrito_nombre }}
+                                </p>
+
+                                <div class="flex justify-between text-xs text-gray-600">
                                     <span>
-                                        Cantidad: {{ $req->cantidad_requerida }} {{ str('persona')->plural($req->cantidad_requerida) }}
+                                        Cantidad Requerida: {{ $req->cantidad_requerida }} {{ str('persona')->plural($req->cantidad_requerida) }}
                                     </span>
                                     <span>
                                         Límite: {{ \Carbon\Carbon::parse($req->fecha_limite)->format('Y/m/d') }}
@@ -80,21 +90,22 @@ use Illuminate\Support\Str;
                     ->mapWithKeys(function ($r) {
                     $badgeColor = match (strtolower($r->prioridad)) {
                     'urgente' => 'bg-red-100 text-red-800',
-                    'alta' => 'bg-red-50 text-red-600',
+                    'alta' => 'bg-red-700 text-red-700',
                     'media' => 'bg-yellow-100 text-yellow-800',
                     'baja' => 'bg-green-100 text-green-800',
                     default => 'bg-gray-100 text-gray-800',
                     };
                     return [
                     $r->id => [
-                    'title' => strtoupper($r->cargo_solicitado),
-                    'location' => \Illuminate\Support\Str::title($r->sucursal).' - '.$r->cliente,
+                    'title' => strtoupper($r->cargo_nombre), // 👈 Cambiado
+                    'location' => $r->sucursal_nombre . ' - ' . $r->cliente, // 👈 Cambiado
                     'quantity' => $r->cantidad_requerida,
                     'deadline' => optional($r->fecha_limite)->format('Y/m/d'),
-                    'requirements'=> array_values(array_filter([
-                    'Edad: '.$r->edad_minima.' - '.$r->edad_maxima.' años',
-                    $r->nivel_estudios ? 'Estudios: '.str_replace('_',' ',$r->nivel_estudios) : null,
-                    $r->experiencia_minima ? 'Experiencia: '.str_replace('_',' ',$r->experiencia_minima) : null,
+                    'requirements' => array_values(array_filter([
+                    'Edad: ' . $r->edad_minima . ' - ' . $r->edad_maxima . ' años',
+
+                    $r->nivel_estudios ? 'Estudios: ' . str_replace('_', ' ', $r->nivel_estudios) : null,
+                    $r->experiencia_minima ? 'Experiencia: ' . str_replace('_', ' ', $r->experiencia_minima) : null,
                     $r->requiere_sucamec ? 'SUCAMEC vigente' : null,
                     $r->requiere_licencia_conducir ? 'Licencia de conducir' : null,
                     $r->requisitos_adicionales,
@@ -105,7 +116,6 @@ use Illuminate\Support\Str;
                     })
                     ->toJson(JSON_UNESCAPED_UNICODE);
                     @endphp
-
 
                     {{-- CONTENEDOR DE OPCIONES (TABS) --}}
                     <div class="bg-white rounded-2xl shadow-lg p-6 card-hover">
@@ -395,7 +405,7 @@ use Illuminate\Support\Str;
 
             posterImage.classList.remove('hidden');
             posterImage.onerror = () => posterImage.src = '/assets/plantillas/placeholder.png';
-            posterImage.onload = () => console.log('✅ Preview listo:', url);
+            //posterImage.onload = () => console.log('✅ Preview listo:', url);
             posterImage.src = url;
         }
 
@@ -461,12 +471,5 @@ use Illuminate\Support\Str;
         function toggleDownloadMenu() {
             document.getElementById('download-menu').classList.toggle('hidden');
         }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const first = document.querySelector('.requirement-item');
-            if (first) first.click();
-            const tpl = document.querySelector(".template-option[onclick*=\"'modern'\"]");
-            if (tpl) tpl.classList.add('selected');
-        });
     </script>
 </x-app-layout>

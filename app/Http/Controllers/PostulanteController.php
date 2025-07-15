@@ -42,8 +42,8 @@ class PostulanteController extends Controller
             'apellidos'          => 'required|string|max:50',
             'dni'                => 'required|string|size:8|unique:postulantes,dni',
             'edad'               => 'required|integer|min:18|max:120',
-            'ciudad'             => 'required|string|max:50',
-            'distrito'           => 'required|string|max:50',
+            'departamento'       => 'required|string|max:50',
+            'provincia'          => 'required|string|max:50',
             'celular'            => 'required|digits:9',
             'celular_referencia' => 'nullable|digits:9',
             'estado_civil'       => 'required|string|max:50',
@@ -115,8 +115,8 @@ class PostulanteController extends Controller
         //if ($request->filled('localidad')) {
         //  $query->where('localidad', $request->localidad);
         //}
-        if ($request->filled('ciudad')) {
-            $query->where('ciudad', $request->ciudad);
+        if ($request->filled('departamento')) {
+            $query->where('departamento', $request->departamento);
         }
         //if ($request->filled('estado')) {
         //  $query->where('estado', $request->estado);
@@ -181,8 +181,8 @@ class PostulanteController extends Controller
             'apellidos' => 'required|string|max:50',
             'dni'                 => ['required','string','size:8', Rule::unique('postulantes', 'dni')->ignore($postulante->id),],
             'edad'     => 'required|integer|min:18|max:120',
-            'ciudad'   => 'required|string|max:50',
-            'distrito' => 'required|string|max:50',
+            'departamento'   => 'required|string|max:50',
+            'provincia' => 'required|string|max:50',
             'celular'  => 'required|digits:9',
             'celular_referencia' => 'nullable|digits:9',
             'estado_civil' => 'required|string|max:50',
