@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,26 +8,30 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="icon" type="image/png" href="{{ asset('imagenes/logo_app.png') }}">
-
     <style>
         .gradient-bg {
             background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #1d4ed8 100%);
         }
+
         .card-hover {
             transition: all 0.3s ease;
         }
+
         .card-hover:hover {
             transform: translateY(-5px);
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
+
         .btn-primary {
             background: linear-gradient(135deg, #3b82f6, #1d4ed8);
             transition: all 0.3s ease;
         }
+
         .btn-primary:hover {
             background: linear-gradient(135deg, #1d4ed8, #1e40af);
             transform: translateY(-1px);
         }
+
         .avatar-container {
             background: linear-gradient(135deg, #fbbf24, #f59e0b);
             border: 4px solid white;
@@ -34,30 +39,35 @@
         }
     </style>
 </head>
+
 <body class="bg-gray-50">
     <!-- Header -->
     <header class="bg-white shadow-sm border-b">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <!-- Logo -->
                 <div class="flex items-center space-x-3">
-                        <img src="{{ asset('imagenes/logo_app.png') }}" alt="Logo RECLUSOL" class="w-12 h-12 rounded-lg object-cover">
+                    <img src="{{ asset('imagenes/logo_app.png') }}" alt="Logo RECLUSOL" class="w-12 h-12 rounded-lg object-cover">
                     <div>
                         <h1 class="text-xl font-bold text-blue-600">RECLUSOL</h1>
                         <p class="text-xs text-gray-500">Plataforma de Reclutamiento</p>
                     </div>
                 </div>
-
-                <!-- Navigation -->
-                <div class="flex items-center space-x-4">
-                    <a href="{{ route('login') }}" class="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors">
-                        <i class="fas fa-sign-in-alt"></i>
-                        <span>Iniciar Sesión</span>
-                    </a>
-                    <a href="{{ route('postulantes.registroPrimario') }}" class="btn-primary text-white px-6 py-2 rounded-lg font-medium">
-                      <i class="fas fa-user-plus mr-2"></i>
-                      Postular
-                    </a>
+                <!-- Navigation con Alpine.js -->
+                <div x-data="{ open: false }" class="relative">
+                    <button @click="open = !open" class="md:hidden text-gray-600 text-2xl focus:outline-none">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div :class="{ 'block': open, 'hidden': !open }" class="absolute top-14 right-0 bg-white shadow-lg rounded-lg w-48 py-4 px-4 space-y-3 md:flex md:static md:bg-transparent md:shadow-none md:space-y-0 md:space-x-4 md:w-auto md:py-0 md:px-0 hidden z-50">
+                        <a href="{{ route('login') }}" class="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors">
+                            <i class="fas fa-sign-in-alt"></i>
+                            <span>Iniciar Sesión</span>
+                        </a>
+                        <a href="{{ route('postulantes.formExterno') }}" class="btn-primary text-white px-6 py-2 rounded-lg font-medium block text-center">
+                            <i class="fas fa-user-plus mr-2"></i>
+                            Postular
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -65,44 +75,41 @@
 
     <!-- Hero Section -->
     <section class="gradient-bg min-h-screen flex items-center">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-            <div class="grid lg:grid-cols-2 gap-12 items-center">
+        <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <!-- Left Content -->
                 <div class="text-white space-y-6">
-                    <h1 class="text-5xl lg:text-6xl font-bold leading-tight">
+                    <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
                         Encuentra tu
                         <span class="block text-yellow-300">Próximo Empleo</span>
                     </h1>
-                    <p class="text-xl text-blue-100 leading-relaxed">
+                    <p class="text-lg sm:text-xl text-blue-100 leading-relaxed">
                         Miles de personas ya forman parte de nuestra comunidad laboral. ¡Súmate!
                     </p>
-                    <div class="flex flex-col sm:flex-row gap-4 pt-4">
-                        <a href="{{ route('login') }}" class="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors inline-flex items-center justify-center">
+                    <div class="flex flex-col sm:flex-row gap-4 pt-2">
+                        <a href="{{ route('login') }}" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors inline-flex items-center justify-center">
                             <i class="fas fa-rocket mr-2"></i>
                             Comenzar Ahora
                         </a>
-                        <a href="#features" class="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors inline-flex items-center justify-center">
+                        <a href="#features" class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors inline-flex items-center justify-center">
                             <i class="fas fa-info-circle mr-2"></i>
                             Saber Más
                         </a>
                     </div>
                 </div>
-
                 <!-- Right Content - Avatar Card -->
                 <div class="flex justify-center">
                     <div class="bg-white rounded-3xl p-8 shadow-2xl max-w-md w-full">
                         <div class="text-center space-y-6">
-                            <div class="avatar-container w-32 h-32 rounded-full mx-auto flex items-center justify-center">
-                                <img src="{{ asset('imagenes/SOLMAR_1.png') }}" alt="Logo RECLUSOL" class="w-28 h-28 rounded-lg object-cover">
+                            <div class="avatar-container w-32 h-32 sm:w-36 sm:h-36 rounded-full mx-auto flex items-center justify-center">
+                                <img src="{{ asset('imagenes/SOLMAR_1.png') }}" alt="Logo RECLUSOL" class="w-28 h-28 object-contain">
                             </div>
-                            <div>
-                                <h3 class="text-2xl font-bold text-gray-800 mb-2">
-                                    ¡Únete a SOLMAR Security!
-                                </h3>
-                                <p class="text-gray-600 leading-relaxed">
-                                    Miles de profesionales ya encontraron su trabajo ideal con nosotros.
-                                </p>
-                            </div>
+                            <h3 class="text-2xl font-bold text-gray-800 mb-2">
+                                ¡Únete a SOLMAR Security!
+                            </h3>
+                            <p class="text-gray-600 leading-relaxed">
+                                Miles de profesionales ya encontraron su trabajo ideal con nosotros.
+                            </p>
                             <div class="flex justify-center space-x-2">
                                 <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
                                 <div class="w-2 h-2 bg-blue-300 rounded-full"></div>
@@ -116,18 +123,17 @@
     </section>
 
     <!-- Features Section -->
-    <section id="features" class="py-20 bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl font-bold text-gray-800 mb-4">
+    <section id="features" class="py-16 sm:py-20 bg-white">
+        <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12 sm:mb-16">
+                <h2 class="text-2xl sm:text-4xl font-bold text-gray-800 mb-4">
                     ¿Por qué elegir a SOLMAR Security?
                 </h2>
-                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                <p class="text-base sm:text-xl text-gray-600 max-w-3xl mx-auto">
                     Descubre las ventajas que nos convierten en la plataforma líder de reclutamiento
                 </p>
             </div>
-
-            <div class="grid md:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <!-- Feature 1 -->
                 <div class="card-hover bg-white rounded-2xl p-8 text-center shadow-lg border">
                     <div class="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -138,7 +144,6 @@
                         Conecta con miles de empresas y profesionales en nuestra extensa red de contactos laborales.
                     </p>
                 </div>
-
                 <!-- Feature 2 -->
                 <div class="card-hover bg-white rounded-2xl p-8 text-center shadow-lg border">
                     <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -149,7 +154,6 @@
                         Accede a oportunidades laborales verificadas y de alta calidad en empresas reconocidas.
                     </p>
                 </div>
-
                 <!-- Feature 3 -->
                 <div class="card-hover bg-white rounded-2xl p-8 text-center shadow-lg border">
                     <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -165,12 +169,12 @@
     </section>
 
     <!-- CTA Section -->
-    <section class="gradient-bg py-20">
+    <section class="gradient-bg py-16 sm:py-20">
         <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-            <h2 class="text-4xl font-bold text-white mb-6">
+            <h2 class="text-2xl sm:text-4xl font-bold text-white mb-6">
                 ¿Listo para encontrar tu próximo empleo?
             </h2>
-            <p class="text-xl text-blue-100 mb-8 leading-relaxed">
+            <p class="text-base sm:text-xl text-blue-100 mb-8 leading-relaxed">
                 Únete a miles de profesionales que ya encontraron su trabajo ideal
             </p>
         </div>
@@ -178,9 +182,9 @@
 
     <!-- Footer -->
     <footer class="bg-gray-800 text-white py-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid md:grid-cols-4 gap-8">
-                <div class="col-span-2">
+        <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="md:col-span-2">
                     <div class="flex items-center space-x-3 mb-4">
                         <div class="w-10 h-10 bg-white-600 rounded-lg flex items-center justify-center">
                             <img src="{{ asset('imagenes/logo_app.png') }}" alt="Logo RECLUSOL" class="w-10 h-10 rounded-lg object-cover">
@@ -226,8 +230,8 @@
 
     <!-- Smooth Scroll Script -->
     <script>
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
+        document.querySelectorAll('a[href^=\"#\"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
                 e.preventDefault();
                 document.querySelector(this.getAttribute('href')).scrollIntoView({
                     behavior: 'smooth'
@@ -235,5 +239,8 @@
             });
         });
     </script>
+    <!-- Alpine.js por CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js" defer></script>
 </body>
+
 </html>

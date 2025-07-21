@@ -13,41 +13,65 @@ class Requerimiento extends Model
     public $timestamps = true;
 
     protected $fillable = [
+        'fecha_solicitud',
+        'user_id',
+        'cargo_usuario',
         'area_solicitante',
-        'distrito',
-        'provincia',
         'departamento',
+        'provincia',
+        'distrito',
         'sucursal',
-        'cliente',
+        'tipo_personal',
         'tipo_cargo',
         'cargo_solicitado',
+        'cliente',
+        'ubicacion_servicio',
+        'sede',
+        'fecha_inicio',
+        'fecha_fin',
+        'urgencia',
         'cantidad_requerida',
-        'fecha_limite',
+        'cantidad_masculino',
+        'cantidad_femenino',
         'edad_minima',
         'edad_maxima',
-        'requiere_licencia_conducir',
-        'requiere_sucamec',
-        'nivel_estudios',
         'experiencia_minima',
-        'requisitos_adicionales',
+        'curso_sucamec_operativo',
+        'carne_sucamec_operativo',
+        'licencia_armas',
+        'servicio_acuartelado',
+        'grado_academico',
+        'formacion_adicional',
         'validado_rrhh',
         'escala_remunerativa',
+        'beneficios',
         'prioridad',
-        'estado'
+        'estado',
+        'fecha_limite',
+        'requiere_licencia_conducir',
+        'requiere_sucamec',
+        'requisitos_adicionales',
     ];
 
     protected $casts = [
+        'fecha_solicitud' => 'date',
+        'fecha_inicio' => 'date',
+        'fecha_fin' => 'date',
         'fecha_limite' => 'date',
+        'validado_rrhh' => 'boolean',
+        'requiere_licencia_conducir' => 'boolean',
+        'requiere_sucamec' => 'boolean',
     ];
+
+
+    public function usuario()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 
     public function estado()
     {
         return $this->belongsTo(EstadoRequerimiento::class, 'estado'); // 'estado' es la FK en tu tabla requerimientos
-    }
-
-    public function prioridad()
-    {
-        return $this->belongsTo(PrioridadRequerimiento::class, 'prioridad'); // 'estado' es la FK en tu tabla requerimientos
     }
 
 
@@ -57,18 +81,6 @@ class Requerimiento extends Model
         if ($this->relationLoaded('estado') && $this->getRelation('estado')) {
             return $this->getRelation('estado');
         }
-
-        // Si no, devuelve el valor crudo de la columna
-        return $value;
-    }
-
-    public function getPrioridadAttribute($value)
-    {
-        // Si la relación ya se cargó, úsala
-        if ($this->relationLoaded('prioridad') && $this->getRelation('prioridad')) {
-            return $this->getRelation('prioridad');
-        }
-
         // Si no, devuelve el valor crudo de la columna
         return $value;
     }

@@ -124,7 +124,7 @@
                             class="flex items-center justify-between w-full space-x-3 text-white/80 hover:text-white hover:bg-white/10 px-4 py-3 rounded-lg transition-colors">
                             <div class="flex items-center space-x-3">
                                 <i class="fas fa-file-alt"></i>
-                                <span>REQUERIMIENTOS</span>
+                                <span>SOLICITUDES</span>
                             </div>
                             <i :class="open ? 'fa-chevron-up' : 'fa-chevron-down'" class="fas"></i>
                         </button>
@@ -136,11 +136,11 @@
                             class="absolute left-0 mt-1 w-48 bg-white rounded-lg shadow-lg z-20">
                             <a href="{{ route('requerimientos.requerimiento') }}"
                                 class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors">
-                                <i class="fas fa-plus mr-2"></i> Crear Requerimiento
+                                <i class="fas fa-plus mr-2"></i> Crear Solicitud
                             </a>
                             <a href="{{ route('requerimientos.filtrar') }}"
                                 class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors">
-                                <i class="fas fa-users mr-2"></i> Ver Requerimientos
+                                <i class="fas fa-users mr-2"></i> Ver Solicitudes
                             </a>
                         </div>
                     </div>
@@ -161,7 +161,7 @@
                             @click.away="open = false"
                             x-transition
                             class="absolute left-0 mt-1 w-48 bg-white rounded-lg shadow-lg z-20">
-                            <a href="{{ route('postulantes.crear') }}"
+                            <a href="{{ route('postulantes.formInterno') }}"
                                 class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors">
                                 <i class="fas fa-plus mr-2"></i> Crear Postulante
                             </a>
@@ -177,7 +177,7 @@
                         <span>AFICHES</span>
                     </a>
 
-                    <a href="#" class="flex items-center space-x-3 text-white/80 hover:text-white hover:bg-white/10 px-4 py-3 rounded-lg transition-colors">
+                    <a href="{{ route('entrevistas.index') }}" class="flex items-center space-x-3 text-white/80 hover:text-white hover:bg-white/10 px-4 py-3 rounded-lg transition-colors">
                         <i class="fas fa-calendar-check"></i>
                         <span>ENTREVISTAS</span>
                     </a>

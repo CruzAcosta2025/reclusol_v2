@@ -16,12 +16,9 @@
                 </h1>
                 <p class="text-gray-600 mt-1">
                     Gestiona y supervisa todos los requerimientos laborales de manera eficiente
-
                 </p>
             </div>
         </div>
-
-
 
         <!-- Filters Section -->
 

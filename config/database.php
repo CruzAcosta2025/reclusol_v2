@@ -97,6 +97,7 @@ return [
             'sslmode' => 'prefer',
         ],
 
+        /*
         'sqlsrv' => [
             'driver' => 'sqlsrv',
             'url' => env('DB_URL'),
@@ -111,17 +112,40 @@ return [
             // 'encrypt' => env('DB_ENCRYPT', 'yes'),
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
+        */
+
+        'sqlsrv' => [
+            'driver' => 'sqlsrv',
+            'host' => env('DB_HOST', 'localhost'),
+            'port' => env('DB_PORT', '1433'),
+            'database' => env('DB_DATABASE', 'prueba1'),
+            'username' => env('DB_USERNAME', 'usr_solmar_vb'),
+            'password' => env('DB_PASSWORD', '11hotelbravo'),
+            'charset' => 'utf8',
+            'prefix' => '',
+        ],
 
         'si_solmar' => [
-        'driver'   => 'sqlsrv',
-        'host'     => env('SI_SOLMAR_HOST', '192.168.10.21'),
-        'port'     => env('SI_SOLMAR_PORT', '1433'),
-        'database' => env('SI_SOLMAR_DB',  'si_solm'),
-        'username' => env('SI_SOLMAR_USER','usr_solmar_vb'),
-        'password' => env('SI_SOLMAR_PASS','11hotelbravo'),
-        'charset'  => 'utf8',
-        'prefix'   => '',
-    ],
+            'driver'   => 'sqlsrv',
+            'host'     => env('SI_SOLMAR_HOST', '192.168.10.21'),
+            'port'     => env('SI_SOLMAR_PORT', '1433'),
+            'database' => env('SI_SOLMAR_DB',  'si_solm'),
+            'username' => env('SI_SOLMAR_USER', 'usr_solmar_vb'),
+            'password' => env('SI_SOLMAR_PASS', '11hotelbravo'),
+            'charset'  => 'utf8',
+            'prefix'   => '',
+        ],
+
+        'sqlsrv_control' => [
+            'driver'   => 'sqlsrv',
+            'host'     => env('DB_HOST_CONTROL', '192.168.10.20'),
+            'port'     => env('DB_PORT_CONTROL', '1433'),
+            'database' => env('DB_DATABASE_CONTROL', 'CONTROLCLIENTES2018'),
+            'username' => env('DB_USERNAME_CONTROL', 'usr_solmar_vb'),
+            'password' => env('DB_PASSWORD_CONTROL', '11hotelbravo'),
+            'charset'  => 'utf8',
+            'prefix'   => '',
+        ],
 
     ],
 
@@ -158,7 +182,7 @@ return [
 
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'redis'),
-            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_database_'),
+            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_') . '_database_'),
             'persistent' => env('REDIS_PERSISTENT', false),
         ],
 

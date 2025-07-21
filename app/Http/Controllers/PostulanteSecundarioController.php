@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 
 class PostulanteSecundarioController extends Controller
 {
-    public function mostrar()
+    public function mostrarExterior()
     {
         return view('postulantes.registroSecundario');
     }
@@ -22,12 +22,14 @@ class PostulanteSecundarioController extends Controller
             'apellidos'          => 'required|string|max:50',
             'dni'                => 'required|string|size:8|unique:postulantes,dni',
             'edad'               => 'required|integer|min:18|max:120',
-            'ciudad'             => 'required|string|max:50',
+            'departamento'       => 'required|string|max:50',
+            'provincia'          => 'required|string|max:50',
             'distrito'           => 'required|string|max:50',
             'celular'            => 'required|digits:9',
             'celular_referencia' => 'nullable|digits:9',
             'estado_civil'       => 'required|string|max:50',
             'nacionalidad'       => 'required|string|max:50',
+            'tipo_cargo'         => 'required|string|max:50',
             'cargo'              => 'required|string|max:50',
             'fecha_postula'      => 'required|date',
             'experiencia_rubro'  => 'required|string|max:50',
@@ -40,18 +42,22 @@ class PostulanteSecundarioController extends Controller
             // Archivos  (máx. 5 MB — ya los validas en el front)
             'cv'  => 'required|file|max:5120',
             'cul' => 'required|file|max:5120',
+            'terms' => 'accepted',
+
+
         ]);
 
         /* ---------- 2. GUARDAR ARCHIVOS ---------- */
         $validated['cv']  = $request->file('cv')
-                                    ->store('postulantes/cv', 'public');
+            ->store('postulantes/cv', 'public');
 
         $validated['cul'] = $request->file('cul')
-                                    ->store('postulantes/cul', 'public');
+            ->store('postulantes/cul', 'public');
 
 
         try {
-            $postulante = DB::transaction(fn () =>
+            $postulante = DB::transaction(
+                fn() =>
                 Postulante::create($validated)
             );
         } catch (\Throwable $e) {
@@ -70,6 +76,6 @@ class PostulanteSecundarioController extends Controller
 
         Log::info('Postulante guardado', $postulante->toArray());
 
-            return back()->with('success', 'Tu información ha sido guardada correctamente. Te estaremos comunicando');
+        return back()->with('success', 'Tu información ha sido guardada correctamente. Te estaremos comunicando');
     }
 }

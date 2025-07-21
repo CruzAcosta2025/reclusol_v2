@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Requerimiento;
 use App\Models\EstadoRequerimiento;
 use App\Models\PrioridadRequerimiento;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 //use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -20,7 +21,24 @@ class RequerimientoController extends Controller
     {
         $estados = EstadoRequerimiento::all();
         $prioridades = PrioridadRequerimiento::all();
-        return view('requerimientos.requerimiento', compact('estados','prioridades'));
+
+        // Clientes (base CONTROLCLIENTES2018)
+        $clientes = DB::connection('sqlsrv_control')
+            ->select('EXEC Migracion_Listar_Clientes ?', ['']);
+
+        return view('requerimientos.requerimiento', compact('estados', 'prioridades', 'clientes'));
+    }
+
+    public function sedesPorCliente(Request $request)
+    {
+        $codigo = $request->input('codigo_cliente');
+
+        $sedes = DB::connection('sqlsrv_control')->select(
+            'EXEC USP_SICOS_2024_LISTAR_SEDES_X_CLIENTE ?, ?, ?',
+            [$codigo, '', 0]
+        );
+
+        return response()->json($sedes);
     }
 
     public function index()
@@ -35,33 +53,58 @@ class RequerimientoController extends Controller
     {
         /* ---------- 1. VALIDACIÓN ---------- */
         $validated = $request->validate([
-            'area_solicitante'           => 'required|string|max:50',
-            'sucursal'                   => 'required|string|max:50',
-            'distrito'                   => 'required|string|max:50',
-            'provincia'                  => 'required|string|max:50',
-            'departamento'               => 'required|string|max:50',
-            'cliente'                    => 'required|string|max:50',
-            'tipo_cargo'                 => 'required|string|max:50',
-            'cargo_solicitado'           => 'required|string|max:50',
-            'cantidad_requerida'         => 'required|integer|min:1|max:255',
-            'fecha_limite'               => 'required|date|after_or_equal:today',
-            'edad_minima'                => 'required|integer|min:18|max:65',
-            'edad_maxima'                => 'required|integer|min:18|max:65',
-            'requiere_licencia_conducir' => 'boolean',
-            'requiere_sucamec'           => 'boolean',
-            'nivel_estudios'             => 'required|string|max:50',
-            'experiencia_minima'         => 'required|string|max:50',
-            'requisitos_adicionales'     => 'nullable|string',
-            'validado_rrhh'              => 'boolean',
-            'escala_remunerativa'        => 'required|string|max:10',
-            'prioridad'                  => 'required|exists:prioridad_requerimiento,id',
-            'estado'                     => 'required|exists:estado_requerimiento,id',
+            // DATOS AUTOMÁTICOS (se agregan luego, no validar)
+            // 'user_id' => ...,
+            // 'cargo_usuario' => ...,
+            // 'fecha_solicitud' => ...,
+
+            'area_solicitante'     => 'nullable|string|max:50',
+            'departamento'         => 'nullable|string|max:50',
+            'provincia'            => 'nullable|string|max:50',
+            'distrito'             => 'nullable|string|max:50',
+            'sucursal'             => 'required|string|max:50',
+            'cliente'              => 'required|string|max:50',
+            'sede'                 => 'nullable|string|max:50',
+            'tipo_personal'        => 'required|string|max:50',
+            'tipo_cargo'           => 'required|string|max:50',
+            'cargo_solicitado'     => 'required|string|max:50',
+            'ubicacion_servicio'   => 'nullable|string|max:50',
+            'fecha_inicio'         => 'required|date',
+            'fecha_fin'            => 'required|date|after_or_equal:fecha_inicio',
+            'urgencia'             => 'required|string|max:50',
+            'cantidad_requerida'   => 'required|integer|min:1|max:255',
+            'cantidad_masculino'   => 'required|integer|min:0|max:255',
+            'cantidad_femenino'    => 'required|integer|min:0|max:255',
+            'edad_minima'          => 'required|integer|min:18|max:65',
+            'edad_maxima'          => 'required|integer|min:18|max:70',
+            'experiencia_minima'   => 'required|string|max:50',
+            'curso_sucamec_operativo'   => 'nullable|string|max:50',
+            'carne_sucamec_operativo'   => 'nullable|string|max:50',
+            'licencia_armas'            => 'nullable|string|max:50',
+            'servicio_acuartelado'      => 'nullable|string|max:50',
+            'grado_academico'           => 'required|string|max:50',
+            'formacion_adicional'       => 'required|string|max:50',
+            'validado_rrhh'             => 'boolean',
+            'escala_remunerativa'       => 'required|string|max:50',
+            'beneficios'                => 'required|string|max:50',
+            //'prioridad'                 => 'nullable|exists:prioridad_requerimiento,id',
+            'estado'                    => 'required|exists:estado_requerimiento,id',
+            //'fecha_limite'              => 'nullable|date|after_or_equal:today',
+            //'requiere_licencia_conducir' => 'boolean',
+            //'requiere_sucamec'          => 'boolean',
+            //'requisitos_adicionales'    => 'nullable|string',
         ]);
 
-        /* ---------- 2. TRANSFORMAR CHECKBOX ---------- */
+
+        /* ---------- 2. CAMPOS AUTOMÁTICOS ---------- */
+        $validated['user_id'] = Auth::id();
+        $validated['fecha_solicitud'] = now();
+        $validated['cargo_usuario'] = Auth::user()->cargo ?? null;
+
+        /* ---------- 3. TRANSFORMAR CHECKBOX ---------- */
         $validated['requiere_licencia_conducir'] = $request->boolean('requiere_licencia_conducir');
-        $validated['requiere_sucamec']           = $request->boolean('requiere_sucamec');
-        $validated['validado_rrhh']              = $request->boolean('validado_rrhh');
+        $validated['requiere_sucamec'] = $request->boolean('requiere_sucamec');
+        $validated['validado_rrhh'] = $request->boolean('validado_rrhh');
 
         try {
             $requerimiento = DB::transaction(
