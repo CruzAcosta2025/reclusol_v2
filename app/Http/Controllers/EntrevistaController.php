@@ -13,7 +13,9 @@ class EntrevistaController extends Controller
 {
     public function listadoInicial()
     {
-        $postulantes = Postulante::where('estado', 'proceso')->orderBy('fecha_postula', 'asc')->paginate(15);
+        $postulantes = Postulante::where('estado', 1) // 1 = EN PROCESO
+            ->orderBy('fecha_postula', 'asc')
+            ->paginate(15);
 
         return view('entrevistas.listadoInicial', compact('postulantes'));
     }

@@ -4,11 +4,9 @@ return [
 
     'models' => [
 
-        //'permission' => Spatie\Permission\Models\Permission::class,
+        'permission' => Spatie\Permission\Models\Permission::class,
 
-        //'role' => Spatie\Permission\Models\Role::class,
-
-            'role'       => App\Models\TipoCargo::class,
+        'role' => Spatie\Permission\Models\Role::class,
 
     ],
 
@@ -19,7 +17,8 @@ return [
          * table should be used to retrieve your roles. We have chosen a basic
          * default value but you may easily change it to any table you like.
          */
-        'roles' => 'TIPO_CARGO',   // Spatie buscará ahí
+        //'roles' => 'TIPO_CARGO',   // Spatie buscará ahí
+        'roles' => 'roles',
 
 
         //'roles' => 'roles',

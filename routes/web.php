@@ -9,7 +9,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\HistorialController;
 use App\Http\Controllers\PosterController;
 use App\Http\Controllers\EntrevistaController;
-use App\Models\Requerimiento;
+use App\Http\Controllers\UserController;
 
 Route::get('/', function () {
   return view('welcome');
@@ -61,6 +61,17 @@ Route::middleware('auth')->group(function () {
 
   Route::get('/poster/{req}/{template}', [PosterController::class, 'show'])->name('poster.show');
   Route::get('/historial-afiches', [HistorialController::class, 'index'])->name('afiches.historial');
+
+  // RUTAS PARA GESTIÓN DE USUARIOS
+  Route::get('/usuarios', [UserController::class, 'index'])->name('usuarios.index');
+  Route::get('/usuarios/create', [UserController::class, 'create'])->name('usuarios.create');
+  Route::post('/usuarios', [UserController::class, 'store'])->name('usuarios.store');
+  Route::get('/usuarios/{user}', [UserController::class, 'show'])->name('usuarios.show');
+  Route::get('/usuarios/{user}/edit', [UserController::class, 'edit'])->name('usuarios.edit');
+  Route::put('/usuarios/{user}', [UserController::class, 'update'])->name('usuarios.update');
+  Route::delete('/usuarios/{user}', [UserController::class, 'destroy'])->name('usuarios.destroy');
+  Route::post('/usuarios/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('usuarios.toggleStatus');
+  Route::get('usuarios/personal-por-sucursal/{codigo}', [UserController::class, 'personalPorSucursal']);
 });
 
 require __DIR__ . '/auth.php';

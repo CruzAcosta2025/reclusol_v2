@@ -185,6 +185,10 @@
                         <i class="fas fa-handshake"></i>
                         <span>CONTRATACIONES</span>
                     </a>
+                    <a href="{{ route('usuarios.index') }}" class="flex items-center space-x-3 text-white/80 hover:text-white hover:bg-white/10 px-4 py-3 rounded-lg transition-colors">
+                        <i class="fas fa-users-cog"></i>
+                        <span>USUARIOS</span>
+                    </a>
                     <a href="#" class="flex items-center space-x-3 text-white/80 hover:text-white hover:bg-white/10 px-4 py-3 rounded-lg transition-colors">
                         <i class="fas fa-cog"></i>
                         <span>CONFIGURACIÓN</span>

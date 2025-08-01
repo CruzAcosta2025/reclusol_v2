@@ -5,11 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use App\Models\Cargo;  
+use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Traits\HasRoles;
+
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasRoles;
 
     /* ---------- Config básicos ---------- */
     protected $table      = 'users';
@@ -19,19 +21,24 @@ class User extends Authenticatable
     /* Campos que puedes asignar masivamente */
     protected $fillable = [
         'name',
-        'usuario',
-        'cargo',        // ← aquí guardas el código “01”, “02”, “07”, …
+        'sucursal',
         'contrasena',
+        'cargo',
+        'usuario',
+        'rol',
     ];
 
     /* Ocultar al serializar (JSON, etc.) */
     protected $hidden = [
+        'password',
         'contrasena',
         'remember_token',
     ];
 
     /* Casts (Laravel 10/11 permite 'hashed') */
     protected $casts = [
+        //'email_verified_at' => 'datetime',
+        //'password' => 'hashed',
         'contrasena' => 'hashed',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
@@ -40,7 +47,8 @@ class User extends Authenticatable
     /* Laravel usará esto para validar la contraseña */
     public function getAuthPassword()
     {
-        return $this->contrasena;
+        // Priorizar 'password' estándar de Laravel, fallback a 'contrasena'
+        return $this->password ?? $this->contrasena;
     }
 
     /* ---------- Relación & helper de cargo ---------- */
@@ -48,7 +56,31 @@ class User extends Authenticatable
     /** Devuelve la fila de TIPO_CARGO con la descripción */
     public function cargoInfo()
     {
-        return $this->belongsTo(Cargo::class, 'cargo', 'CODI_TIPO_CARG');
+        if (!$this->cargo) {
+            return null;
+        }
+
+        // Usar TIPO_CARGO (o la tabla donde realmente está el catálogo de cargos)
+        return DB::connection('si_solmar')
+            ->table('TIPO_CARGO')
+            ->where('CODI_TIPO_CARG', $this->cargo)
+            ->select(['CODI_TIPO_CARG', 'DESC_TIPO_CARG'])
+            ->first();
+    }
+
+
+    /** Accessor para obtener información del cargo directamente */
+    public function getCargoInfoAttribute()
+    {
+        if (!$this->cargo) {
+            return null;
+        }
+
+        return DB::connection('si_solmar')
+            ->table('TIPO_CARGO')
+            ->where('CODI_TIPO_CARG', $this->cargo)
+            ->select(['CODI_TIPO_CARG', 'DESC_TIPO_CARG'])
+            ->first();
     }
 
     /** Comprueba si el usuario tiene un cargo específico */
@@ -57,9 +89,9 @@ class User extends Authenticatable
         return $this->cargo === $codigo;
     }
 
+    // Accessor para la descripción directa en la vista
     public function getCargoDescripcionAttribute(): string
-{
-    return $this->cargoInfo->DESC_TIPO_CARG ?? 'Sin rol';
-}
-
+    {
+        return $this->cargoInfo()?->DESC_TIPO_CARG ?? 'Sin rol';
+    }
 }
