@@ -1,4 +1,6 @@
-<x-app-layout>
+@extends('layouts.app')
+
+@section('content')
     <div class="min-h-screen gradient-bg py-8">
         <!-- Back to Dashboard Button -->
         <a href="{{ route('dashboard') }}" class="absolute top-6 left-6 text-white hover:text-yellow-300 transition-colors flex items-center space-x-2 group z-10">
@@ -67,11 +69,11 @@
                             </label>
                             <input
                                 type="text"
-                                value="{{ Auth::user()->name ?? 'INVITADO' }}-{{ Auth::user()->cargoInfo?->DESC_TIPO_CARG ?? 'Sin rol' }}"
+                                value="{{ Auth::user()->name ?? 'INVITADO' }}"
                                 disabled
                                 class="form-input text-xs w-full px-4 py-3 border border-gray-300 bg-gray-100 text-gray-600 rounded-lg focus:outline-none cursor-not-allowed">
                             <input type="hidden" name="user_id" value="{{ Auth::id() }}">
-                            <input type="hidden" name="cargo_usuario" value="{{ Auth::user()->cargoInfo?->DESC_TIPO_CARG ?? 'Sin rol' }}">
+                            <input type="hidden" name="cargo_usuario" value="{{ Auth::user()->cargoInfo?->DESC_TIPO_CARG ?? 'Sin rol' }}"> 
                         </div>
 
                         <!-- Sucursal -->
@@ -350,6 +352,21 @@
                                     <option value="no">No</option>
                                 </select>
                             </div>
+                            <!-- Licencia para portar armas (L4-L5) -->
+                            <div class="space-y-2">
+                                <label class="block text-sm font-semibold text-gray-700">
+                                    <i class="fas fa-shield-alt mr-2 text-green-500"></i>
+                                    Licencia de conducir *
+                                </label>
+                                <select
+                                    id="requiere_licencia_conducir"
+                                    name="requiere_licencia_conducir"
+                                    class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300">
+                                    <option value="">Seleccione...</option>
+                                    <option value="si">Sí</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </div>
                             <!-- Servicio acuartelado -->
                             <div class="space-y-2">
                                 <label class="block text-sm font-semibold text-gray-700">
@@ -361,10 +378,10 @@
                                     name="servicio_acuartelado"
                                     class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300">
                                     <option value="">Seleccione el servicio</option>
+                                    <option value="no">No</option>
                                     <option value="con_habitabilidad">Con habitabilidad</option>
                                     <option value="con_alimentacion">Con alimentación</option>
                                     <option value="con_movilidad">Con movilidad de traslado</option>
-                                    <option value="no">No</option>
                                 </select>
                             </div>
                         </div>
@@ -381,10 +398,11 @@
                                 required
                                 class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300">
                                 <option value="">Selecciona experiencia</option>
-                                <option value="6_meses">Mínima de 6 meses</option>
-                                <option value="1_anio">1 año</option>
-                                <option value="2_anios">Más de 2 años</option>
-                                <option value="sin_experiencia">Sin experiencia</option>
+                                <option value="6_meses">Sin experiencia</option>
+                                <option value="1_anio">Menos de 1 año</option>
+                                <option value="2_anios">Entre 1 y 2 años</option>
+                                <option value="sin_experiencia">Entre 3 y 4 años</option>
+                                <option value="sin_experiencia">Más de 4 años</option>
                             </select>
                         </div>
 
@@ -830,4 +848,4 @@
             }
         });
     </script>
-</x-app-layout>
+@endsection

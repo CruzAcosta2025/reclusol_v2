@@ -17,8 +17,8 @@ class UserController extends Controller
         $users = User::query()
             ->when(request('buscar'), function ($query, $buscar) {
                 $query->where(function ($q) use ($buscar) {
-                    $q->where('name', 'like', "%{$buscar}%")
-                        ->orWhere('email', 'like', "%{$buscar}%");
+                    $q->where('name', 'like', "%{$buscar}%");
+                    //->orWhere('email', 'like', "%{$buscar}%");
                 });
             })
             ->when(request('cargo'), function ($query, $cargo) {
@@ -26,9 +26,9 @@ class UserController extends Controller
             })
             ->when(request('estado'), function ($query, $estado) {
                 if ($estado === 'activo') {
-                    $query->whereNotNull('email_verified_at');
+                    $query->where('habilitado', 1);
                 } elseif ($estado === 'inactivo') {
-                    $query->whereNull('email_verified_at');
+                    $query->where('habilitado', 0);
                 }
             })
             ->paginate(15);
@@ -43,17 +43,14 @@ class UserController extends Controller
             ->count();
 
         // Obtener datos para filtros
-
-        $cargos = DB::connection('si_solmar')->table('TIPO_CARGO')
-            ->select(['CODI_TIPO_CARG', 'DESC_TIPO_CARG'])
+        $cargos = DB::connection('si_solmar')->table('CARGOS')
+            ->select(['CODI_CARG', 'DESC_CARGO'])
             ->get()
-            ->keyBy('CODI_TIPO_CARG');
+            ->keyBy('CODI_CARG');
 
         return view('usuarios.index', compact(
             'users',
             'totalUsers',
-            // 'activeUsers',
-            // 'inactiveUsers',
             'newUsersThisMonth',
             'cargos'
         ));
@@ -83,6 +80,36 @@ class UserController extends Controller
         return view('usuarios.create', compact('personal', 'sucursales', 'cargos'));
     }
 
+    public function buscarPersonal(Request $request)
+    {
+        Log::info('Buscar personal', [
+            'sucursal' => $request->sucursal,
+            'q' => $request->q
+        ]);
+        $sucursal = $request->sucursal;
+        $search = $request->q;
+
+        $personal = collect(DB::connection('sqlsrv')
+            ->select('EXEC RECLUSOL_2025_LISTAR_PERSONALXSUCURSAL ?', [$sucursal]));
+
+        if ($search) {
+            $personal = $personal->filter(function ($item) use ($search) {
+                return stripos($item->NOMBRE_COMPLETO, $search) !== false;
+            });
+        }
+
+        $result = $personal->map(function ($item) {
+            return [
+                'id'    => $item->NOMBRE_COMPLETO, // o usa un ID único si tienes
+                'text'  => $item->NOMBRE_COMPLETO,
+                'cargo' => $item->DESC_CARGO ?? '',
+            ];
+        })->values();
+
+        return response()->json(['results' => $result]);
+    }
+
+
     public function personalPorSucursal($codigo)
     {
         // Log para depurar
@@ -97,6 +124,18 @@ class UserController extends Controller
         return response()->json($personal);
     }
 
+    public function habilitarUsuario(User $user)
+    {
+        // Cambia el estado: si está habilitado lo deshabilita, y viceversa
+        $user->habilitado = !$user->habilitado;
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => $user->habilitado ? 'Usuario habilitado' : 'Usuario deshabilitado',
+            'status'  => $user->habilitado ? 'activo' : 'inactivo'
+        ]);
+    }
 
     public function store(Request $request)
     {
@@ -104,10 +143,11 @@ class UserController extends Controller
             'request' => $request->all()
         ]);
 
+        // --- VALIDACIÓN ---
         $request->validate([
             'sucursal'    => 'required|string|max:50',
             'personal_id' => 'required',
-            'name'        => 'required|string|unique:users,name', // o 'usuario', revisa tu tabla
+            'name'        => 'required|string|unique:users,name',
             'contrasena'  => 'required|string|min:8',
             'rol'         => 'required|exists:roles,name',
         ]);
@@ -117,7 +157,6 @@ class UserController extends Controller
                 'sucursal' => $request->sucursal
             ]);
 
-            // Ahora el SP debe devolver CODI_CARG también
             $personal = collect(
                 DB::connection('sqlsrv')
                     ->select('EXEC RECLUSOL_2025_LISTAR_PERSONALXSUCURSAL ?', [$request->sucursal])
@@ -140,16 +179,23 @@ class UserController extends Controller
                     'nombre' => $request->personal_id,
                     'sucursal' => $request->sucursal
                 ]);
+                // --- RESPONDE JSON SI AJAX ---
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'No se encontró la persona seleccionada para esta sucursal.',
+                    ], 422);
+                }
                 return back()->withErrors(['personal_id' => 'No se encontró la persona seleccionada para esta sucursal.'])->withInput();
             }
 
             $user = User::create([
                 'sucursal'   => $persona->SUCURSAL ?? $request->sucursal,
                 'name'       => $persona->NOMBRE_COMPLETO,
-                'usuario'    => $request->name, // o $request->usuario según corresponda
+                'usuario'    => $request->name,
                 'contrasena' => bcrypt($request->contrasena),
-                'cargo'      => $persona->CODI_CARG ?? null, // **AHORA el código del cargo**
-                'rol'        => $request->rol,               // Guarda el rol textual si quieres verlo en la tabla
+                'cargo'      => $persona->CODI_CARG ?? null,
+                'rol'        => $request->rol,
             ]);
 
             Log::info('Usuario creado', [
@@ -157,7 +203,6 @@ class UserController extends Controller
                 'name'    => $user->name
             ]);
 
-            // Asignar el rol (Spatie)
             $user->assignRole($request->rol);
 
             Log::info('Rol asignado', [
@@ -165,15 +210,31 @@ class UserController extends Controller
                 'rol' => $request->rol
             ]);
 
+            // --- RESPONDE JSON SI AJAX ---
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Usuario creado con éxito'
+                ]);
+            }
             return redirect()->route('usuarios.index')->with('success', 'Usuario creado con éxito');
         } catch (\Throwable $e) {
             Log::error('Error al crear usuario', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
+            // --- RESPONDE JSON SI AJAX ---
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Ocurrió un error al guardar el usuario',
+                    'errors'  => $e->getMessage(),
+                ], 500);
+            }
             return back()->withErrors(['general' => 'Ocurrió un error al guardar el usuario'])->withInput();
         }
     }
+
 
     public function show(User $user)
     {

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Requerimiento;
+use App\Models\User;
 use App\Models\EstadoRequerimiento;
 use App\Models\PrioridadRequerimiento;
 use Illuminate\Support\Facades\Auth;
@@ -10,6 +11,7 @@ use Illuminate\Http\Request;
 //use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Notifications\NuevoRequerimientoCreado;
 
 
 class RequerimientoController extends Controller
@@ -84,13 +86,14 @@ class RequerimientoController extends Controller
             'servicio_acuartelado'      => 'nullable|string|max:50',
             'grado_academico'           => 'required|string|max:50',
             'formacion_adicional'       => 'required|string|max:50',
+            'requiere_licencia_conducir' => 'nullable|string|max:50',
             'validado_rrhh'             => 'boolean',
             'escala_remunerativa'       => 'required|string|max:50',
             'beneficios'                => 'required|string|max:50',
             //'prioridad'                 => 'nullable|exists:prioridad_requerimiento,id',
             'estado'                    => 'required|exists:estado_requerimiento,id',
             //'fecha_limite'              => 'nullable|date|after_or_equal:today',
-            //'requiere_licencia_conducir' => 'boolean',
+
             //'requiere_sucamec'          => 'boolean',
             //'requisitos_adicionales'    => 'nullable|string',
         ]);
@@ -102,7 +105,6 @@ class RequerimientoController extends Controller
         $validated['cargo_usuario'] = Auth::user()->cargo ?? null;
 
         /* ---------- 3. TRANSFORMAR CHECKBOX ---------- */
-        $validated['requiere_licencia_conducir'] = $request->boolean('requiere_licencia_conducir');
         $validated['requiere_sucamec'] = $request->boolean('requiere_sucamec');
         $validated['validado_rrhh'] = $request->boolean('validado_rrhh');
 
@@ -111,6 +113,11 @@ class RequerimientoController extends Controller
                 fn() =>
                 Requerimiento::create($validated)
             );
+            // Notificar a todos los usuarios (puedes filtrar si quieres solo admins/reclutadores)
+            $usuarios = User::all(); // O un filtro si prefieres
+            foreach ($usuarios as $usuario) {
+                $usuario->notify(new NuevoRequerimientoCreado($requerimiento));
+            }
 
             Log::info('Requerimiento guardado', $requerimiento->toArray());
             return back()->with('success', '¡Requerimiento creado con éxito!');
@@ -366,7 +373,7 @@ class RequerimientoController extends Controller
             'fecha_limite'               => 'required|date|after_or_equal:today',
             'edad_minima'                => 'required|integer|min:18|max:65',
             'edad_maxima'                => 'required|integer|min:18|max:65',
-            'requiere_licencia_conducir' => 'boolean',
+            'requiere_licencia_conducir' => 'required|string|max:50',
             'requiere_sucamec'           => 'boolean',
             'nivel_estudios'             => 'required|string|max:50',
             'experiencia_minima'         => 'required|string|max:50',

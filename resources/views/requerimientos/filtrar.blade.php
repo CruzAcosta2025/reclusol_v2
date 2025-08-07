@@ -1,4 +1,6 @@
-<x-app-layout>
+@extends('layouts.app')
+
+@section('content')
     <!-- Header -->
     <div class="min-h-screen gradient-bg py-8">
         <a href="{{ route('dashboard') }}"
@@ -617,5 +619,4 @@
             }
         });
     </script>
-
-</x-app-layout>
+@endsection

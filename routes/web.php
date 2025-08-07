@@ -37,11 +37,16 @@ Route::middleware('auth')->group(function () {
     Route::delete('/postulantes/{postulante}', [PostulanteController::class, 'destroy'])->name('postulantes.destroy');
     Route::get('/postulantes/{postulante}/edit', [PostulanteController::class, 'edit'])->name('postulantes.edit');
     Route::put('/postulantes/{postulante}', [PostulanteController::class, 'update'])->name('postulantes.update');
+    // Puedes proteger la ruta con middleware 'auth' si solo usuarios logueados usan el formulario interno
+    Route::get('/api/verificar-lista-negra/{dni}', [PostulanteController::class, 'verificarListaNegra']);
     Route::get('/postulantes/{id}/descargar/{tipo}', [PostulanteController::class, 'descargarArchivo'])
       ->name('postulantes.descargarArchivo');
   });
 
   Route::get('/entrevistas', [EntrevistaController::class, 'listadoInicial'])->name('entrevistas.index');
+  //Route::get('/entrevistas', [EntrevistaController::class, 'listadoInicial'])->name('entrevistas.listadoInicial');
+  Route::get('/entrevistas/evaluar/{id}', [EntrevistaController::class, 'evaluar'])->name('entrevistas.evaluar');
+
 
   // RUTAS PARA REQUERIMIENTOS
   Route::get('/requerimientos/registro', [RequerimientoController::class, 'mostrar'])->name('requerimientos.requerimiento');
@@ -63,15 +68,20 @@ Route::middleware('auth')->group(function () {
   Route::get('/historial-afiches', [HistorialController::class, 'index'])->name('afiches.historial');
 
   // RUTAS PARA GESTIÓN DE USUARIOS
+  // Siempre pon las rutas "específicas" antes de las que usan {user}
+  Route::get('/usuarios/buscar-personal', [UserController::class, 'buscarPersonal'])->name('usuarios.buscarPersonal');
+  Route::get('usuarios/personal-por-sucursal/{codigo}', [UserController::class, 'personalPorSucursal']);
+
+  // Rutas CRUD
   Route::get('/usuarios', [UserController::class, 'index'])->name('usuarios.index');
   Route::get('/usuarios/create', [UserController::class, 'create'])->name('usuarios.create');
   Route::post('/usuarios', [UserController::class, 'store'])->name('usuarios.store');
   Route::get('/usuarios/{user}', [UserController::class, 'show'])->name('usuarios.show');
+  Route::post('/usuarios/{user}/habilitar', [UserController::class, 'habilitarUsuario'])->name('usuarios.habilitarUsuario');
   Route::get('/usuarios/{user}/edit', [UserController::class, 'edit'])->name('usuarios.edit');
   Route::put('/usuarios/{user}', [UserController::class, 'update'])->name('usuarios.update');
   Route::delete('/usuarios/{user}', [UserController::class, 'destroy'])->name('usuarios.destroy');
   Route::post('/usuarios/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('usuarios.toggleStatus');
-  Route::get('usuarios/personal-por-sucursal/{codigo}', [UserController::class, 'personalPorSucursal']);
 });
 
 require __DIR__ . '/auth.php';

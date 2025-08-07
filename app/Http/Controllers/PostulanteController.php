@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Response;
+use App\Models\User;
+use App\Notifications\PostulanteEnListaNegra;
+use App\Notifications\NuevoPostulanteRegistrado;
 
 
 class PostulanteController extends Controller
@@ -15,6 +18,33 @@ class PostulanteController extends Controller
     /*-------------------------------------------------
     |  Mostrar formulario GET
     *------------------------------------------------*/
+    public function verificarListaNegra($dni)
+    {
+        try {
+            $listaNegra = collect(DB::select(
+                'EXEC SP_PERSONAL_CESADO @dni = :dni, @nombre = :nombre',
+                [
+                    'dni' => $dni,
+                    'nombre' => null
+                ]
+            ));
+
+            if ($listaNegra->isNotEmpty()) {
+                // Si el SP devuelve campos como "motivo", puedes mostrarlo
+                $mensaje = 'Este postulante está en la lista negra.';
+                if (isset($listaNegra[0]->motivo)) {
+                    $mensaje .= ' Motivo: ' . $listaNegra[0]->motivo;
+                }
+                return response()->json(['enListaNegra' => true, 'mensaje' => $mensaje]);
+            } else {
+                return response()->json(['enListaNegra' => false]);
+            }
+        } catch (\Exception $e) {
+            // Responde el error para debug rápido
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
 
     public function formExterno()
     {
@@ -145,102 +175,34 @@ class PostulanteController extends Controller
     {
         /* ---------- 1. VALIDAR ---------- */
         $validated = $request->validate([
+            'fecha_postula'      => 'required|date',
+            'dni'                => 'required|string|size:8|unique:postulantes,dni',
             'nombres'            => 'required|string|max:50',
             'apellidos'          => 'required|string|max:50',
-            'dni'                => 'required|string|size:8|unique:postulantes,dni',
+            'fecha_nacimiento'   => 'required|date',
             'edad'               => 'required|integer|min:18|max:120',
             'departamento'       => 'required|string|max:50',
             'provincia'          => 'required|string|max:50',
             'distrito'           => 'required|string|max:50',
+            'nacionalidad'       => 'required|string|max:50',
+            'grado_instruccion'  => 'required|string|max:50',
             'celular'            => 'required|digits:9',
             'celular_referencia' => 'nullable|digits:9',
-            'estado_civil'       => 'required|string|max:50',
-            'nacionalidad'       => 'required|string|max:50',
             'tipo_cargo'         => 'required|string|max:50',
             'cargo'              => 'required|string|max:50',
-            'fecha_postula'      => 'required|date',
             'experiencia_rubro'  => 'required|string|max:50',
             'sucamec'            => 'required|string|max:10',
-            'grado_instruccion'  => 'required|string|max:50',
-            'servicio_militar'   => 'required|string|max:15',
+            'carne_sucamec'      => 'required|string|max:10',
             'licencia_arma'      => 'required|string|max:10',
             'licencia_conducir'  => 'required|string|max:10',
-
+            'servicio_militar'   => 'nullable|string|max:15',
+            'estado_civil'       => 'nullable|string|max:15',
             // Archivos  (máx. 5 MB — ya los validas en el front)
             'cv'  => 'required|file|max:5120',
             'cul' => 'required|file|max:5120',
 
             // Checkbox términos
             //'terms' => 'accepted',
-        ]);
-
-        /* ---------- 2. GUARDAR ARCHIVOS ---------- */
-        $carpeta = $request->input('dni'); // o cualquier identificador único
-
-        $validated['cv']  = $request->file('cv')->store($carpeta, 'postulantes');
-        $validated['cul'] = $request->file('cul')->store($carpeta, 'postulantes');
-
-
-        unset($validated['terms']); // no se guarda en la tabla
-
-        /* ---------- 3. INSERTAR EN TRANSACCIÓN ---------- */
-        try {
-            $postulante = DB::transaction(
-                fn() =>
-                Postulante::create($validated)
-            );
-        } catch (\Throwable $e) {
-            Log::error('Error al guardar postulante', [
-                'error' => $e->getMessage(),
-                'dni'   => $request->input('dni')
-            ]);
-
-            // Redirigir con mensaje de error para SweetAlert
-            return back()
-                ->withInput()
-                ->withErrors([
-                    'general' => 'Ocurrió un problema al guardar la postulación. Intenta de nuevo.'
-                ]);
-        }
-
-        /* ---------- 4. ÉXITO ---------- */
-        Log::info('Postulante guardado', $postulante->toArray());
-
-        return back()->with('success', 'Información guardada');
-    }
-
-
-    public function storeExterno(Request $request)
-    {
-        /* ---------- 1. VALIDAR ---------- */
-        $validated = $request->validate([
-            'nombres'            => 'required|string|max:50',
-            'apellidos'          => 'required|string|max:50',
-            'dni'                => 'required|string|size:8|unique:postulantes,dni',
-            'edad'               => 'required|integer|min:18|max:120',
-            'departamento'       => 'required|string|max:50',
-            'provincia'          => 'required|string|max:50',
-            'distrito'           => 'required|string|max:50',
-            'celular'            => 'required|digits:9',
-            'celular_referencia' => 'nullable|digits:9',
-            'estado_civil'       => 'required|string|max:50',
-            'nacionalidad'       => 'required|string|max:50',
-            'tipo_cargo'         => 'required|string|max:50',
-            'cargo'              => 'required|string|max:50',
-            'fecha_postula'      => 'required|date',
-            'experiencia_rubro'  => 'required|string|max:50',
-            'sucamec'            => 'required|string|max:10',
-            'grado_instruccion'  => 'required|string|max:50',
-            'servicio_militar'   => 'required|string|max:15',
-            'licencia_arma'      => 'required|string|max:10',
-            'licencia_conducir'  => 'required|string|max:10',
-
-            // Archivos  (máx. 5 MB — ya los validas en el front)
-            'cv'  => 'required|file|max:5120',
-            'cul' => 'required|file|max:5120',
-
-            // Checkbox términos
-            'terms' => 'accepted',
         ]);
 
         /* ---------- 2. GUARDAR ARCHIVOS ---------- */
@@ -293,6 +255,120 @@ class PostulanteController extends Controller
 
         return back()->with('success', 'Información guardada');
     }
+
+
+    public function storeExterno(Request $request)
+    {
+
+        Log::info('Iniciando registro externo de postulante', [
+            'ip' => $request->ip(),
+            'dni' => $request->input('dni')
+        ]);
+
+        /* ---------- 1. VALIDAR ---------- */
+        $validated = $request->validate([
+            'fecha_postula'      => 'required|date',
+            'dni'                => 'required|string|size:8|unique:postulantes,dni',
+            'nombres'            => 'required|string|max:50',
+            'apellidos'          => 'required|string|max:50',
+            'fecha_nacimiento'   => 'required|date',
+            'edad'               => 'required|integer|min:18|max:120',
+            'departamento'       => 'required|string|max:50',
+            'provincia'          => 'required|string|max:50',
+            'distrito'           => 'required|string|max:50',
+            'nacionalidad'       => 'required|string|max:50',
+            'grado_instruccion'  => 'required|string|max:50',
+            'celular'            => 'required|digits:9',
+            'celular_referencia' => 'nullable|digits:9',
+            'tipo_cargo'         => 'required|string|max:50',
+            'cargo'              => 'required|string|max:50',
+            'experiencia_rubro'  => 'required|string|max:50',
+            'sucamec'            => 'required|string|max:10',
+            'carne_sucamec'      => 'required|string|max:10',
+            'licencia_arma'      => 'required|string|max:10',
+            'licencia_conducir'  => 'required|string|max:10',
+            'servicio_militar'   => 'nullable|string|max:15',
+            'estado_civil'       => 'nullable|string|max:15',
+            // Archivos  (máx. 5 MB — ya los validas en el front)
+            'cv'  => 'required|file|max:5120',
+            'cul' => 'required|file|max:5120',
+        ]);
+        Log::info('Validación exitosa', $validated);
+
+        /* ---------- 2. GUARDAR ARCHIVOS ---------- */
+        $dni = $request->input('dni');
+        $basePath = '\\\\192.168.10.5\\sicos\\RECLUSOL\\DOCUMENTOS\\POSTULANTES\\' . $dni . '\\';
+        if (!file_exists($basePath)) {
+            mkdir($basePath, 0777, true);
+            Log::info('Carpeta creada', ['path' => $basePath]);
+        }
+        // Nombres de archivos únicos
+        $cvFileName  = 'cv_'  . time() . '.' . $request->file('cv')->getClientOriginalExtension();
+        $culFileName = 'cul_' . time() . '.' . $request->file('cul')->getClientOriginalExtension();
+        $request->file('cv')->move($basePath, $cvFileName);
+        $request->file('cul')->move($basePath, $culFileName);
+        Log::info('Archivos guardados', ['cv' => $cvFileName, 'cul' => $culFileName]);
+
+        $validated['cv']  = $dni . '/' . $cvFileName;
+        $validated['cul'] = $dni . '/' . $culFileName;
+        unset($validated['terms']);
+
+        /* ---------- 3. INSERTAR EN TRANSACCIÓN ---------- */
+        try {
+            $postulante = DB::transaction(
+                fn() => Postulante::create($validated)
+            );
+            Log::info('Postulante creado', $postulante->toArray());
+        } catch (\Throwable $e) {
+            Log::error('Error al guardar postulante', [
+                'error' => $e->getMessage(),
+                'dni'   => $request->input('dni')
+            ]);
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'general' => 'Ocurrió un problema al guardar la postulación. Intenta de nuevo.'
+                ]);
+        }
+
+        // ... Después de guardar el postulante
+        $enListaNegra = collect(DB::select('EXEC SP_PERSONAL_CESADO @dni = :dni, @nombre = :nombre', [
+            'dni' => $request->input('dni'),
+            'nombre' => $request->input('nombres')
+        ]));
+        Log::info('Resultado lista negra', [
+            'dni' => $request->input('dni'),
+            'enListaNegra' => $enListaNegra->count()
+        ]);
+
+        $usuarios = User::all();
+
+        if ($enListaNegra->count() > 0) {
+            if (auth()->check()) {
+                auth()->user()->notify(new PostulanteEnListaNegra($postulante));
+            }
+            // Enviar un flag a la vista para mostrar en el console
+            return back()->with([
+                'success' => 'Información guardada',
+                'debug_console' => [
+                    'mensaje' => '¡El postulante está en la lista negra!',
+                    'dni' => $request->input('dni'),
+                    'nombre' => $request->input('nombres'),
+                    'notificado_a_usuario_id' => auth()->id()
+                ]
+            ]);
+        } else {
+            // Notifica si NO está en lista negra
+            foreach ($usuarios as $user) {
+                $user->notify(new NuevoPostulanteRegistrado($postulante));
+            }
+        }
+        /* ---------- 4. ÉXITO ---------- */
+        Log::info('Fin del registro externo');
+
+        return back()->with('success', 'Información guardada');
+    }
+
 
     public function ver()
     {

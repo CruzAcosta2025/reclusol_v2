@@ -1,3 +1,6 @@
+@extends('layouts.app')
+
+@section('content')
 <div class="p-6">
     <div class="flex items-center justify-between mb-6">
         <h3 class="text-xl font-semibold text-gray-800 flex items-center">
@@ -32,7 +35,7 @@
                 <div class="error-message text-red-500 text-sm mt-1 hidden"></div>
             </div>
 
-            {{-- Personal elegible --}}
+            {{-- Personal elegible con autocomplete --}}
             <div>
                 <label for="personal" class="block text-sm font-medium text-gray-700 mb-2">
                     <i class="fas fa-user mr-1"></i>
@@ -42,7 +45,7 @@
                     name="personal_id"
                     id="personal"
                     required
-                    class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-0 transition-colors">
+                    class="select-personal w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-0 transition-colors">
                     <option value="">Selecciona una persona</option>
                 </select>
                 <div class="error-message text-red-500 text-sm mt-1 hidden"></div>
@@ -79,7 +82,6 @@
                 <div class="error-message text-red-500 text-sm mt-1 hidden"></div>
             </div>
 
-
             {{-- Rol --}}
             <div>
                 <label for="rol" class="block text-sm font-medium text-gray-700 mb-2">
@@ -107,8 +109,7 @@
                         minlength="8"
                         class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-0 transition-colors pr-12"
                         placeholder="Mínimo 8 caracteres">
-                    <input type="password" id="contrasena" name="contrasena">
-                    <button type="button" id="contrasena-eye" class="fa fa-eye"></button>
+                    <button type="button" id="contrasena-eye" class="fa fa-eye absolute right-3 top-1/2 transform -translate-y-1/2"></button>
                 </div>
                 <div class="error-message text-red-500 text-sm mt-1 hidden"></div>
             </div>
@@ -130,3 +131,5 @@
         </div>
     </form>
 </div>
+
+@endsection

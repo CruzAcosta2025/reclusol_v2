@@ -1,5 +1,6 @@
-<x-app-layout>
+@extends('layouts.app')
 
+@section('content')
     <div class="min-h-screen gradient-bg py-8">
 
         <a href="{{ route('dashboard') }}" class="absolute top-6 left-6 text-white hover:text-yellow-300 transition-colors flex items-center space-x-2 group z-10">
@@ -519,4 +520,4 @@
             // Implement sort logic here
         });
     </script>
-</x-app-layout>
+@endsection

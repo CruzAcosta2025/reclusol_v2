@@ -10,6 +10,7 @@ use Intervention\Image\Laravel\Facades\Image;
 use Intervention\Image\Encoders\PngEncoder;
 use Intervention\Image\Encoders\JpegEncoder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class PosterController extends Controller
 {
@@ -63,9 +64,9 @@ class PosterController extends Controller
             ->where('DIST_VIGENCIA', 'SI')
             ->orderBy('DIST_DESCRIPCION')
             ->get()
-            ->keyBy('DIST_CODIGO');
-             
-
+            ->keyBy(function ($item) {
+                return ltrim($item->DIST_CODIGO, '0');
+            });
 
         // Mapear nombres legibles
         foreach ($requerimientos as $r) {
@@ -73,15 +74,22 @@ class PosterController extends Controller
             $codigoSucursal = ltrim((string)$r->sucursal, '0');
             $codigoDepartamento = ltrim((string)$r->departamento, '0');
             $codigoProvincia = ltrim((string)$r->provincia, '0');
-            $codigoDistrito = (string)$r->distrito;
-            
+            $codigoDistrito = ltrim((string)$r->distrito, '0');
+            // Debug temporal para ver si vienen vacíos
+            if (empty($codigoProvincia)) {
+                Log::warning("Requerimiento {$r->id} tiene provincia vacía");
+            }
+            if (empty($codigoDistrito)) {
+                Log::warning("Requerimiento {$r->id} tiene distrito vacío");
+            }
+
+
 
             $r->cargo_nombre = $cargos->get($codigoCargo)?->DESC_CARGO ?? $r->cargo_solicitado;
             $r->sucursal_nombre = $sucursales->get($codigoSucursal)?->SUCU_DESCRIPCION ?? $r->sucursal;
             $r->departamento_nombre = $departamentos->get($codigoDepartamento)?->DEPA_DESCRIPCION ?? $r->departamento;
             $r->provincia_nombre = $provincias->get($codigoProvincia)?->PROVI_DESCRIPCION ?? $r->provincia;
             $r->distrito_nombre = $distritos->get($codigoDistrito)?->DIST_DESCRIPCION ?? $r->distrito;
-
         }
 
         return view('afiches.afiche', compact('requerimientos'));

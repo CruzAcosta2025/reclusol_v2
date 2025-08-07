@@ -1,4 +1,6 @@
-<x-app-layout>
+@extends('layouts.app')
+
+@section('content')
     <div class="min-h-screen gradient-bg py-8">
         {{-- Botón volver --}}
         <a href="{{ route('dashboard') }}"
@@ -489,5 +491,4 @@
             window.open(`/postulantes/exportar?${params}`, '_blank');
         }
     </script>
-
-</x-app-layout>
+@endsection

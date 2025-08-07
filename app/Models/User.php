@@ -39,6 +39,7 @@ class User extends Authenticatable
     protected $casts = [
         //'email_verified_at' => 'datetime',
         //'password' => 'hashed',
+        'habilitado'=>'boolean',
         'contrasena' => 'hashed',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
@@ -68,7 +69,6 @@ class User extends Authenticatable
             ->first();
     }
 
-
     /** Accessor para obtener información del cargo directamente */
     public function getCargoInfoAttribute()
     {
@@ -77,11 +77,12 @@ class User extends Authenticatable
         }
 
         return DB::connection('si_solmar')
-            ->table('TIPO_CARGO')
-            ->where('CODI_TIPO_CARG', $this->cargo)
-            ->select(['CODI_TIPO_CARG', 'DESC_TIPO_CARG'])
+            ->table('CARGOS')
+            ->where('CODI_CARG', $this->cargo)
+            ->select(['CODI_CARG', 'DESC_CARGO'])
             ->first();
     }
+
 
     /** Comprueba si el usuario tiene un cargo específico */
     public function tieneCargo(string $codigo): bool

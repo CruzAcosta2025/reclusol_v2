@@ -10,13 +10,14 @@ use App\Models\Catalogo;
 use Carbon\Carbon;
 use App\Models\Requerimiento;
 
-
-
 class HomeController extends Controller
 {
     public function index()
     {
         /* ---------- Totales absolutos ---------- */
+        // En tu controlador del dashboard (o donde generas la vista)
+        $notificaciones = auth()->user()->unreadNotifications()->take(5)->get();
+
         $totalPostulantes   = Postulante::count();
         $totalRequerimientos = Requerimiento::count();
 
@@ -61,8 +62,6 @@ class HomeController extends Controller
 
         $departamentos = Catalogo::obtenerDepartamentos()->keyBy('DEPA_CODIGO');
 
-
-
         /* ---------- Enviar a la vista ---------- */
         return view('dashboard', compact(
             'totalPostulantes',
@@ -71,7 +70,8 @@ class HomeController extends Controller
             'variacionRequerimientos',
             'porSede',
             'maxTotalSede',
-            'requerimientos'
+            'requerimientos',
+            'notificaciones'
         ));
     }
 }
