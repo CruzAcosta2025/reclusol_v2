@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Postulante;
+use App\Models\Departamento;
 use App\Models\Catalogo;
 use Carbon\Carbon;
 use App\Models\Requerimiento;
@@ -48,19 +49,17 @@ class HomeController extends Controller
 
         $maxTotalSede = $porSede->max('total');    // para calcular porcentajes
 
-        // Traer catálogo
-        $departamentos = Catalogo::obtenerDepartamentos()->keyBy('DEPA_CODIGO');
-
-        // Mapear nombres
-        foreach ($porSede as $sede) {
-            $codigo = str_pad($sede->departamento, 2, '0', STR_PAD_LEFT);
-            $sede->nombre_departamento = $departamentos[$codigo]->DEPA_DESCRIPCION ?? 'Sin nombre';
-        }
-
-
+        
         $requerimientos = Requerimiento::orderByDesc('created_at')->get(); // Puedes agregar filtros si deseas solo los activos o validados
 
-        $departamentos = Catalogo::obtenerDepartamentos()->keyBy('DEPA_CODIGO');
+        $departamentos = Departamento::forSelectPadded();
+
+        foreach ($porSede as $sede) {
+            // normaliza el código del postulante a 2 dígitos
+            $codigo = str_pad(ltrim((string)$sede->departamento, '0'), 2, '0', STR_PAD_LEFT);
+            $sede->nombre_departamento = $departamentos->get($codigo, 'Sin nombre');
+        }
+
 
         /* ---------- Enviar a la vista ---------- */
         return view('dashboard', compact(

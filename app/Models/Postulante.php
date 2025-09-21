@@ -42,7 +42,22 @@ class Postulante extends Model
         'servicio_militar',
         'licencia_arma',
         'licencia_conducir',
+        'tipo_personal',
+        'tipo_personal_codigo',
         'cv',
         'cul',
+        'origin',
+        'created_by'
     ];
+
+    protected $casts = [
+        'fecha_postula'     => 'datetime',
+        'fecha_nacimiento'  => 'date',
+        'created_by'        => 'integer',
+    ];
+
+    public function creador()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 }

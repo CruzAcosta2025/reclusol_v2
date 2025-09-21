@@ -114,6 +114,8 @@ return [
         ],
         */
 
+        /*
+
         'sqlsrv' => [
             'driver' => 'sqlsrv',
             'host' => env('DB_HOST', 'localhost'),
@@ -146,6 +148,7 @@ return [
             'charset'  => 'utf8',
             'prefix'   => '',
         ],
+        */
 
     ],
 

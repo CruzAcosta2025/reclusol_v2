@@ -22,6 +22,9 @@ Route::get('/dashboard', [HomeController::class, 'index'])
 // Registro externo (publico)
 Route::get('/postulantes/registro', [PostulanteController::class, 'formExterno'])->name('postulantes.formExterno');
 Route::post('/postulantes/registro', [PostulanteController::class, 'storeExterno'])->name('postulantes.storeExterno');
+Route::get('/api-publico/cargos-por-tipo/{tipo}', [PostulanteController::class, 'getCargosPorTipo']);
+Route::get('/api-publico/provincias/{depa}', [PostulanteController::class, 'getProvincias']);
+Route::get('/api-publico/distritos/{prov}',  [PostulanteController::class, 'getDistritos']);
 
 Route::middleware('auth')->group(function () {
   Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -37,6 +40,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/postulantes/{postulante}', [PostulanteController::class, 'destroy'])->name('postulantes.destroy');
     Route::get('/postulantes/{postulante}/edit', [PostulanteController::class, 'edit'])->name('postulantes.edit');
     Route::put('/postulantes/{postulante}', [PostulanteController::class, 'update'])->name('postulantes.update');
+    Route::get('/api/cargos-por-tipo/{tipo}', [PostulanteController::class, 'getCargosPorTipo']);
+    Route::get('/api/provincias/{depa}', [PostulanteController::class, 'getProvincias']);
+    Route::get('/api/distritos/{prov}',  [PostulanteController::class, 'getDistritos']);
+
     // Puedes proteger la ruta con middleware 'auth' si solo usuarios logueados usan el formulario interno
     Route::get('/api/verificar-lista-negra/{dni}', [PostulanteController::class, 'verificarListaNegra']);
     Route::get('/postulantes/{id}/descargar/{tipo}', [PostulanteController::class, 'descargarArchivo'])

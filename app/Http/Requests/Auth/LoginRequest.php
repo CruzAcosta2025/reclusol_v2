@@ -11,7 +11,6 @@ use Illuminate\Validation\ValidationException;
 
 class LoginRequest extends FormRequest
 {
-
     public function authorize(): bool
     {
         return true;
@@ -20,7 +19,7 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'usuario' => ['required', 'string'],
+            'usuario'   => ['required', 'string'],
             'contrasena' => ['required', 'string'],
         ];
     }
@@ -29,11 +28,12 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (Auth::attempt([
-           'usuario' => $this->usuario,
-           'password' => $this->contrasena
-           ], $this->boolean('remember'))
-           ) {
+        // Si NO podemos autenticar (credenciales inválidas) -> contar intento y lanzar excepción
+        if (! Auth::attempt([
+            'usuario' => $this->input('usuario'),
+            'password' => $this->input('contrasena'),
+        ], $this->boolean('remember'))) {
+            // Aumenta el contador de intentos (decay por defecto: 60s, puedes pasar otro valor si quieres)
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
@@ -41,6 +41,7 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        // Si llegamos aquí es porque la autenticación fue exitosa -> limpiar contador
         RateLimiter::clear($this->throttleKey());
     }
 
@@ -61,8 +62,10 @@ class LoginRequest extends FormRequest
             ]),
         ]);
     }
+
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('usuario')).'|'.$this->ip());
+        // Uso input() para mayor compatibilidad
+        return Str::transliterate(Str::lower($this->input('usuario')) . '|' . $this->ip());
     }
 }

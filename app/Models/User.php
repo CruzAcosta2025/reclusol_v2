@@ -21,11 +21,12 @@ class User extends Authenticatable
     /* Campos que puedes asignar masivamente */
     protected $fillable = [
         'name',
-        'sucursal',
-        'contrasena',
-        'cargo',
         'usuario',
+        'cargo',
+        'sucursal',
         'rol',
+        'contrasena',
+        'habilitado',
     ];
 
     /* Ocultar al serializar (JSON, etc.) */
@@ -39,7 +40,7 @@ class User extends Authenticatable
     protected $casts = [
         //'email_verified_at' => 'datetime',
         //'password' => 'hashed',
-        'habilitado'=>'boolean',
+        'habilitado' => 'boolean',
         'contrasena' => 'hashed',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
@@ -52,47 +53,71 @@ class User extends Authenticatable
         return $this->password ?? $this->contrasena;
     }
 
-    /* ---------- Relación & helper de cargo ---------- */
-
-    /** Devuelve la fila de TIPO_CARGO con la descripción */
-    public function cargoInfo()
+    /**
+     * Relación con TipoCargo (tabla TIPO_CARGO).
+     * Asume que el campo `cargo` contiene CODI_TIPO_CARG cuando corresponde.
+     * withDefault evita que $this->tipoCargo sea null y facilita el accessor.
+     */
+    public function tipoCargo()
     {
-        if (!$this->cargo) {
-            return null;
-        }
-
-        // Usar TIPO_CARGO (o la tabla donde realmente está el catálogo de cargos)
-        return DB::connection('si_solmar')
-            ->table('TIPO_CARGO')
-            ->where('CODI_TIPO_CARG', $this->cargo)
-            ->select(['CODI_TIPO_CARG', 'DESC_TIPO_CARG'])
-            ->first();
+        return $this->belongsTo(TipoCargo::class, 'cargo', 'CODI_TIPO_CARG')->withDefault();
     }
 
-    /** Accessor para obtener información del cargo directamente */
-    public function getCargoInfoAttribute()
+    /**
+     * Relación con Cargo (tabla CARGOS).
+     * Asume que el campo `cargo` contiene CODI_CARG cuando corresponde.
+     */
+    public function cargoRelation()
     {
-        if (!$this->cargo) {
-            return null;
-        }
-
-        return DB::connection('si_solmar')
-            ->table('CARGOS')
-            ->where('CODI_CARG', $this->cargo)
-            ->select(['CODI_CARG', 'DESC_CARGO'])
-            ->first();
+        return $this->belongsTo(Cargo::class, 'cargo', 'CODI_CARG')->withDefault();
     }
 
-
-    /** Comprueba si el usuario tiene un cargo específico */
-    public function tieneCargo(string $codigo): bool
+    /**
+     * Relación con postulantes creados por este usuario.
+     */
+    public function postulantesCreados()
     {
-        return $this->cargo === $codigo;
+        return $this->hasMany(Postulante::class, 'created_by');
     }
 
-    // Accessor para la descripción directa en la vista
+    /* -------------------------------
+       Accessor simple para descripción del cargo
+       ------------------------------- */
+
+    /**
+     * Devuelve una descripción legible del cargo:
+     * - Prioriza DESC_TIPO_CARG (TipoCargo)
+     * - Si no existe, usa DESC_CARGO (Cargo)
+     * - Si ninguno existe, devuelve 'Sin rol'
+     *
+     * Uso en Blade: {{ $user->cargo_descripcion }}
+     */
     public function getCargoDescripcionAttribute(): string
     {
-        return $this->cargoInfo()?->DESC_TIPO_CARG ?? 'Sin rol';
+        // Si las relaciones están eager-loaded, no hará queries adicionales.
+        if ($this->relationLoaded('tipoCargo') && $this->tipoCargo && $this->tipoCargo->DESC_TIPO_CARG) {
+            return $this->tipoCargo->DESC_TIPO_CARG;
+        }
+
+        if ($this->relationLoaded('cargoRelation') && $this->cargoRelation && $this->cargoRelation->DESC_CARGO) {
+            return $this->cargoRelation->DESC_CARGO;
+        }
+
+        // Fallback: acceder a la relación (esto ejecutará una consulta sólo si no se hizo eager loading)
+        return $this->tipoCargo->DESC_TIPO_CARG
+            ?? $this->cargoRelation->DESC_CARGO
+            ?? 'Sin rol';
+    }
+
+    /* -------------------------------
+       Utilitarios
+       ------------------------------- */
+
+    /**
+     * Comprueba si el usuario tiene un cargo específico (compara códigos).
+     */
+    public function tieneCargo(string $codigo): bool
+    {
+        return (string) $this->cargo === (string) $codigo;
     }
 }
