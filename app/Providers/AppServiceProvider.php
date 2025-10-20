@@ -23,6 +23,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        /*
         View::composer('postulantes.registroPrimario', function ($view) {
             $departamentos = Catalogo::obtenerDepartamentos();
             $provincias = Catalogo::obtenerTodasProvincias();
@@ -42,5 +43,6 @@ class AppServiceProvider extends ServiceProvider
             $distritos = Catalogo::obtenerDistritos();
             $view->with(compact('sucursales', 'tipoCargos', 'cargos','niveles','departamentos','provincias','distritos'));
         });
+        */
     }
 }

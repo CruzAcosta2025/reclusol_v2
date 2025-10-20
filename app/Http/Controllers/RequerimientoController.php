@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Requerimiento;
 use App\Models\User;
 use App\Models\EstadoRequerimiento;
+use App\Models\Sucursal;
+use App\Models\TipoCargo;
+use App\Models\Cargo;
 use App\Models\PrioridadRequerimiento;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -23,22 +26,28 @@ class RequerimientoController extends Controller
     {
         $estados = EstadoRequerimiento::all();
         $prioridades = PrioridadRequerimiento::all();
+        $sucursales =  Sucursal::forSelect();
+        $tipoCargos = TipoCargo::forSelect();
+        $cargos = Cargo::forSelect();
+
 
         // Clientes (base CONTROLCLIENTES2018)
-        $clientes = DB::connection('sqlsrv_control')
-            ->select('EXEC Migracion_Listar_Clientes ?', ['']);
+        $clientes = collect(DB::connection('sqlsrv')->select('EXEC dbo.SP_LISTAR_CLIENTES'));
 
-        return view('requerimientos.requerimiento', compact('estados', 'prioridades', 'clientes'));
+
+        return view('requerimientos.requerimiento', compact('estados', 'prioridades', 
+        'clientes','sucursales','tipoCargos','cargos'));
     }
+
 
     public function sedesPorCliente(Request $request)
     {
         $codigo = $request->input('codigo_cliente');
 
-        $sedes = DB::connection('sqlsrv_control')->select(
+        $sedes = collect(DB::select(
             'EXEC USP_SICOS_2024_LISTAR_SEDES_X_CLIENTE ?, ?, ?',
             [$codigo, '', 0]
-        );
+        ));
 
         return response()->json($sedes);
     }
@@ -194,6 +203,7 @@ class RequerimientoController extends Controller
         -------------------------------------------------*/
         // Cargar catálogos
 
+        /*
         $tipoCargos = DB::connection('si_solmar')
             ->table('TIPO_CARGO')
             ->select('CODI_TIPO_CARG', 'DESC_TIPO_CARG')
@@ -261,6 +271,8 @@ class RequerimientoController extends Controller
             $r->distrito_nombre = $distritos->get($codigoDistrito)?->DIST_DESCRIPCION ?? $r->distrito;
         }
 
+        */
+
         // Contar total general
         $requerimientosProcesos = Requerimiento::where('estado', 1)->count();
 
@@ -289,7 +301,7 @@ class RequerimientoController extends Controller
         ));
     }
 
-
+   /*
     public function edit(Requerimiento $requerimiento)
     {
         $estados = EstadoRequerimiento::all();
@@ -353,6 +365,7 @@ class RequerimientoController extends Controller
             'distritos'
         ));
     }
+    */
 
     /**
      * Valida y actualiza el postulante.

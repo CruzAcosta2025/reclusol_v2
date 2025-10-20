@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Response;
 use App\Models\User;
+use Illuminate\Support\Str;
 use App\Notifications\PostulanteEnListaNegra;
 use App\Notifications\NuevoPostulanteRegistrado;
 
@@ -65,79 +66,76 @@ class PostulanteController extends Controller
         ]);
         Log::info('Validación exitosa', $validated);
 
-        /* ---------- 2. GUARDAR ARCHIVOS ---------- */
-        $dni = $request->input('dni');
-        $basePath = '\\\\192.168.10.5\\sicos\\RECLUSOL\\DOCUMENTOS\\POSTULANTES\\' . $dni . '\\';
-        if (!file_exists($basePath)) {
-            mkdir($basePath, 0777, true);
-            Log::info('Carpeta creada', ['path' => $basePath]);
+
+        $dni    = $validated['dni'];
+        $disk   = config('filesystems.default', 'local');  // 'local' (privado) o 'public'
+        $folder = "postulantes/{$dni}";
+
+        /* ---------- 1b. Validación adicional: cargo existe y coincide con tipo_cargo ---------- */
+        $cargo = Cargo::where('CODI_CARG', $validated['cargo'])->first();
+        if (! $cargo) {
+            return back()->withInput()->withErrors(['cargo' => 'El cargo seleccionado no existe.']);
         }
-        // Nombres de archivos únicos
-        $cvFileName  = 'cv_'  . time() . '.' . $request->file('cv')->getClientOriginalExtension();
-        $culFileName = 'cul_' . time() . '.' . $request->file('cul')->getClientOriginalExtension();
-        $request->file('cv')->move($basePath, $cvFileName);
-        $request->file('cul')->move($basePath, $culFileName);
-        Log::info('Archivos guardados', ['cv' => $cvFileName, 'cul' => $culFileName]);
 
-        $validated['cv']  = $dni . '/' . $cvFileName;
-        $validated['cul'] = $dni . '/' . $culFileName;
-        unset($validated['terms']);
+        // Verificamos que el cargo pertenece al tipo seleccionado (si almacenaste tipo_cargo en el formulario)
+        if ((string) $cargo->TIPO_CARG !== (string) $validated['tipo_cargo']) {
+            return back()->withInput()->withErrors(['cargo' => 'El cargo seleccionado no corresponde al tipo de cargo elegido.']);
+        }
 
-        /* ---------- 3. INSERTAR EN TRANSACCIÓN ---------- */
+        /* ---------- 2) Determinar tipo de personal a partir del cargo ---------- */
+        // CARGO_TIPO es la columna que, según muestras, relaciona con ADMI_TIPO_PERSONAL.TIPE_CODIGO
+        $tipoPersonalCodigo = $cargo->CARGO_TIPO ?? null;
+        $tipoPersonalDescripcion = null;
+
+        if ($tipoPersonalCodigo) {
+            $tipo = TipoPersonal::where('TIPE_CODIGO', $tipoPersonalCodigo)->first();
+            $tipoPersonalDescripcion = $tipo?->TIPE_DESCRIPCION ?? null;
+        }
+
+        // Guarda con nombre hash único (recomendado). Si prefieres nombres fijos, usa putFileAs.
+        $cvPath  = $request->file('cv')->store($folder, $disk);
+        $culPath = $request->file('cul')->store($folder, $disk);
+
+        // Guardamos solo las rutas relativas en la tabla
+        $validated['cv']   = $cvPath;
+        $validated['cul']  = $culPath;
+
+        // Campos para rastrear origen y creador (ya agregados a tu tabla)
+        $validated['origin']     = 'external';
+        $validated['created_by'] = auth()->id() ?? null;      // <-- por si no hay login
+        //$validated['created_by'] = auth()->id();
+
+        // agregar tipo_personal al array que se guardará
+        $validated['tipo_personal_codigo'] = $tipoPersonalCodigo;
+        $validated['tipo_personal']        = $tipoPersonalDescripcion;
+
+        /* ---------- 3) INSERTAR EN TRANSACCIÓN ---------- */
         try {
-            $postulante = DB::transaction(
-                fn() => Postulante::create($validated)
-            );
-            Log::info('Postulante creado', $postulante->toArray());
+            $postulante = DB::transaction(function () use ($validated) {
+                return Postulante::create($validated); // exige fillable en el modelo
+            });
         } catch (\Throwable $e) {
             Log::error('Error al guardar postulante', [
                 'error' => $e->getMessage(),
-                'dni'   => $request->input('dni')
+                'dni'   => $dni,
             ]);
-            return back()
-                ->withInput()
-                ->withErrors([
-                    'general' => 'Ocurrió un problema al guardar la postulación. Intenta de nuevo.'
-                ]);
+
+            // Si falló la DB y no quieres dejar archivos “huérfanos”, intenta borrarlos
+            if (isset($cvPath))  Storage::disk($disk)->delete($cvPath);
+            if (isset($culPath)) Storage::disk($disk)->delete($culPath);
+
+            return back()->withInput()->withErrors([
+                'general' => 'Ocurrió un problema al guardar la postulación. Intenta de nuevo.'
+            ]);
         }
 
-        // ... Después de guardar el postulante
-        $enListaNegra = collect(DB::select('EXEC SP_PERSONAL_CESADO @dni = :dni, @nombre = :nombre', [
-            'dni' => $request->input('dni'),
-            'nombre' => $request->input('nombres')
-        ]));
-        Log::info('Resultado lista negra', [
-            'dni' => $request->input('dni'),
-            'enListaNegra' => $enListaNegra->count()
-        ]);
-
-        $usuarios = User::all();
-
-        if ($enListaNegra->count() > 0) {
-            if (auth()->check()) {
-                auth()->user()->notify(new PostulanteEnListaNegra($postulante));
-            }
-            // Enviar un flag a la vista para mostrar en el console
-            return back()->with([
-                'success' => 'Información guardada',
-                'debug_console' => [
-                    'mensaje' => '¡El postulante está en la lista negra!',
-                    'dni' => $request->input('dni'),
-                    'nombre' => $request->input('nombres'),
-                    'notificado_a_usuario_id' => auth()->id()
-                ]
-            ]);
-        } else {
-            // Notifica si NO está en lista negra
-            foreach ($usuarios as $user) {
-                $user->notify(new NuevoPostulanteRegistrado($postulante));
-            }
-        }
-        /* ---------- 4. ÉXITO ---------- */
-        Log::info('Fin del registro externo');
+        /* ---------- 4) OK ---------- */
+        Log::info('Postulante guardado (interno)', ['id' => $postulante->id, 'dni' => $dni]);
 
         return back()->with('success', 'Información guardada');
     }
+
+
 
 
     /* ---------- FUNCION PARA GUARDAR UN REGISTRO INTERNO
@@ -686,5 +684,46 @@ class PostulanteController extends Controller
             'provincias',
             'distritos'
         ));
+    }
+
+    public function verPdfEnvuelto(Postulante $postulante, string $tipo)
+    {
+        abort_unless(in_array($tipo, ['cv', 'cul'], true), 404);
+
+        $rel  = $postulante->{$tipo};
+        $disk = config('filesystems.default', 'local'); // mismo que usaste al guardar
+
+        abort_if(!$rel || !Storage::disk($disk)->exists($rel), 404);
+
+        $streamUrl = route('postulantes.ver-archivo', ['postulante' => $postulante->id, 'tipo' => $tipo]);
+        $titulo = \Illuminate\Support\Str::upper($postulante->apellidos) . ' - ' . strtoupper($tipo);
+
+        return view('postulantes.pdf-wrapper', compact('streamUrl', 'titulo'));
+    }
+
+    public function verArchivoPostulante(Postulante $postulante, string $tipo)
+    {
+        $path = $postulante->{$tipo};
+        $disk = config('filesystems.default', 'local');
+
+        abort_if(!$path || !Storage::disk($disk)->exists($path), 404);
+
+        return Storage::disk($disk)->response($path, basename($path), [
+            'Content-Type'        => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="' . basename($path) . '"',
+        ]);
+    }
+
+
+
+    public function cargoTipo($codiCarg)
+    {
+        $tipo = DB::connection('sqlsrv')->table('CARGOS')
+            ->where('CODI_CARG', $codiCarg)
+            ->value('CARGO_TIPO'); // '01' operativo, '02' administrativo
+
+        return response()->json([
+            'cargo_tipo' => $tipo ? str_pad($tipo, 2, '0', STR_PAD_LEFT) : null
+        ]);
     }
 }

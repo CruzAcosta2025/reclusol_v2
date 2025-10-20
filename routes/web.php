@@ -25,6 +25,8 @@ Route::post('/postulantes/registro', [PostulanteController::class, 'storeExterno
 Route::get('/api-publico/cargos-por-tipo/{tipo}', [PostulanteController::class, 'getCargosPorTipo']);
 Route::get('/api-publico/provincias/{depa}', [PostulanteController::class, 'getProvincias']);
 Route::get('/api-publico/distritos/{prov}',  [PostulanteController::class, 'getDistritos']);
+// routes/web.php o api.php
+Route::get('/api-publico/cargo-tipo/{codiCarg}', [PostulanteController::class, 'cargoTipo']);
 
 Route::middleware('auth')->group(function () {
   Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -41,8 +43,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/postulantes/{postulante}/edit', [PostulanteController::class, 'edit'])->name('postulantes.edit');
     Route::put('/postulantes/{postulante}', [PostulanteController::class, 'update'])->name('postulantes.update');
     Route::get('/api/cargos-por-tipo/{tipo}', [PostulanteController::class, 'getCargosPorTipo']);
+    Route::get('/api/cargo-tipo/{codiCarg}', [PostulanteController::class, 'cargoTipo']);
     Route::get('/api/provincias/{depa}', [PostulanteController::class, 'getProvincias']);
     Route::get('/api/distritos/{prov}',  [PostulanteController::class, 'getDistritos']);
+    Route::get('/postulantes/{postulante}/ver/{tipo}', [PostulanteController::class, 'verPdfEnvuelto'])
+      ->whereIn('tipo', ['cv', 'cul'])
+      ->name('postulantes.ver-envuelto');
+    Route::get('/postulantes/{postulante}/archivo/{tipo}', [PostulanteController::class, 'verArchivoPostulante'])
+      ->whereIn('tipo', ['cv', 'cul'])->name('postulantes.ver-archivo');
 
     // Puedes proteger la ruta con middleware 'auth' si solo usuarios logueados usan el formulario interno
     Route::get('/api/verificar-lista-negra/{dni}', [PostulanteController::class, 'verificarListaNegra']);

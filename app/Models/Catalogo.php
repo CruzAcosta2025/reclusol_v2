@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class Catalogo 
 {
 
+    /*
+
     public static function obtenerDepartamentos()
     {
         return DB::connection('si_solmar')
@@ -75,4 +77,5 @@ class Catalogo
             //->orderBy('DESC_CARGO')
             ->get();
     }
+            */
 }
