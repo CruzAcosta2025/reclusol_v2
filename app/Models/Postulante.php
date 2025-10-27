@@ -47,7 +47,10 @@ class Postulante extends Model
         'cv',
         'cul',
         'origin',
-        'created_by'
+        'created_by',
+        'estado',        
+        'decision',     
+        'comentario'
     ];
 
     protected $casts = [

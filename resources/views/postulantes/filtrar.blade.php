@@ -61,7 +61,6 @@
             </div>
 
             {{-- Departamento --}}
-            {{-- Departamento --}}
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Departamento</label>
                 <select name="departamento" id="departamento"
@@ -159,32 +158,33 @@
             <table class="w-full">
                 <thead class="bg-gradient-to-r from-blue-50 to-blue-100">
                     <tr class="text-left">
-                        <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase text-center">Cargo</th>
-                        <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase text-center">Distrito</th>
-                        <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase text-center">Nombres y Apellidos
+                        <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Cargo</th>
+                        <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Distrito</th>
+                        <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Nombres y Apellidos
                         </th>
-                        <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase text-center">Edad</th>
-                        <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase text-center">DNI</th>
-                        <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase text-center">Nacionalidad</th>
-                        <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase text-center">Experiencia</th>
-                        <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase text-center">SUCAMEC</th>
-                        <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase text-center">Grado de Instrucción</th>
-                        <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase text-center">Celular</th>
-                        <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase text-center">Licencia de Arma L4</th>
-                        <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase text-center">Licencia de Conducir A1</th>
-                        <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase text-center">CV</th>
-                        <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase text-center">CUL</th>
+                        <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Edad</th>
+                        <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">DNI</th>
+                        <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Nacionalidad</th>
+                        <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Experiencia</th>
+                        <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">SUCAMEC</th>
+                        <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Grado de Instrucción</th>
+                        <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Celular</th>
+                        <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Licencia de Arma L4</th>
+                        <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Licencia de Conducir A1</th>
+                        <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">CV</th>
+                        <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">CUL</th>
                         <!-- <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase text-center">Estado</th> -->
-                        <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase text-center">Acciones</th>
+                        <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Acciones</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
                     @forelse($postulantes as $postulante)
-                    <tr
+                    <tr id="row-{{ $postulante->id }}"
+                        data-dni="{{ strtolower($postulante->dni) }}"
+                        data-nombre="{{ strtolower($postulante->nombres.' '.$postulante->apellidos) }}"
                         class="hover:bg-blue-50 transition
                             @if ($postulante->decision === 'apto') bg-green-100
-                            @elseif ($postulante->decision === 'no_apto') bg-red-100 @endif
-                            ">
+                            @elseif ($postulante->decision === 'no_apto') bg-red-100 @endif">
                         <td class="px-6 py-4">
                             <p class="text-gray-700 text-center">{{ $postulante->cargo_nombre }}</p>
                         </td>
@@ -656,7 +656,7 @@
     async function openEditModal(url, triggerEl = null) {
         editTriggerEl = triggerEl || document.activeElement;
 
-        // Skeleton mientras carga
+        // Skeleton
         editContent.innerHTML = `
     <div class="p-6 space-y-3">
       <div class="h-6 w-40 bg-gray-200 rounded animate-pulse"></div>
@@ -664,14 +664,12 @@
       <div class="h-32 w-full bg-gray-200 rounded animate-pulse"></div>
     </div>`;
 
-        // Mostrar overlay + bloquear scroll
+        // Mostrar modal
         editModal.classList.remove('hidden');
         editModal.classList.add('flex');
         document.body.style.overflow = 'hidden';
-
-        // Animación de entrada del panel
         if (editPanel) {
-            void editPanel.offsetWidth; // reflow
+            void editPanel.offsetWidth;
             editPanel.setAttribute('data-open', 'true');
         }
 
@@ -684,17 +682,19 @@
             const html = await res.text();
             editContent.innerHTML = html;
 
-            // Foco en el primer campo útil
-            const firstEl = editContent.querySelector('[autofocus], input, select, textarea, button');
-            if (firstEl && typeof firstEl.focus === 'function') firstEl.focus();
+            // === IMPORTANTE: inicializar selects dependientes del modal ===
+            initEditForm(editContent);
 
-            // Listeners de cierre UX
+            const firstEl = editContent.querySelector('[autofocus], input, select, textarea, button');
+            if (firstEl) firstEl.focus();
+
             editModal.addEventListener('mousedown', onEditBackdropClick);
             document.addEventListener('keydown', onEditEsc);
         } catch (e) {
             editContent.innerHTML = `<div class="p-6 text-sm text-red-600">No se pudo cargar el formulario.</div>`;
         }
     }
+
 
     function closeEditModal() {
         // Animación de salida
@@ -862,6 +862,86 @@
 
         if (fileName) fileName.textContent = file.name;
         if (preview) preview.classList.remove("hidden");
+
+
+    }
+
+
+    function initEditForm(root) {
+        // Elementos del modal
+        const tipoSel = root.querySelector('#tipo_cargo_edit');
+        const cargoSel = root.querySelector('#cargo_edit');
+        const depaSel = root.querySelector('#departamento_edit');
+        const provSel = root.querySelector('#provincia_edit');
+        const distSel = root.querySelector('#distrito_edit');
+        if (!tipoSel || !cargoSel || !depaSel || !provSel || !distSel) return;
+
+        // Helpers
+        const pad = (v, l) => (v == null ? '' : String(v).replace(/\D+/g, '').padStart(l, '0', ));
+        const setOptions = (select, items, valueKey, labelKey, placeholder) => {
+            select.innerHTML = `<option value="">${placeholder}</option>`;
+            items.forEach(it => {
+                const opt = document.createElement('option');
+                opt.value = it[valueKey];
+                opt.textContent = it[labelKey];
+                select.appendChild(opt);
+            });
+        };
+
+        const fillCargos = (tipo, preselect = null) => {
+            const t = pad(tipo, 2);
+            const list = cargos
+                .filter(c => pad(c.TIPO_CARG, 2) === t)
+                .map(c => ({
+                    value: c.CODI_CARG,
+                    label: c.DESC_CARGO
+                }));
+            setOptions(cargoSel, list, 'value', 'label', 'Selecciona el cargo');
+            if (preselect) cargoSel.value = String(preselect);
+        };
+
+        const fillProvs = (depa, preselect = null) => {
+            const d = pad(depa, 2);
+            const list = provincias
+                .filter(p => pad(p.DEPA_CODIGO, 2) === d)
+                .map(p => ({
+                    value: pad(p.PROVI_CODIGO, 4),
+                    label: p.PROVI_DESCRIPCION
+                }));
+            setOptions(provSel, list, 'value', 'label', 'Selecciona…');
+            if (preselect) provSel.value = pad(preselect, 4);
+        };
+
+        const fillDists = (prov, preselect = null) => {
+            const p = pad(prov, 4);
+            const list = distritos
+                .filter(d => pad(d.PROVI_CODIGO, 4) === p)
+                .map(d => ({
+                    value: pad(d.DIST_CODIGO, 6),
+                    label: d.DIST_DESCRIPCION
+                }));
+            setOptions(distSel, list, 'value', 'label', 'Selecciona…');
+            if (preselect) distSel.value = pad(preselect, 6);
+        };
+
+        // Estado inicial usando los data-value del parcial
+        fillCargos(tipoSel.value, cargoSel.dataset.value || null);
+        fillProvs(depaSel.value, provSel.dataset.value || null);
+        fillDists(provSel.value, distSel.dataset.value || null);
+
+        // Listeners en el modal
+        tipoSel.addEventListener('change', () => {
+            fillCargos(tipoSel.value, null); // recarga cargos y limpia selección
+        });
+        depaSel.addEventListener('change', () => {
+            fillProvs(depaSel.value, null); // recarga provincias
+            setOptions(distSel, [], 'value', 'label', 'Selecciona…'); // limpia distritos
+        });
+        provSel.addEventListener('change', () => {
+            fillDists(provSel.value, null); // recarga distritos
+        });
+
+
     }
 </script>
 @endsection

@@ -56,6 +56,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/api/verificar-lista-negra/{dni}', [PostulanteController::class, 'verificarListaNegra']);
     Route::get('/postulantes/{id}/descargar/{tipo}', [PostulanteController::class, 'descargarArchivo'])
       ->name('postulantes.descargarArchivo');
+
+    Route::patch('/postulantes/{postulante}/estado', [PostulanteController::class, 'updateEstado'])->name('postulantes.estado');
+
+    Route::post('/postulantes/{postulante}/validar', [PostulanteController::class, 'validarPostulante'])->name('postulantes.validar');
   });
 
   Route::get('/entrevistas', [EntrevistaController::class, 'listadoInicial'])->name('entrevistas.index');

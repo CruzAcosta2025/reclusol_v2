@@ -203,10 +203,10 @@
                             <select id="grado_instruccion" name="grado_instruccion" required
                                 class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300">
                                 <option value="">Selecciona el cargo</option>
-                                <option value="universitaria">Universitaria</option>
-                                <option value="carrera_tecnica">Carrera Técnica</option>
-                                <option value="ffaa_ffpp">Egresado de las FFAA / FFPP</option>
-                                <option value="5_secundaria">5º Grado de Secundaria</option>
+                                <option value="Universitaria">Universitaria</option>
+                                <option value="Carrera Técnica">Carrera Técnica</option>
+                                <option value="Egresado de las FFAA / FFPP">Egresado de las FFAA / FFPP</option>
+                                <option value="5º Grado de Secundaria">5º Grado de Secundaria</option>
                             </select>
                             <span class="error-message text-red-500 text-sm hidden"></span>
                         </div>
@@ -287,11 +287,11 @@
                             <select id="experiencia_rubro" name="experiencia_rubro" required
                                 class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all duration-300">
                                 <option value="">Selecciona tu experiencia</option>
-                                <option value="sin_experiencia">Sin experiencia</option>
-                                <option value="menos_1_año">Menos de 1 año</option>
-                                <option value="1_2_años">Entre 1 y 2 años</option>
-                                <option value="3_4_años">Entre 3 y 4 años</option>
-                                <option value="mas_4_años">Más de 4 años</option>
+                                <option value="Sin experiencia">Sin experiencia</option>
+                                <option value="Menos de 1 años">Menos de 1 año</option>
+                                <option value="Entre 1 y 2 años">Entre 1 y 2 años</option>
+                                <option value="Entre 3 y 4 años">Entre 3 y 4 años</option>
+                                <option value="Más de 4 años">Más de 4 años</option>
                             </select>
                             <span class="error-message text-red-500 text-sm hidden"></span>
                         </div>
@@ -323,7 +323,7 @@
                                 <option value="SI">SI</option>
                                 <option value="NO">NO</option>
                             </select>
-                            <x-input-error :messages="$errors->get('sucamec')" class="mt-2" />
+                            <x-input-error :messages="$errors->get('carne_sucamec')" class="mt-2" />
                         </div>
 
                         <!-- Licencia de arma -->
