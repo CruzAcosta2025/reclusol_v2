@@ -76,6 +76,9 @@ Route::middleware('auth')->group(function () {
   Route::put('/requerimientos/{requerimiento}', [RequerimientoController::class, 'update'])->name('requerimientos.update');
   Route::get('requerimientos/sedes-por-cliente', [RequerimientoController::class, 'sedesPorCliente']);
 
+  Route::get('/requerimientos/clientes-por-sucursal', [RequerimientoController::class, 'clientesPorSucursalSP'])
+        ->name('requerimientos.clientes_por_sucursal');
+
 
   Route::get('/cargos', [CargoController::class, 'index']);
   Route::get('/cargos/{id}', [CargoController::class, 'show']);

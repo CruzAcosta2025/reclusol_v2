@@ -35,8 +35,52 @@ class RequerimientoController extends Controller
         $clientes = collect(DB::connection('sqlsrv')->select('EXEC dbo.SP_LISTAR_CLIENTES'));
 
 
-        return view('requerimientos.requerimiento', compact('estados', 'prioridades', 
-        'clientes','sucursales','tipoCargos','cargos'));
+        return view('requerimientos.requerimiento', compact(
+            'estados',
+            'prioridades',
+            'clientes',
+            'sucursales',
+            'tipoCargos',
+            'cargos'
+        ));
+    }
+
+    public function clientesPorSucursalSP(Request $r)
+    {
+        $sucursal = trim((string) $r->query('codigo_sucursal', ''));
+        $buscar   = $r->query('q'); // opcional para autocompletar
+
+        if ($sucursal === '') {
+            return response()->json([], 200);
+        }
+
+        try {
+            // Ajusta la conexión si tu SP vive en otra DB (p.ej. 'sqlsrv')
+            // Firma sugerida del SP: dbo.USP_RECLUSOL_CLIENTES_POR_SUCURSAL @CODIGO_SUCURSAL, @BUSCAR = NULL
+            $rows = DB::connection('sqlsrv')->select(
+                'EXEC dbo.USP_RECLUSOL_CLIENTES_POR_SUCURSAL ?, ?',
+                [$sucursal, $buscar]
+            );
+
+            // Normaliza llaves para el <select>
+            $data = array_map(function ($x) {
+                $cod = $x->CODIGO_CLIENTE ?? $x->codigo_cliente ?? null;
+                $nom = $x->NOMBRE_CLIENTE ?? $x->nombre_cliente ?? null;
+                return [
+                    'CODIGO_CLIENTE' => is_string($cod) ? trim($cod) : $cod,
+                    'NOMBRE_CLIENTE' => $nom,
+                ];
+            }, $rows);
+
+            return response()->json($data, 200);
+        } catch (\Throwable $e) {
+            Log::error('SP clientesPorSucursal error', [
+                'sucursal' => $sucursal,
+                'error'    => $e->getMessage()
+            ]);
+            // No rompas el form: responde vacío
+            return response()->json([], 200);
+        }
     }
 
 
@@ -51,6 +95,31 @@ class RequerimientoController extends Controller
 
         return response()->json($sedes);
     }
+
+
+    
+
+    public function cargoTipo($codiCarg)
+    {
+        $tipo = DB::connection('sqlsrv')->table('CARGOS')
+            ->where('CODI_CARG', $codiCarg)
+            ->value('CARGO_TIPO'); // '01' operativo, '02' administrativo
+
+        return response()->json([
+            'cargo_tipo' => $tipo ? str_pad($tipo, 2, '0', STR_PAD_LEFT) : null
+        ]);
+    }
+
+    public function getCargosPorTipo($tipoCodigo)
+    {
+        // devuelve array de objetos [{CODI_CARG, DESC_CARGO}, ...]
+        $cargos = Cargo::vigentes()->porTipo($tipoCodigo)->get(['CODI_CARG', 'DESC_CARGO']);
+        return response()->json($cargos);
+    }
+
+
+
+
 
     public function index()
     {
@@ -301,7 +370,7 @@ class RequerimientoController extends Controller
         ));
     }
 
-   /*
+    /*
     public function edit(Requerimiento $requerimiento)
     {
         $estados = EstadoRequerimiento::all();
