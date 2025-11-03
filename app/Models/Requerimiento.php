@@ -51,6 +51,8 @@ class Requerimiento extends Model
         'requiere_licencia_conducir',
         'requiere_sucamec',
         'requisitos_adicionales',
+        'sueldo_basico',
+        'beneficios'
     ];
 
     protected $casts = [

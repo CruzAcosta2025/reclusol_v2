@@ -8,9 +8,11 @@ use App\Models\EstadoRequerimiento;
 use App\Models\Sucursal;
 use App\Models\TipoCargo;
 use App\Models\Cargo;
+use App\Models\TipoPersonal;
 use App\Models\PrioridadRequerimiento;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use App\Models\Departamento;
 //use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -29,6 +31,7 @@ class RequerimientoController extends Controller
         $sucursales =  Sucursal::forSelect();
         $tipoCargos = TipoCargo::forSelect();
         $cargos = Cargo::forSelect();
+        $tipoPersonal = TipoPersonal::forSelect();
 
 
         // Clientes (base CONTROLCLIENTES2018)
@@ -40,8 +43,7 @@ class RequerimientoController extends Controller
             'prioridades',
             'clientes',
             'sucursales',
-            'tipoCargos',
-            'cargos'
+            'tipoPersonal',
         ));
     }
 
@@ -97,7 +99,32 @@ class RequerimientoController extends Controller
     }
 
 
-    
+    public function tiposPorTipoPersonal(Request $request)
+    {
+        $tipoPersonal = $request->query('tipo_personal'); // '01' o '02'
+        if (!$tipoPersonal) return response()->json([]);
+
+        $rows = DB::connection('sqlsrv')->select(
+            'EXEC dbo.REC_TIPOS_CARGO_POR_TIPO_PERSONAL ?',
+            [$tipoPersonal]
+        );
+
+        return response()->json($rows);
+    }
+
+    public function cargosPorTipo(Request $request)
+    {
+        $tipoPersonal = $request->query('tipo_personal'); // '01' o '02'
+        $tipoCargo    = $request->query('tipo_cargo');    // p.ej. '01'
+        if (!$tipoPersonal || !$tipoCargo) return response()->json([]);
+
+        $rows = DB::connection('sqlsrv')->select(
+            'EXEC dbo.REC_CARGOS_POR_TIPO ?, ?',
+            [$tipoPersonal, $tipoCargo]
+        );
+
+        return response()->json($rows);
+    }
 
     public function cargoTipo($codiCarg)
     {
@@ -109,16 +136,6 @@ class RequerimientoController extends Controller
             'cargo_tipo' => $tipo ? str_pad($tipo, 2, '0', STR_PAD_LEFT) : null
         ]);
     }
-
-    public function getCargosPorTipo($tipoCodigo)
-    {
-        // devuelve array de objetos [{CODI_CARG, DESC_CARGO}, ...]
-        $cargos = Cargo::vigentes()->porTipo($tipoCodigo)->get(['CODI_CARG', 'DESC_CARGO']);
-        return response()->json($cargos);
-    }
-
-
-
 
 
     public function index()
@@ -163,11 +180,12 @@ class RequerimientoController extends Controller
             'licencia_armas'            => 'nullable|string|max:50',
             'servicio_acuartelado'      => 'nullable|string|max:50',
             'grado_academico'           => 'required|string|max:50',
-            'formacion_adicional'       => 'required|string|max:50',
+            'formacion_adicional'       => 'nullable|string|max:50',
             'requiere_licencia_conducir' => 'nullable|string|max:50',
             'validado_rrhh'             => 'boolean',
-            'escala_remunerativa'       => 'required|string|max:50',
+            'sueldo_basico'             => 'required|string|max:50',
             'beneficios'                => 'required|string|max:50',
+
             //'prioridad'                 => 'nullable|exists:prioridad_requerimiento,id',
             'estado'                    => 'required|exists:estado_requerimiento,id',
             //'fecha_limite'              => 'nullable|date|after_or_equal:today',
@@ -211,6 +229,7 @@ class RequerimientoController extends Controller
 
     //REVIEW FILTRAR
 
+    /*
     public function filtrar(Request $request)
     {
         //$query = Requerimiento::query();
@@ -267,12 +286,7 @@ class RequerimientoController extends Controller
         // Paginación
         $requerimientos = $query->paginate(15)->withQueryString();
 
-        /*-------------------------------------------------
-        |   Mapeo de nombres legibles
-        -------------------------------------------------*/
-        // Cargar catálogos
 
-        /*
         $tipoCargos = DB::connection('si_solmar')
             ->table('TIPO_CARGO')
             ->select('CODI_TIPO_CARG', 'DESC_TIPO_CARG')
@@ -340,7 +354,7 @@ class RequerimientoController extends Controller
             $r->distrito_nombre = $distritos->get($codigoDistrito)?->DIST_DESCRIPCION ?? $r->distrito;
         }
 
-        */
+        
 
         // Contar total general
         $requerimientosProcesos = Requerimiento::where('estado', 1)->count();
@@ -369,6 +383,144 @@ class RequerimientoController extends Controller
             'requerimientosVencidos'
         ));
     }
+    */
+
+    public function filtrar(Request $request)
+    {
+
+        $query = Requerimiento::query();
+
+        $norm = function (?string $val, int $len = null) {
+            if ($val === null || $val === '') return null;
+            $val = (string) $val;
+            if (!ctype_digit($val) || $len === null) return $val;
+            return str_pad($val, $len, '0', STR_PAD_LEFT);
+        };
+        // Solo dígitos + pad (a prueba de espacios, NBSP, guiones)
+        $normDigits = function (?string $val, int $len) {
+            $raw = preg_replace('/\D+/', '', (string)($val ?? ''));
+            if ($raw === '') return null;
+            return str_pad($raw, $len, '0', STR_PAD_LEFT);
+        };
+
+        $tipoCargo = $request->filled('tipo_cargo') ? (string)$request->input('tipo_cargo') : null;
+        $cargo     = $request->filled('cargo')      ? (string)$request->input('cargo')      : null;
+        $depa      = $norm($request->input('departamento'), 2);
+        $provi     = $norm($request->input('provincia'),     4);
+        $distr     = $norm($request->input('distrito'),      6);
+
+        $query->when($tipoCargo, fn($q) => $q->where('tipo_cargo', $tipoCargo));
+        $query->when($cargo,     fn($q) => $q->where('cargo', $cargo));
+        $query->when($depa,      fn($q) => $q->where('departamento', $depa));
+        $query->when($provi,     fn($q) => $q->where('provincia', $provi));
+        $query->when($distr,     fn($q) => $q->where('distrito', $distr));
+
+        $query->orderBy('created_at', 'desc');
+        $requerimientos = $query->paginate(15)->withQueryString();
+
+        // Catálogos para la vista
+        $departamentos = Departamento::forSelect(); // [DEPA_CODIGO => DEPA_DESCRIPCION]
+        $tipoCargos    = TipoCargo::forSelect();    // [CODI_TIPO_CARG => DESC_TIPO_CARG]
+
+        $cargos = Cargo::vigentes()
+            ->get(['CODI_CARG', 'DESC_CARGO', 'TIPO_CARG'])
+            ->keyBy('CODI_CARG');
+
+        /* === Provincias y Distritos desde SQL Server (tablas reales) === */
+        // PROVINCIAS
+        $provinciasList = DB::connection('sqlsrv')->table('ADMI_PROVINCIA')
+            ->select('PROVI_CODIGO', 'PROVI_DESCRIPCION', 'DEPA_CODIGO')
+            ->where('PROVI_VIGENCIA', 'SI')
+            ->get()
+            ->map(function ($p) use ($normDigits) {
+                $p->PROVI_CODIGO = $normDigits($p->PROVI_CODIGO, 4);
+                $p->DEPA_CODIGO  = $normDigits($p->DEPA_CODIGO,  2);
+                return $p;
+            });
+        $provinciasStr = $provinciasList->keyBy('PROVI_CODIGO');                 // '0608'
+        $provinciasNum = $provinciasList->keyBy(fn($p) => (int)$p->PROVI_CODIGO); // 608
+
+        // DISTRITOS
+        $distritosList = DB::connection('sqlsrv')->table('ADMI_DISTRITO')
+            ->select('DIST_CODIGO', 'DIST_DESCRIPCION', 'PROVI_CODIGO')
+            ->where('DIST_VIGENCIA', 'SI')
+            ->get()
+            ->map(function ($d) use ($normDigits) {
+                $d->DIST_CODIGO  = $normDigits($d->DIST_CODIGO,  6);
+                $d->PROVI_CODIGO = $normDigits($d->PROVI_CODIGO, 4);
+                return $d;
+            });
+        $distritosStr = $distritosList->keyBy('DIST_CODIGO');                     // '060808'
+        $distritosNum = $distritosList->keyBy(fn($d) => (int)$d->DIST_CODIGO);    // 60808
+
+        // Helper que intenta con clave string y numérica
+        $label2 = function ($collStr, $collNum, $code, $field) {
+            if ($code === null || $code === '') return $code;
+            if ($collStr->has($code)) {
+                $o = $collStr->get($code);
+                return $o->{$field} ?? (string)$o;
+            }
+            $numKey = (int)preg_replace('/\D+/', '', $code);
+            if ($collNum->has($numKey)) {
+                $o = $collNum->get($numKey);
+                return $o->{$field} ?? (string)$o;
+            }
+            return $code;
+        };
+
+        // Mapeo legible por fila
+        foreach ($requerimientos as $r) {
+            $dep  = $normDigits($r->departamento ?? '', 2);
+            $prov = $normDigits($r->provincia    ?? '', 4);
+            $dist = $normDigits($r->distrito     ?? '', 6);
+
+            $r->cargo_nombre        = $cargos->get((string)$r->cargo)->DESC_CARGO ?? $r->cargo;
+
+            // Departamentos: mapa simple [codigo => texto]
+            $r->departamento_nombre = $departamentos[$dep] ?? $r->departamento;
+
+            // Provincias/Distritos: catálogos completos (dos índices)
+            $r->provincia_nombre    = $label2($provinciasStr, $provinciasNum, $prov, 'PROVI_DESCRIPCION');
+            $r->distrito_nombre     = $label2($distritosStr,  $distritosNum,  $dist, 'DIST_DESCRIPCION');
+
+            if (!$distritosStr->has($dist) && !$distritosNum->has((int)$dist)) {
+                Log::warning('Distrito no encontrado en catálogo', [
+                    'id_postulante' => $r->id,
+                    'codigo_norm'   => $dist,
+                    'valor_original' => $r->distrito,
+                ]);
+            }
+        }
+
+        // Para la vista/JS seguimos exponiendo $provincias y $distritos
+        $provincias = $provinciasStr;
+        $distritos  = $distritosStr;
+
+
+        // Contar total general
+        $requerimientosProcesos = Requerimiento::where('estado', 1)->count();
+
+        // Contar cubiertos
+        $requerimientosCubiertos = Requerimiento::where('estado', 2)->count(); // suponiendo que estado 2 = Cubierto
+
+        // Contar cancelados
+        $requerimientosCancelados = Requerimiento::where('estado', 3)->count(); // estado 3 = Cancelado
+
+        // Contar vencidos
+        $requerimientosVencidos = Requerimiento::where('estado', 4)->count(); // estado 4 = Vencido
+
+
+        return view('requerimientos.filtrar', compact(
+            'requerimientos',
+            'tipoCargos',
+            'cargos',
+            'departamentos',
+            'provincias',
+            'distritos',
+        ));
+    }
+
+
 
     /*
     public function edit(Requerimiento $requerimiento)

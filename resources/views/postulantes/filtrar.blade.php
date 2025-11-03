@@ -940,8 +940,6 @@
         provSel.addEventListener('change', () => {
             fillDists(provSel.value, null); // recarga distritos
         });
-
-
     }
 </script>
 @endsection

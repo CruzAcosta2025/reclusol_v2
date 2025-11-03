@@ -20,6 +20,14 @@ class Sucursal extends Model
     }
     */
 
+    public const EXCLUIR_CODIGOS = ['11', '18','25']; // ej.
+
+    public function scopeSinEspeciales($q)
+    {
+        return $q->whereNotIn('SUCU_CODIGO', self::EXCLUIR_CODIGOS);
+    }
+
+
     public function scopeVigentes($q)
     {
         return $q->where('SUCU_VIGENCIA', 'SI')->orderBy('SUCU_DESCRIPCION');
@@ -28,12 +36,16 @@ class Sucursal extends Model
     // Método reutilizable para selects (codigo => descripcion)
     public static function forSelect()
     {
-        return self::vigentes()->pluck('SUCU_DESCRIPCION', 'SUCU_CODIGO');
+        return self::vigentes()
+            ->sinEspeciales()
+            ->pluck('SUCU_DESCRIPCION', 'SUCU_CODIGO');
     }
+
 
     public static function forSelectPadded()
     {
         return self::vigentes()
+            ->sinEspeciales()
             ->get(['SUCU_CODIGO', 'SUCU_DESCRIPCION'])
             ->mapWithKeys(function ($r) {
                 $code = (string) $r->SUCU_CODIGO;
