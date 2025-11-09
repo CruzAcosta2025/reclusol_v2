@@ -862,8 +862,6 @@
 
         if (fileName) fileName.textContent = file.name;
         if (preview) preview.classList.remove("hidden");
-
-
     }
 
 

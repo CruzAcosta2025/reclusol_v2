@@ -404,22 +404,46 @@ class RequerimientoController extends Controller
         };
 
         $tipoCargo = $request->filled('tipo_cargo') ? (string)$request->input('tipo_cargo') : null;
-        $cargo     = $request->filled('cargo')      ? (string)$request->input('cargo')      : null;
+        $cargo     = $request->filled('cargo_solicitado')      ? (string)$request->input('cargo_solicitado')      : null;
         $depa      = $norm($request->input('departamento'), 2);
         $provi     = $norm($request->input('provincia'),     4);
         $distr     = $norm($request->input('distrito'),      6);
+        $sucu      = $norm($request->input('sucursal'), 2);
+        // Tenías 2; los códigos son de 5 dígitos
+        $cli = $normDigits($request->input('cliente'), 5);
 
         $query->when($tipoCargo, fn($q) => $q->where('tipo_cargo', $tipoCargo));
         $query->when($cargo,     fn($q) => $q->where('cargo', $cargo));
         $query->when($depa,      fn($q) => $q->where('departamento', $depa));
         $query->when($provi,     fn($q) => $q->where('provincia', $provi));
         $query->when($distr,     fn($q) => $q->where('distrito', $distr));
+        $query->when($sucu, fn($q) => $q->where('sucursal', $sucu));
+        $query->when($cli,  fn($q) => $q->where('cliente',  $cli));
+
+        // Stats con mismos filtros
+        $base = clone $query;
+        $stats = [
+            'total'    => (clone $base)->count(),
+            'en_validacion'    => (clone $base)->where('estado', '1')->count(),
+            'aprobado' => (clone $base)->where('estado', '2')->count(),
+            'cancelado' => (clone $base)->where('estado', '3')->count(),
+            'cerrado' => (clone $base)->where('estado', '4')->count(),
+
+        ];
 
         $query->orderBy('created_at', 'desc');
         $requerimientos = $query->paginate(15)->withQueryString();
 
+
         // Catálogos para la vista
         $departamentos = Departamento::forSelect(); // [DEPA_CODIGO => DEPA_DESCRIPCION]
+        $sucursales    = Sucursal::forSelect();    // [SUCU_CODIGO => SUCU_DESCRIPCION]
+        $clientes      = collect(DB::connection('sqlsrv')->select('EXEC dbo.SP_LISTAR_CLIENTES'))
+            ->mapWithKeys(function ($item) {
+                $cod = is_string($item->CODIGO_CLIENTE) ? trim($item->CODIGO_CLIENTE) : $item->CODIGO_CLIENTE;
+                return [$cod => $item->NOMBRE_CLIENTE];
+            })->toArray(); // [CODIGO_CLIENTE => NOMBRE_CLIENTE]
+
         $tipoCargos    = TipoCargo::forSelect();    // [CODI_TIPO_CARG => DESC_TIPO_CARG]
 
         $cargos = Cargo::vigentes()
@@ -452,6 +476,8 @@ class RequerimientoController extends Controller
             });
         $distritosStr = $distritosList->keyBy('DIST_CODIGO');                     // '060808'
         $distritosNum = $distritosList->keyBy(fn($d) => (int)$d->DIST_CODIGO);    // 60808
+        $tiposPersonal = TipoPersonal::forSelect();
+
 
         // Helper que intenta con clave string y numérica
         $label2 = function ($collStr, $collNum, $code, $field) {
@@ -474,23 +500,25 @@ class RequerimientoController extends Controller
             $prov = $normDigits($r->provincia    ?? '', 4);
             $dist = $normDigits($r->distrito     ?? '', 6);
 
-            $r->cargo_nombre        = $cargos->get((string)$r->cargo)->DESC_CARGO ?? $r->cargo;
+            // NOMBRE DE CARGO (usa cargo_solicitado)
+            $r->cargo_nombre = optional($cargos->get((string)$r->cargo_solicitado))->DESC_CARGO
+                ?? $r->cargo_solicitado;
 
-            // Departamentos: mapa simple [codigo => texto]
+            // SUCURSAL y CLIENTE legibles
+            $r->sucursal_nombre = $sucursales[$normDigits($r->sucursal, 2)] ?? $r->sucursal;
+            $r->cliente_nombre  = $clientes[$normDigits($r->cliente, 5)]   ?? $r->cliente;
+
+            // Los que ya tenías
             $r->departamento_nombre = $departamentos[$dep] ?? $r->departamento;
-
-            // Provincias/Distritos: catálogos completos (dos índices)
             $r->provincia_nombre    = $label2($provinciasStr, $provinciasNum, $prov, 'PROVI_DESCRIPCION');
             $r->distrito_nombre     = $label2($distritosStr,  $distritosNum,  $dist, 'DIST_DESCRIPCION');
-
-            if (!$distritosStr->has($dist) && !$distritosNum->has((int)$dist)) {
-                Log::warning('Distrito no encontrado en catálogo', [
-                    'id_postulante' => $r->id,
-                    'codigo_norm'   => $dist,
-                    'valor_original' => $r->distrito,
-                ]);
-            }
+            $cod = $normDigits($r->tipo_personal ?? '', 2);
+            $r->tipo_personal_nombre = $tiposPersonal[$cod] ?? $r->tipo_personal;
+            // Mapear estado numérico -> etiqueta
+            $estadoMap = [1 => 'En proceso', 2 => 'Cubierto', 3 => 'Cancelado', 4 => 'Vencido'];
+            $r->estado_nombre = $estadoMap[(int)$r->estado] ?? null;
         }
+
 
         // Para la vista/JS seguimos exponiendo $provincias y $distritos
         $provincias = $provinciasStr;
@@ -517,6 +545,10 @@ class RequerimientoController extends Controller
             'departamentos',
             'provincias',
             'distritos',
+            'sucursales',
+            'clientes',
+            'stats'
+
         ));
     }
 
@@ -636,7 +668,7 @@ class RequerimientoController extends Controller
     }
 
     /**
-     * Elimina un postulante.
+     * Elimina un requerimiento
      */
     public function destroy(Requerimiento $requerimiento)
     {
@@ -644,7 +676,7 @@ class RequerimientoController extends Controller
             $requerimiento->delete();
             return response()->json(['success' => true]);
         } catch (\Throwable $e) {
-            Log::error('Error al eliminar postulante', [
+            Log::error('Error al eliminar un requerimiento', [
                 'error' => $e->getMessage(),
                 'id'    => $requerimiento->id,
             ]);

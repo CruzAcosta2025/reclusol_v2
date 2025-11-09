@@ -27,6 +27,32 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
         <form id="filter-form" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4 bg-white p-6 rounded-2xl shadow-lg">
 
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Sucursal</label>
+                <select name="sucursal" id="sucursal"
+                    class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 bg-white/80">
+                    <option value="">Todos</option>
+                    @foreach ($sucursales as $codigo => $desc) {{-- $desc es STRING --}}
+                    <option value="{{ $codigo }}" @selected((string)request('sucursal')===(string)$codigo)>
+                        {{ $desc }}
+                    </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Cliente</label>
+                <select name="cliente" id="cliente"
+                    class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 bg-white/80">
+                    <option value="">Todos</option>
+                    @foreach ($clientes as $codigo => $desc) {{-- $desc es STRING --}}
+                    <option value="{{ $codigo }}" @selected((string)request('sucursal')===(string)$codigo)>
+                        {{ $desc }}
+                    </option>
+                    @endforeach
+                </select>
+            </div>
+
             <!-- Tipo de Cargo -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Cargo</label>
@@ -114,25 +140,25 @@
             <div class="bg-yellow-100 p-4 rounded-lg text-center flex flex-col items-center">
                 <i class="fas fa-hourglass-half text-yellow-500 mb-2"></i>
                 <h3 class="text-sm text-gray-600">En Proceso</h3>
-                <p class="text-2xl font-bold">{{ $requerimientosProcesos ?? 0 }} </p>
+                <p class="text-2xl font-bold">{{ $stats['en_validacion']?? 0 }} </p>
             </div>
 
             <div class="bg-green-100 p-4 rounded-lg text-center flex flex-col items-center">
                 <i class="fas fa-check-circle text-green-500 mb-2"></i>
                 <h3 class="text-sm text-gray-600">Cubiertos</h3>
-                <p class="text-2xl font-bold">{{ $requerimientosCubiertos ?? 0 }}</p>
+                <p class="text-2xl font-bold">{{ $stats['aprobado'] ?? 0 }}</p>
             </div>
 
             <div class="bg-blue-100 p-4 rounded-lg text-center flex flex-col items-center">
                 <i class="fas fa-times-circle text-blue-500 mb-2"></i>
                 <h3 class="text-sm text-gray-600">Cancelados</h3>
-                <p class="text-2xl font-bold">{{ $requerimientosCancelados ?? 0 }}</p>
+                <p class="text-2xl font-bold">{{ $stats['cancelado'] ?? 0 }}</p>
             </div>
 
             <div class="bg-red-100 p-4 rounded-lg text-center flex flex-col items-center">
                 <i class="fas fa-clock text-red-500 mb-2"></i>
                 <h3 class="text-sm text-gray-600">Vencidos</h3>
-                <p class="text-2xl font-bold">{{ $requerimientosVencidos ?? 0 }} </p>
+                <p class="text-2xl font-bold">{{ $stats['cerrado'] ?? 0 }} </p>
             </div>
         </div>
     </div>
@@ -152,55 +178,67 @@
                 <table class="w-full">
                     <thead class="bg-gradient-to-r from-blue-50 to-blue-100">
                         <tr class="text-left">
+                            <th class="px-6 py-4 text-center font-bold text-gray-800 uppercase text-center">Tipo de Personal</th>
                             <th class="px-6 py-4 text-center font-bold text-gray-800 uppercase text-center">Cargo Solicitado</th>
                             <th class="px-6 py-4 text-center font-bold text-gray-800 uppercase text-center">Sucursal</th>
                             <th class="px-6 py-4 text-center font-bold text-gray-800 uppercase text-center">Cliente</th>
-                            <th class="px-6 py-4 text-center font-bold text-gray-800 uppercase text-center">Prioridad</th>
+                            <th class="px-6 py-4 text-center font-bold text-gray-800 uppercase text-center">Urgencia</th>
                             <th class="px-6 py-4 text-center font-bold text-gray-800 uppercase text-center">Estado</th>
-                            <th class="px-6 py-4 text-center font-bold text-gray-800 uppercase text-center">Fecha Límite</th>
+                            <th class="px-6 py-4 text-center font-bold text-gray-800 uppercase text-center">Fecha Inicio</th>
+                            <th class="px-6 py-4 text-center font-bold text-gray-800 uppercase text-center">Fecha Final</th>
                             <th class="px-6 py-4 text-center font-bold text-gray-800 uppercase text-center">Acciones</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
                         @forelse($requerimientos as $requerimiento)
                         <tr class="hover:bg-blue-50 transition">
+                            <td class="px-6 py-4 text-center">
+                                {{ $requerimiento->tipo_personal_nombre }}
+                            </td>
                             <td class="px-6 py-4 text-center">{{ $requerimiento->cargo_nombre }}</td>
                             <td class="px-6 py-4 text-center">{{ ucfirst($requerimiento->sucursal_nombre) }}</td>
-                            <td class="px-6 py-4 text-center">{{ ucfirst($requerimiento->cliente) }}</td>
+                            <td class="px-6 py-4 text-center">{{ ucfirst($requerimiento->cliente_nombre) }}</td>
                             <td class="px-6 py-4 text-center">
                                 @php
+                                $urg = strtolower($requerimiento->urgencia ?? '');
                                 $priorityColors = [
                                 'alta' => 'bg-red-100 text-red-800',
                                 'media' => 'bg-yellow-100 text-yellow-800',
                                 'baja' => 'bg-green-100 text-green-800',
-                                null => 'bg-gray-100 text-gray-600'
                                 ];
-                                $priorityClass = $priorityColors[$requerimiento->prioridad ?? null] ?? 'bg-gray-100 text-gray-600';
+                                $priorityClass = $priorityColors[$urg] ?? 'bg-gray-100 text-gray-600';
                                 @endphp
-                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium {{ $priorityClass }}">
-                                    {{ ucfirst($requerimiento->prioridad ?? 'N/A') }}
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm {{ $priorityClass }}">
+                                    {{ ucfirst($requerimiento->urgencia ?? 'N/A') }}
                                 </span>
+
                             </td>
                             <td class="px-6 py-4 text-center">
                                 @php
-                                $estadoNombre = is_object($requerimiento->estado) ? $req->estado->nombre : null;
+                                $estadoNombre = $requerimiento->estado_nombre; // ya viene del controller
                                 $statusColors = [
                                 'en proceso' => 'bg-yellow-100 text-yellow-800',
                                 'cubierto' => 'bg-green-100 text-green-800',
                                 'cancelado' => 'bg-red-100 text-red-800',
                                 'vencido' => 'bg-gray-200 text-gray-700',
-                                null => 'bg-gray-100 text-gray-600',
                                 ];
-                                $statusClass = $statusColors[strtolower($estadoNombre)] ?? 'bg-gray-100 text-gray-600';
+                                $statusClass = $statusColors[strtolower($estadoNombre ?? '')] ?? 'bg-gray-100 text-gray-600';
                                 @endphp
-                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium {{ $statusClass }}">
-                                    {{ ucfirst($estadoNombre ?? 'N/A') }}
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm {{ $statusClass }}">
+                                    {{ $estadoNombre ?? 'N/A' }}
                                 </span>
+
                             </td>
 
-                            <td class="px-6 py-4">
-                                {{ \Carbon\Carbon::parse($requerimiento->fecha_limite)->format('d/m/Y') }}
+                            <td class="px-6 py-4 text-center">
+                                {{ $requerimiento->fecha_inicio ? $requerimiento->fecha_inicio->format('d/m/Y') : '—' }}
                             </td>
+
+                            <td class="px-6 py-4 text-center">
+                                {{ $requerimiento->fecha_fin ? $requerimiento->fecha_fin->format('d/m/Y') : '—' }}
+                            </td>
+
+
                             <td class="px-4 py-3 flex space-x-2">
                                 <a href="#"
                                     class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 hover:bg-blue-100 text-blue-600 transition"
@@ -230,20 +268,51 @@
             </div>
 
             {{-- Modal de Edición --}}
-            <div id="edit-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-                <div class="bg-white p-6 rounded-lg shadow-lg max-w-xl w-full mx-auto" id="edit-modal-content">
-                    {{-- Aquí se inyectará el formulario de edición --}}
+            <div id="edit-modal"
+                class="hidden fixed inset-0 z-50 items-center justify-center bg-black/50 backdrop-blur-sm">
+                <div id="edit-panel"
+                    class="bg-white w-full max-w-3xl mx-4 rounded-2xl shadow-2xl border border-gray-100
+              max-h-[90vh] overflow-y-auto
+              opacity-0 scale-95 transition duration-200 ease-out
+              data-[open=true]:opacity-100 data-[open=true]:scale-100">
+                    <div id="edit-modal-content"><!-- aquí se inyecta el formulario --></div>
                 </div>
             </div>
 
+
             {{-- Modal de Eliminación --}}
-            <div id="delete-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-                <div class="bg-white p-6 rounded-lg shadow-lg max-w-sm mx-auto">
-                    <h3 class="text-lg font-semibold mb-4">¿Eliminar requerimiento?</h3>
-                    <p class="text-sm text-gray-600 mb-4">Esta acción no se puede deshacer.</p>
-                    <div class="flex justify-end space-x-2">
-                        <button onclick="closeDeleteModal()" class="px-4 py-2 bg-gray-200 rounded">Cancelar</button>
-                        <button onclick="confirmDelete()" class="px-4 py-2 bg-red-600 text-white rounded">Eliminar</button>
+            <div id="delete-modal"
+                class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+                role="dialog" aria-modal="true" aria-labelledby="delete-title" aria-describedby="delete-desc">
+                <!-- Panel -->
+                <div class="bg-white w-full max-w-md mx-4 rounded-2xl shadow-2xl border border-gray-100 p-6
+           opacity-0 translate-y-2 transition-all duration-200 ease-out
+           data-[open=true]:opacity-100 data-[open=true]:translate-y-0"
+                    id="delete-panel" data-open="true">
+                    <!-- Encabezado -->
+                    <div class="flex items-start gap-3 mb-4">
+                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-50">
+                            <i class="fa-solid fa-triangle-exclamation text-red-600"></i>
+                        </div>
+                        <div>
+                            <h3 id="delete-title" class="text-xl font-semibold">¿Eliminar requerimiento?</h3>
+                            <p id="delete-desc" class="text-sm text-gray-600 mt-1">Esta acción no se puede deshacer.</p>
+                        </div>
+                    </div>
+
+                    <!-- Botones -->
+                    <div class="mt-5 flex justify-end gap-3 pt-4 border-t border-gray-100">
+                        <button type="button" onclick="closeDeleteModal()"
+                            class="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800
+               focus:outline-none focus:ring focus:ring-gray-300 transition">
+                            Cancelar
+                        </button>
+
+                        <button type="button" onclick="confirmDelete()"
+                            class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white
+               focus:outline-none focus:ring focus:ring-red-300 transition">
+                            Eliminar
+                        </button>
                     </div>
                 </div>
             </div>
@@ -251,61 +320,19 @@
     </div>
 </div>
 
-
-<style>
-    .gradient-bg {
-        background: linear-gradient(135deg, #60a5fa, #1d4ed8);
-    }
-
-    .glassmorphism {
-        background: rgba(255, 255, 255, 0.25);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.18);
-    }
-
-    .filter-card {
-        background: rgba(255, 255, 255, 0.98);
-        backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-    }
-
-    .btn-primary {
-        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-        transition: all 0.3s ease;
-    }
-
-    .btn-primary:hover {
-        background: linear-gradient(135deg, #1d4ed8, #1e40af);
-        transform: translateY(-1px);
-    }
-
-    .priority-high {
-        background: linear-gradient(135deg, #ef4444, #dc2626);
-    }
-
-    .priority-medium {
-        background: linear-gradient(135deg, #f59e0b, #d97706);
-    }
-
-    .priority-low {
-        background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-    }
-
-    .status-active {
-        background: linear-gradient(135deg, #10b981, #059669);
-    }
-
-    .status-pending {
-        background: linear-gradient(135deg, #f59e0b, #d97706);
-    }
-
-    .status-closed {
-        background: linear-gradient(135deg, #6b7280, #4b5563);
-    }
-</style>
-
 <script>
     let deleteRequerimientoId = null;
+    let deleteTriggerEl = null;
+    const modal = document.getElementById('delete-modal');
+    const panel = document.getElementById('delete-panel');
+    const btnCancelar = modal?.querySelector('button[onclick="closeDeleteModal()"]');
+    const btnEliminar = modal?.querySelector('button[onclick="confirmDelete()"]');
+
+    const editModal = document.getElementById('edit-modal');
+    const editPanel = document.getElementById('edit-panel');
+    const editContent = document.getElementById('edit-modal-content');
+    let eaditTriggerEl = null;
+
 
     const cargos = Object.values(@json($cargos));
     const provincias = Object.values(@json($provincias));
@@ -316,17 +343,140 @@
         window.location.href = window.location.pathname;
     }
 
-    function eliminarRequerimiento(id) {
+    function openDeleteModal(id, triggerEl = null) {
         deleteRequerimientoId = id;
-        document.getElementById('delete-modal').classList.remove('hidden');
-        document.getElementById('delete-modal').classList.add('flex');
+        deleteTriggerEl = triggerEl || document.activeElement;
+
+        // Mostrar overlay
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+
+        // Bloquear scroll del fondo
+        document.body.style.overflow = 'hidden';
+
+        // Forzar reflow para que la transición se aplique
+        void panel.offsetWidth;
+        panel.setAttribute('data-open', 'true');
+
+        // Foco al botón más seguro (Cancelar)
+        setTimeout(() => {
+            btnCancelar?.focus();
+        }, 0);
+
+        // Listeners de UX
+        document.addEventListener('keydown', onEscClose);
+        modal.addEventListener('mousedown', onBackdropClick);
+    }
+
+    function eliminarRequerimiento(id) {
+        openDeleteModal(id);
     }
 
     function closeDeleteModal() {
         deleteRequerimientoId = null;
-        document.getElementById('delete-modal').classList.add('hidden');
+
+        // Animación de salida
+        panel.setAttribute('data-open', 'false');
+
+        // Habilitar de nuevo botones y texto original si estaba cargando
+        restoreButtons();
+
+        // Quitar listeners
+        document.removeEventListener('keydown', onEscClose);
+        modal.removeEventListener('mousedown', onBackdropClick);
+
+        // Devolver scroll
+        document.body.style.overflow = '';
+
+        // Ocultar después de la duración de la transición (200ms)
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            // Devolver foco al disparador
+            if (deleteTriggerEl && typeof deleteTriggerEl.focus === 'function') {
+                deleteTriggerEl.focus();
+            }
+            deleteTriggerEl = null;
+        }, 200);
     }
 
+    function onEscClose(event) {
+        if (event.key === 'Escape') {
+            closeDeleteModal();
+        }
+    }
+
+    function onBackdropClick(event) {
+        if (!panel.contains(event.target)) {
+            closeDeleteModal();
+        }
+    }
+
+    async function confirmDelete() {
+        if (!deleteRequerimientoId) {
+            closeDeleteModal();
+            return;
+        }
+
+        // Estado de carga
+        const prevEliminarText = btnEliminar?.textContent;
+        btnEliminar.disabled = true;
+        btnCancelar.disabled = true;
+        btnEliminar.textContent = 'Eliminando…';
+
+        try {
+            const res = await fetch(`/requerimientos/${deleteRequerimientoId}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                        'content'),
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                },
+            });
+
+            // Si tu backend devuelve 204 No Content, evita .json()
+            let data = null;
+            const contentType = res.headers.get('Content-Type') || '';
+            if (contentType.includes('application/json')) {
+                data = await res.json().catch(() => null);
+            }
+
+            if (res.ok && (!data || data.success !== false)) {
+                // éxito: recarga o elimina fila de la tabla si quieres hacerlo sin recargar
+                window.location.reload();
+                return;
+            } else {
+                alert((data && data.message) ? data.message : 'Error al eliminar');
+            }
+        } catch (err) {
+            alert('Error al eliminar');
+        } finally {
+            // Si no recargó (hubo error), restauro y cierro
+            if (!document.hidden) {
+                if (prevEliminarText) btnEliminar.textContent = prevEliminarText;
+                btnEliminar.disabled = false;
+                btnCancelar.disabled = false;
+                closeDeleteModal();
+            }
+        }
+    }
+
+    function restoreButtons() {
+        if (!btnEliminar || !btnCancelar) return;
+        btnEliminar.disabled = false;
+        btnCancelar.disabled = false;
+        if (btnEliminar.textContent !== 'Eliminar') {
+            btnEliminar.textContent = 'Eliminar';
+        }
+    }
+
+    // function closeDeleteModal() {
+    //   deleteRequerimientoId = null;
+    // document.getElementById('delete-modal').classList.add('hidden');
+    //}
+
+    /*
     function confirmDelete() {
         if (deleteRequerimientoId) {
             fetch(`/requerimientos/${deleteRequerimientoId}`, {
@@ -348,11 +498,13 @@
         }
         closeDeleteModal();
     }
+    */
+
 
     // Filtrar cargos dinámicamente en el filtro principal
     document.getElementById('tipo_cargo').addEventListener('change', function() {
         const tipoCargoId = this.value;
-        const cargoSelect = document.getElementById('cargo_solicitado');
+        const cargoSelect = document.getElementById('cargo');
 
         cargoSelect.innerHTML = '<option value="">Selecciona un cargo</option>';
 
@@ -394,7 +546,7 @@
 
     // Filtrar distritos al cambiar provincia
     document.getElementById('provincia').addEventListener('change', function() {
-        const provId = this.value.padStart(2, '0');
+        const provId = this.value.padStart(4, '0');
         const distritoSelect = document.getElementById('distrito');
 
         distritoSelect.innerHTML = '<option value="">Selecciona un distrito</option>';
@@ -411,7 +563,220 @@
         }
     });
 
+    // Funciones para el modal de edición
+    async function openEditModal(url, triggerEl = null) {
+        editTriggerEl = triggerEl || document.activeElement;
+
+        // Skeleton
+        editContent.innerHTML = `
+    <div class="p-6 space-y-3">
+      <div class="h-6 w-40 bg-gray-200 rounded animate-pulse"></div>
+      <div class="h-4 w-3/4 bg-gray-200 rounded animate-pulse"></div>
+      <div class="h-32 w-full bg-gray-200 rounded animate-pulse"></div>
+    </div>`;
+
+        // Mostrar modal
+        editModal.classList.remove('hidden');
+        editModal.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+        if (editPanel) {
+            void editPanel.offsetWidth;
+            editPanel.setAttribute('data-open', 'true');
+        }
+
+        try {
+            const res = await fetch(url, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            const html = await res.text();
+            editContent.innerHTML = html;
+
+            // === IMPORTANTE: inicializar selects dependientes del modal ===
+            initEditForm(editContent);
+
+            const firstEl = editContent.querySelector('[autofocus], input, select, textarea, button');
+            if (firstEl) firstEl.focus();
+
+            editModal.addEventListener('mousedown', onEditBackdropClick);
+            document.addEventListener('keydown', onEditEsc);
+        } catch (e) {
+            editContent.innerHTML = `<div class="p-6 text-sm text-red-600">No se pudo cargar el formulario.</div>`;
+        }
+    }
+
+    function closeEditModal() {
+        // Animación de salida
+        if (editPanel) editPanel.setAttribute('data-open', 'false');
+
+        // Quitar listeners y devolver scroll
+        document.removeEventListener('keydown', onEditEsc);
+        editModal.removeEventListener('mousedown', onEditBackdropClick);
+        document.body.style.overflow = '';
+
+        // Ocultar tras la duración de la animación (200ms)
+        setTimeout(() => {
+            editModal.classList.add('hidden');
+            editModal.classList.remove('flex');
+            // Devolver foco al disparador
+            if (editTriggerEl && typeof editTriggerEl.focus === 'function') editTriggerEl.focus();
+            editTriggerEl = null;
+        }, 200);
+    }
+
+    function onEditEsc(e) {
+        if (e.key === 'Escape') closeEditModal();
+    }
+
+    function onEditBackdropClick(e) {
+        if (!editPanel?.contains(e.target)) closeEditModal();
+    }
+
+    // Conectar los botones "Editar" a la nueva función
+    document.querySelectorAll('.btn-edit').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.dataset.id;
+            openEditModal(`/requerimientos/${id}/edit`, btn);
+        });
+    });
+
+
+    document.addEventListener('submit', function(e) {
+        if (e.target.id === 'form-edit') {
+            e.preventDefault();
+            const form = e.target;
+            fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'X-HTTP-Method-Override': 'PUT',
+                        'Accept': 'application/json'
+                    },
+                    body: new FormData(form)
+                })
+                .then(response => {
+                    if (!response.ok) return response.json().then(err => Promise.reject(err));
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Éxito!',
+                            text: '¡Requerimiento actualizado correctamente!',
+                            confirmButtonColor: '#3085d6',
+                            timer: 1800,
+                            timerProgressBar: true,
+                            showConfirmButton: false
+                        });
+                        // Cerrar el modal antes de recargar (opcional)
+                        closeEditModal();
+                        // Esperar al SweetAlert antes de recargar
+                        setTimeout(() => window.location.reload(), 1800);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.message || 'Error al actualizar.',
+                            confirmButtonColor: '#d33'
+                        });
+                    }
+                })
+                .catch(err => {
+                    let mensaje = 'Ocurrió un error inesperado.';
+                    if (err.errors) {
+                        mensaje = Object.values(err.errors).flat().join('\n');
+                    }
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error de validación',
+                        text: mensaje,
+                        confirmButtonColor: '#d33'
+                    });
+                    console.error('Errores de validación:', err.errors || err);
+                });
+        }
+    });
+
+    function initEditForm(root) {
+        // Elementos del modal
+        const tipoSel = root.querySelector('#tipo_cargo_edit');
+        const cargoSel = root.querySelector('#cargo_edit');
+        const depaSel = root.querySelector('#departamento_edit');
+        const provSel = root.querySelector('#provincia_edit');
+        const distSel = root.querySelector('#distrito_edit');
+        if (!tipoSel || !cargoSel || !depaSel || !provSel || !distSel) return;
+
+        // Helpers
+        const pad = (v, l) => (v == null ? '' : String(v).replace(/\D+/g, '').padStart(l, '0', ));
+        const setOptions = (select, items, valueKey, labelKey, placeholder) => {
+            select.innerHTML = `<option value="">${placeholder}</option>`;
+            items.forEach(it => {
+                const opt = document.createElement('option');
+                opt.value = it[valueKey];
+                opt.textContent = it[labelKey];
+                select.appendChild(opt);
+            });
+        };
+
+        const fillCargos = (tipo, preselect = null) => {
+            const t = pad(tipo, 2);
+            const list = cargos
+                .filter(c => pad(c.TIPO_CARG, 2) === t)
+                .map(c => ({
+                    value: c.CODI_CARG,
+                    label: c.DESC_CARGO
+                }));
+            setOptions(cargoSel, list, 'value', 'label', 'Selecciona el cargo');
+            if (preselect) cargoSel.value = String(preselect);
+        };
+
+        const fillProvs = (depa, preselect = null) => {
+            const d = pad(depa, 2);
+            const list = provincias
+                .filter(p => pad(p.DEPA_CODIGO, 2) === d)
+                .map(p => ({
+                    value: pad(p.PROVI_CODIGO, 4),
+                    label: p.PROVI_DESCRIPCION
+                }));
+            setOptions(provSel, list, 'value', 'label', 'Selecciona…');
+            if (preselect) provSel.value = pad(preselect, 4);
+        };
+
+        const fillDists = (prov, preselect = null) => {
+            const p = pad(prov, 4);
+            const list = distritos
+                .filter(d => pad(d.PROVI_CODIGO, 4) === p)
+                .map(d => ({
+                    value: pad(d.DIST_CODIGO, 6),
+                    label: d.DIST_DESCRIPCION
+                }));
+            setOptions(distSel, list, 'value', 'label', 'Selecciona…');
+            if (preselect) distSel.value = pad(preselect, 6);
+        };
+
+        // Estado inicial usando los data-value del parcial
+        fillCargos(tipoSel.value, cargoSel.dataset.value || null);
+        fillProvs(depaSel.value, provSel.dataset.value || null);
+        fillDists(provSel.value, distSel.dataset.value || null);
+
+        // Listeners en el modal
+        tipoSel.addEventListener('change', () => {
+            fillCargos(tipoSel.value, null); // recarga cargos y limpia selección
+        });
+        depaSel.addEventListener('change', () => {
+            fillProvs(depaSel.value, null); // recarga provincias
+            setOptions(distSel, [], 'value', 'label', 'Selecciona…'); // limpia distritos
+        });
+        provSel.addEventListener('change', () => {
+            fillDists(provSel.value, null); // recarga distritos
+        });
+    }
+
+
     // Función global para inicializar el filtrado del modal de edición
+    /*
     window.inicializarFiltroCargosModal = function() {
         const modal = document.getElementById('edit-modal');
         const tipoCargoSelect = modal.querySelector('#tipo_cargo');
@@ -527,8 +892,9 @@
             });
         }
     };
+    */
 
-
+    /*
     // Abrir modal y cargar el form-edit
     document.querySelectorAll('.btn-edit').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -581,5 +947,6 @@
                 });
         }
     });
+    */
 </script>
 @endsection
