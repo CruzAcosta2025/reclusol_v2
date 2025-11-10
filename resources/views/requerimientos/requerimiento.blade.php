@@ -887,7 +887,7 @@
 
 
     // Update scale info based on selection
-    document.getElementById('escala_remunerativa').addEventListener('change', function() {
+    document.getElementById('beneficios').addEventListener('change', function() {
         const infoBox = document.querySelector('.bg-blue-50 p strong');
         if (infoBox && this.value) {
             infoBox.textContent = `Escala seleccionada: ${this.options[this.selectedIndex].text}`;

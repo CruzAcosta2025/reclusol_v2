@@ -5,11 +5,12 @@ use Illuminate\Support\Str;
 @extends('layouts.app')
 
 @section('content')
-<div class="min-h-screen gradient-bg py-8">
+<div class="min-h-screen gradient-bg py-8 pt-24">
     <!-- Back to Dashboard Button -->
-    <a href="{{ route('dashboard') }}" class="absolute top-6 left-6 text-white hover:text-yellow-300 transition-colors flex items-center space-x-2 group z-10">
-        <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i>
-        <span class="font-medium">Volver al Dashboard</span>
+    <a href="{{ route('dashboard') }}"
+        class="absolute top-6 left-6 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold rounded-xl shadow-lg transition-colors flex items-center space-x-3 px-6 py-3 text-lg z-10 group">
+        <i class="fas fa-arrow-left text-2xl group-hover:-translate-x-1 transition-transform"></i>
+        <span class="font-bold">Volver al Dashboard</span>
     </a>
 
     <!-- Header -->

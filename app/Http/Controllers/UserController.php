@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Cargo;
+use App\Models\Sucursal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -41,12 +42,8 @@ class UserController extends Controller
         $newUsersThisMonth = User::whereMonth('created_at', Carbon::now()->month)
             ->whereYear('created_at', Carbon::now()->year)
             ->count();
-
         // Obtener datos para filtros
-        $cargos = DB::connection('si_solmar')->table('CARGOS')
-            ->select(['CODI_CARG', 'DESC_CARGO'])
-            ->get()
-            ->keyBy('CODI_CARG');
+        $cargos = Cargo::forSelect();
 
         return view('usuarios.index', compact(
             'users',
@@ -59,6 +56,7 @@ class UserController extends Controller
     public function create()
     {
         // Llamada al SP, puedes filtrar por sucursal si quieres
+        /*
         $personal = DB::connection('sqlsrv')
             ->select('EXEC RECLUSOL_2025_LISTAR_PERSONALXSUCURSAL');
 
@@ -74,10 +72,13 @@ class UserController extends Controller
             ->select(['CODI_TIPO_CARG', 'DESC_TIPO_CARG'])
             ->get()
             ->keyBy('CODI_TIPO_CARG');
+        */
 
+        $sucursales = Sucursal::forSelect();
+        $cargos = Cargo::forSelect();
 
         // Pasa el personal y sucursales a la vista
-        return view('usuarios.create', compact('personal', 'sucursales', 'cargos'));
+        return view('usuarios.create', compact( 'sucursales', 'cargos'));
     }
 
     public function buscarPersonal(Request $request)

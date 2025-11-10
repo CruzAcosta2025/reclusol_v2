@@ -25,7 +25,6 @@ use App\Notifications\NuevoPostulanteRegistrado;
 class PostulanteController extends Controller
 {
 
-
     /* ---------- FUNCION PARA GUARDAR UN REGISTRO EXTERNO ---------- */
 
     /*

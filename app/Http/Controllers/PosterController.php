@@ -5,6 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Requerimiento;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use App\Models\Postulante;
+use App\Models\Departamento;
+use App\Models\Provincia;
+use App\Models\Distrito;
+use App\Models\TipoCargo;
+use App\Models\TipoPersonal;
+use App\Models\Cargo;
+use App\Models\Sucursal;
 use Illuminate\Support\Facades\Response;
 use Intervention\Image\Laravel\Facades\Image;
 use Intervention\Image\Encoders\PngEncoder;
@@ -19,6 +27,27 @@ class PosterController extends Controller
         // Traer requerimientos
         $requerimientos = Requerimiento::orderByDesc('created_at')->get();
 
+        $cargos = Cargo::forSelect();
+        $sucursales = Sucursal::forSelect();
+        $departamentos = Departamento::forSelect();
+        $provincias = Provincia::forSelect();
+        $distritos = Distrito::forSelect();
+
+        foreach ($requerimientos as $r) {
+            $codigoCargo = ltrim((string)$r->cargo_solicitado, '0');
+            $codigoSucursal = ltrim((string)$r->sucursal, '0');
+            $codigoDepartamento = ltrim((string)$r->departamento, '0');
+            $codigoProvincia = ltrim((string)$r->provincia, '0');
+            $codigoDistrito = ltrim((string)$r->distrito, '0');
+
+            $r->cargo_nombre = $cargos->get($codigoCargo)?->DESC_CARGO ?? $r->cargo_solicitado;
+            $r->sucursal_nombre = $sucursales->get($codigoSucursal)?->SUCU_DESCRIPCION ?? $r->sucursal;
+            $r->departamento_nombre = $departamentos->get($codigoDepartamento)?->DEPA_DESCRIPCION ?? $r->departamento;
+            $r->provincia_nombre = $provincias->get($codigoProvincia)?->PROVI_DESCRIPCION ?? $r->provincia;
+            $r->distrito_nombre = $distritos->get($codigoDistrito)?->DIST_DESCRIPCION ?? $r->distrito;
+        }
+
+        /*
         // Cargar catálogos
         $cargos = DB::connection('si_solmar')
             ->table('CARGOS')
@@ -83,14 +112,13 @@ class PosterController extends Controller
                 Log::warning("Requerimiento {$r->id} tiene distrito vacío");
             }
 
-
-
             $r->cargo_nombre = $cargos->get($codigoCargo)?->DESC_CARGO ?? $r->cargo_solicitado;
             $r->sucursal_nombre = $sucursales->get($codigoSucursal)?->SUCU_DESCRIPCION ?? $r->sucursal;
             $r->departamento_nombre = $departamentos->get($codigoDepartamento)?->DEPA_DESCRIPCION ?? $r->departamento;
             $r->provincia_nombre = $provincias->get($codigoProvincia)?->PROVI_DESCRIPCION ?? $r->provincia;
             $r->distrito_nombre = $distritos->get($codigoDistrito)?->DIST_DESCRIPCION ?? $r->distrito;
         }
+        */
 
         return view('afiches.afiche', compact('requerimientos'));
     }
@@ -98,6 +126,7 @@ class PosterController extends Controller
 
     public function show(Request $request, Requerimiento $req, string $template)
     {
+        /*
         // Cargar catálogos
         $cargos = DB::connection('si_solmar')
             ->table('CARGOS')
@@ -321,6 +350,7 @@ class PosterController extends Controller
                 'Content-Disposition' => "attachment; filename=\"poster_{$req->id}.pdf\"",
             ]
         );
+        */
     }
 
     // Helper para formato de texto
