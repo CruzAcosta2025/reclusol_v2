@@ -108,6 +108,7 @@ Route::middleware('auth')->group(function () {
   Route::get('/usuarios/{user}/edit', [UserController::class, 'edit'])->name('usuarios.edit');
   Route::put('/usuarios/{user}', [UserController::class, 'update'])->name('usuarios.update');
   Route::delete('/usuarios/{user}', [UserController::class, 'destroy'])->name('usuarios.destroy');
+  Route::get('/usuarios/dni-simple/{dni}', [UserController::class, 'buscarDniSimple'])->middleware(['auth','throttle:30,1'])->name('usuarios.dni.simple');
   Route::post('/usuarios/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('usuarios.toggleStatus');
 });
 

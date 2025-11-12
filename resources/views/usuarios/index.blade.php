@@ -32,24 +32,10 @@
                 class="grid grid-cols-1 md:grid-cols-4 gap-4 bg-white p-6 rounded-2xl shadow-lg">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Buscar Usuario</label>
-                    <input type="text" name="buscar" value="{{ request('buscar') }}" placeholder="Nombre o email..."
+                    <input type="text" name="buscar" value="{{ request('buscar') }}" placeholder="Nombre..."
                         class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-0 bg-white/80 transition-colors">
                 </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Cargo</label>
-                    <select name="cargo"
-                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        <option value="">Todos los cargos</option>
-                        @foreach ($cargos as $codigo => $descripcion)
-                            <option value="{{ $codigo }}"
-                                {{ (string) request('cargo') === (string) $codigo ? 'selected' : '' }}>
-                                {{ $descripcion }}
-                            </option>
-                        @endforeach
-                    </select>
-
-                </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
                     <select name="estado"
@@ -149,27 +135,23 @@
                     <table class="w-full">
                         <thead class="bg-gradient-to-r from-blue-50 to-blue-100">
                             <tr class="text-left">
-                                <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase tracking-wider">Avatar</th>
-                                <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase tracking-wider">Usuario</th>
-                                <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-center">
-                                    Cargo</th>
-                                <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase tracking-wider">Estado</th>
-                                <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase tracking-wider">Última
-                                    Actividad</th>
-                                <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-center">
-                                    Acciones</th>
+                                <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-center">Usuario</th>
+                                <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-center">Nombres y Apellidos</th>
+                                <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-center">Rol</th>
+                                <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-center">Estado</th>
+                                <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-center">Acciones</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
                             @forelse($users as $user)
                                 <tr class="hover:bg-blue-50 transition-colors">
-                                    <td class="px-6 py-4">
-                                        <div
-                                            class="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-bold">
-                                            {{ substr($user->name, 0, 2) }}
-                                        </div>
+                                    <td class="px-6 py-4 text-center">
+                                        <span
+                                            class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                                            {{ $user->usuario ?? 'Sin rol' }}
+                                        </span>
                                     </td>
-                                    <td class="px-6 py-4">
+                                    <td class="px-6 py-4  text-center">
                                         <div class="flex flex-col">
                                             <p class="text-sm font-semibold text-gray-900">{{ $user->name }}</p>
                                             <p class="text-xs text-gray-500">Registrado:
@@ -179,10 +161,10 @@
                                     <td class="px-6 py-4 text-center">
                                         <span
                                             class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-                                            {{ $user->cargoInfo?->DESC_CARGO ?? 'Sin cargo' }}
+                                            {{ $user->rol ?? 'Sin rol' }}
                                         </span>
                                     </td>
-                                    <td class="px-6 py-4">
+                                    <td class="px-6 py-4  text-center">
                                         @if ($user->habilitado)
                                             <span
                                                 class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
@@ -198,15 +180,7 @@
                                         @endif
                                     </td>
                                     <td class="px-6 py-4">
-                                        <p class="text-sm text-gray-900">{{ $user->updated_at->diffForHumans() }}</p>
-                                    </td>
-                                    <td class="px-6 py-4">
                                         <div class="flex items-center justify-center space-x-2">
-                                            <button onclick="viewUser({{ $user->id }})"
-                                                class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 hover:bg-blue-100 text-blue-600 transition"
-                                                title="Ver usuario">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
                                             <button onclick="editUser({{ $user->id }})"
                                                 class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-50 hover:bg-green-100 text-green-600 transition"
                                                 title="Editar">
@@ -297,6 +271,8 @@
         </div>
     </div>
     <script>
+        window.ROUTE_DNI_SIMPLE = @json(route('usuarios.dni.simple', ['dni' => 'DNI_PLACEHOLDER']));
+
         let deleteUserId = null;
 
         // ------ Filtros y tabla ------
@@ -426,42 +402,53 @@
                         });
                 });
             }
-            // ------ SOLO Select2 y AJAX, ya no hace falta el código manual ------
-            // Reinicia select y cargo al cambiar sucursal
-            $('#sucursal').on('change', function() {
-                $('#personal').val(null).trigger('change');
-                $('#cargo').val('');
-            });
 
-            // Inicializa Select2 para el select de personal
-            $('#personal').select2({
-                placeholder: 'Escribe para buscar personal',
-                minimumInputLength: 2,
-                width: '100%',
-                ajax: {
-                    url: '{{ route('usuarios.buscarPersonal') }}',
-                    dataType: 'json',
-                    delay: 250,
-                    data: function(params) {
-                        return {
-                            sucursal: $('#sucursal').val(),
-                            q: params.term
-                        };
-                    },
-                    processResults: function(data) {
-                        return {
-                            results: data.results
-                        };
-                    },
-                    cache: true
+            // --- AUTOCOMPLETADO POR DNI (RENIEC) ---
+            const modal = document.getElementById('create-modal-content');
+            const dni = modal.querySelector('#dni');
+            const nombres = modal.querySelector('#nombres');
+            const apellidos = modal.querySelector('#apellidos');
+
+            if (dni && nombres && apellidos) {
+                const urlFor = d => window.ROUTE_DNI_SIMPLE.replace('DNI_PLACEHOLDER', d);
+                let t = null;
+
+                async function lookup(d) {
+                    try {
+                        const r = await fetch(urlFor(d), {
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        });
+                        const j = await r.json();
+                        if (j.ok) {
+                            nombres.value = j.data.nombres || '';
+                            apellidos.value = j.data.apellidos || '';
+                        } else {
+                            nombres.value = '';
+                            apellidos.value = '';
+                        }
+                    } catch (e) {
+                        console.error(e);
+                    }
                 }
-            });
 
-            // Cuando seleccionas personal, autollenar cargo
-            $('#personal').on('select2:select', function(e) {
-                var data = e.params.data;
-                $('#cargo').val(data.cargo || '');
-            });
+                dni.addEventListener('input', (e) => {
+                    const v = e.target.value.replace(/\D/g, '').slice(0, 8);
+                    e.target.value = v;
+                    clearTimeout(t);
+                    if (v.length === 8) t = setTimeout(() => lookup(v), 300);
+                });
+
+                dni.addEventListener('blur', (e) => {
+                    const v = e.target.value.replace(/\D/g, '');
+                    if (v.length === 8) lookup(v);
+                });
+
+                // Si ya llega con 8 dígitos (por autofill), dispara:
+                if (dni.value && dni.value.length === 8) lookup(dni.value);
+            }
+
         }
     </script>
 @endsection

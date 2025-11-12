@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
 
 class UserController extends Controller
 {
@@ -78,8 +80,44 @@ class UserController extends Controller
         $cargos = Cargo::forSelect();
 
         // Pasa el personal y sucursales a la vista
-        return view('usuarios.create', compact( 'sucursales', 'cargos'));
+        return view('usuarios.create', compact('sucursales', 'cargos'));
     }
+
+    public function buscarDniSimple(string $dni)
+    {
+        $dni = preg_replace('/\D/', '', $dni);
+        if (strlen($dni) !== 8) {
+            return response()->json(['ok' => false, 'message' => 'DNI inválido'], 422);
+        }
+
+        $data = Cache::remember("perudevs:dni:$dni", now()->addHours(12), function () use ($dni) {
+            $resp = Http::timeout(10)->acceptJson()->get(
+                config('services.perudevs.dni_simple_url'), // de config/services.php
+                [
+                    'document' => $dni,
+                    'key'      => config('services.perudevs.key'), // de .env
+                ]
+            );
+
+            if (!$resp->ok()) return null;
+            $j = $resp->json();
+            if (!($j['estado'] ?? false)) return null;
+
+            $r = $j['resultado'] ?? [];
+            return [
+                'nombres'   => $r['nombres'] ?? '',
+                'apellidos' => trim(($r['apellido_paterno'] ?? '') . ' ' . ($r['apellido_materno'] ?? '')),
+                'completo'  => $r['nombre_completo'] ?? '',
+            ];
+        });
+
+        if (!$data) {
+            return response()->json(['ok' => false, 'message' => 'No encontrado'], 404);
+        }
+
+        return response()->json(['ok' => true, 'data' => $data]);
+    }
+
 
     public function buscarPersonal(Request $request)
     {
@@ -138,6 +176,63 @@ class UserController extends Controller
         ]);
     }
 
+
+    public function store(Request $request)
+    {
+        Log::info('Inicio de registro de usuario', ['request' => $request->all()]);
+
+        // "name" en el form es el USERNAME; nombre completo viene de nombres+apellidos
+        $request->validate([
+            'dni'        => 'nullable|digits:8',
+            'nombres'    => 'required|string|max:120',
+            'apellidos'  => 'required|string|max:120',
+            'name'       => 'required|string|max:60|unique:users,usuario', // unique sobre columna usuario
+            'contrasena' => 'required|string|min:8',
+            'rol'        => 'required|exists:roles,name',
+            // 'email'    => 'nullable|email|max:255|unique:users,email', // si usarás email
+        ]);
+
+        $fullName = trim($request->nombres . ' ' . $request->apellidos);
+        $dni      = $request->filled('dni') ? (int)preg_replace('/\D/', '', $request->dni) : null;
+        $hash     = bcrypt($request->contrasena);
+
+        DB::beginTransaction();
+        try {
+            $user = User::create([
+                'name'        => $fullName,          // nombre completo
+                'usuario'     => $request->name,     // username
+                'dni'         => $dni,               // numeric(18,0)
+                'cargo'       => null,               // aquí no lo tienes
+                'sucursal'    => null,
+                'rol'         => $request->rol,      // además de Spatie si lo guardas como texto
+                'contrasena'  => $hash,              // tu columna usada
+                'password'    => $hash,              // mantén ambas sincronizadas por si usas Auth de Laravel
+                'email'       => null,
+                'habilitado'  => 1,                  // NOT NULL en tu tabla
+            ]);
+
+            // Spatie
+            $user->assignRole($request->rol);
+
+            DB::commit();
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => true, 'message' => 'Usuario creado con éxito']);
+            }
+            return redirect()->route('usuarios.index')->with('success', 'Usuario creado con éxito');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            Log::error('Error al crear usuario', ['error' => $e->getMessage()]);
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Ocurrió un error al guardar el usuario'], 500);
+            }
+            return back()->withErrors(['general' => 'Ocurrió un error al guardar el usuario'])->withInput();
+        }
+    }
+
+
+
+    /*
     public function store(Request $request)
     {
         Log::info('Inicio de registro de usuario', [
@@ -235,6 +330,7 @@ class UserController extends Controller
             return back()->withErrors(['general' => 'Ocurrió un error al guardar el usuario'])->withInput();
         }
     }
+    */
 
 
     public function show(User $user)
