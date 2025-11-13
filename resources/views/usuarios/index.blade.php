@@ -1,12 +1,12 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="min-h-screen gradient-bg py-8">
+    <div class="min-h-screen gradient-bg py-8 pt-24">
         {{-- Botón volver --}}
         <a href="{{ route('dashboard') }}"
-            class="absolute top-6 left-6 text-white hover:text-yellow-300 transition-colors flex items-center space-x-2 group z-10">
-            <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i>
-            <span class="font-medium">Volver al Dashboard</span>
+            class="absolute top-6 left-6 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold rounded-xl shadow-lg transition-colors flex items-center space-x-3 px-6 py-3 text-lg z-10 group">
+            <i class="fas fa-arrow-left text-2xl group-hover:-translate-x-1 transition-transform"></i>
+            <span class="font-bold">Volver al Dashboard</span>
         </a>
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
@@ -41,8 +41,10 @@
                     <select name="estado"
                         class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-0 bg-white/80 transition-colors">
                         <option value="">Todos</option>
-                        <option value="activo" {{ request('estado') == 'activo' ? 'selected' : '' }}>Activos</option>
-                        <option value="inactivo" {{ request('estado') == 'inactivo' ? 'selected' : '' }}>Inactivos</option>
+                        <option value="habilitado" {{ request('estado') == 'habilitado' ? 'selected' : '' }}>Habilitados
+                        </option>
+                        <option value="inhabilitado" {{ request('estado') == 'inhabilitado' ? 'selected' : '' }}>
+                            Inhabilitados</option>
                     </select>
                 </div>
 
@@ -84,10 +86,10 @@
                         <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
                             <i class="fas fa-user-check text-green-600 text-xl"></i>
                         </div>
-                        <span class="text-green-500 text-sm font-medium">Activos</span>
+                        <span class="text-green-500 text-sm font-medium">Habilitados</span>
                     </div>
                     {{-- <h3 class="text-3xl font-bold text-gray-800 mb-1">{{ $activeUsers }}</h3> --}}
-                    <p class="text-gray-600 text-sm">Usuarios activos</p>
+                    <p class="text-gray-600 text-sm">Usuarios Habilitados</p>
                 </div>
 
                 {{-- Usuarios Inactivos --}}
@@ -96,10 +98,10 @@
                         <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
                             <i class="fas fa-user-times text-red-600 text-xl"></i>
                         </div>
-                        <span class="text-red-500 text-sm font-medium">Inactivos</span>
+                        <span class="text-red-500 text-sm font-medium">Inhabilitados</span>
                     </div>
                     {{-- <h3 class="text-3xl font-bold text-gray-800 mb-1">{{ $inactiveUsers }}</h3> --}}
-                    <p class="text-gray-600 text-sm">Usuarios inactivos</p>
+                    <p class="text-gray-600 text-sm">Usuarios Inhabilitados</p>
                 </div>
 
                 {{-- Nuevos este mes --}}
@@ -135,11 +137,16 @@
                     <table class="w-full">
                         <thead class="bg-gradient-to-r from-blue-50 to-blue-100">
                             <tr class="text-left">
-                                <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-center">Usuario</th>
-                                <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-center">Nombres y Apellidos</th>
-                                <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-center">Rol</th>
-                                <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-center">Estado</th>
-                                <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-center">Acciones</th>
+                                <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-center">
+                                    Usuario</th>
+                                <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-center">
+                                    Nombres y Apellidos</th>
+                                <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-center">
+                                    Rol</th>
+                                <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-center">
+                                    Estado</th>
+                                <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-center">
+                                    Acciones</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
@@ -169,23 +176,24 @@
                                             <span
                                                 class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                                 <i class="fas fa-check-circle mr-1"></i>
-                                                Activo
+                                                Habilitado
                                             </span>
                                         @else
                                             <span
                                                 class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
                                                 <i class="fas fa-times-circle mr-1"></i>
-                                                Inactivo
+                                                Inhabilitado
                                             </span>
                                         @endif
                                     </td>
                                     <td class="px-6 py-4">
                                         <div class="flex items-center justify-center space-x-2">
-                                            <button onclick="editUser({{ $user->id }})"
+                                            <button type="button" onclick="window.openEditModal({{ $user->id }})"
                                                 class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-50 hover:bg-green-100 text-green-600 transition"
                                                 title="Editar">
                                                 <i class="fas fa-edit"></i>
                                             </button>
+
                                             <button onclick="toggleUserStatus({{ $user->id }})"
                                                 class="inline-flex items-center justify-center w-8 h-8 rounded-full {{ $user->habilitado ? 'bg-green-50 hover:bg-green-100 text-green-600' : 'bg-orange-50 hover:bg-orange-100 text-orange-600' }} transition"
                                                 title="{{ $user->habilitado ? 'Desactivar' : 'Activar' }}">
@@ -448,7 +456,93 @@
                 // Si ya llega con 8 dígitos (por autofill), dispara:
                 if (dni.value && dni.value.length === 8) lookup(dni.value);
             }
+        }
 
+        function openEditModal(id) {
+            fetch(`/usuarios/${id}/edit`, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'text/html'
+                    }
+                })
+                .then(r => r.text())
+                .then(html => {
+                    document.getElementById('edit-modal-content').innerHTML = html;
+                    document.getElementById('edit-modal').classList.remove('hidden');
+                    inicializarEventosEditModal();
+                });
+        }
+
+
+        function closeEditModal() {
+            document.getElementById('edit-modal').classList.add('hidden');
+        }
+
+        function inicializarEventosEditModal() {
+            const modal = document.getElementById('edit-modal-content');
+            const form = modal.querySelector('#edit-user-form');
+            if (form) {
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const fd = new FormData(form); // incluye @method('PUT')
+                    fetch(form.action, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            body: fd
+                        })
+
+                        .then(r => r.ok ? r.json() : r.json().then(Promise.reject))
+                        .then(j => j.success ? window.location.reload() : alert(j.message || 'Error al editar'))
+                        .catch(err => {
+                            console.log(err);
+                            if (err.errors) {
+                                Object.entries(err.errors).forEach(([field, msgs]) => {
+                                    const el = form.querySelector(`[name="${field}"]`)?.parentNode
+                                        ?.querySelector('.error-message');
+                                    if (el) {
+                                        el.textContent = msgs[0];
+                                        el.classList.remove('hidden');
+                                    }
+                                });
+                            } else alert('Error al editar el usuario');
+                        });
+                });
+            }
+
+            // Autocompletar RENIEC en edición (opcional)
+            const dni = modal.querySelector('#dni');
+            const nombres = modal.querySelector('#nombres');
+            const apellidos = modal.querySelector('#apellidos');
+            if (dni && nombres && apellidos) {
+                const urlFor = d => window.ROUTE_DNI_SIMPLE.replace('DNI_PLACEHOLDER', d);
+                let t = null;
+                async function lookup(d) {
+                    const r = await fetch(urlFor(d), {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+                    const j = await r.json();
+                    if (j.ok) {
+                        nombres.value = j.data.nombres || '';
+                        apellidos.value = j.data.apellidos || '';
+                    }
+                }
+                dni.addEventListener('input', e => {
+                    const v = e.target.value.replace(/\D/g, '').slice(0, 8);
+                    e.target.value = v;
+                    clearTimeout(t);
+                    if (v.length === 8) t = setTimeout(() => lookup(v), 300);
+                });
+                dni.addEventListener('blur', e => {
+                    const v = e.target.value.replace(/\D/g, '');
+                    if (v.length === 8) lookup(v);
+                });
+            }
         }
     </script>
 @endsection

@@ -34,7 +34,7 @@
                         Nombres *
                     </label>
                     <input type="text" id="nombres" name="nombres"
-                        class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300"
+                        class="form-input w-full px-4 py-3 border border-gray-300 bg-gray-100 text-gray-600 rounded-lg focus:outline-none cursor-not-allowed"
                         placeholder="Ingresa tus nombres">
                     <span class="error-message text-red-500 text-sm hidden"></span>
                 </div>
@@ -46,7 +46,7 @@
                         Apellidos *
                     </label>
                     <input type="text" id="apellidos" name="apellidos"
-                        class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300"
+                        class=""
                         placeholder="Ingresa tus apellidos">
                     <span class="error-message text-red-500 text-sm hidden"></span>
                 </div>

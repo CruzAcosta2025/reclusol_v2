@@ -1,8 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="font-sans antialiased">
-    <div class="min-h-screen gradient-bg py-8">
+<div class="min-h-screen gradient-bg py-8 pt-24">
         {{-- Botón volver --}}
         <a href="{{ route('dashboard') }}"
             class="absolute top-6 left-6 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold rounded-xl shadow-lg transition-colors flex items-center space-x-3 px-6 py-3 text-lg z-10 group">

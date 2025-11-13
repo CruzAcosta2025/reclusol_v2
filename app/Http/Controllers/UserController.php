@@ -172,7 +172,7 @@ class UserController extends Controller
         return response()->json([
             'success' => true,
             'message' => $user->habilitado ? 'Usuario habilitado' : 'Usuario deshabilitado',
-            'status'  => $user->habilitado ? 'activo' : 'inactivo'
+            'status'  => $user->habilitado ? 'habilitado' : 'inhabilitado'
         ]);
     }
 
@@ -339,53 +339,46 @@ class UserController extends Controller
         return view('usuarios.show', compact('user'));
     }
 
-    public function edit(User $user)
-    {
-        $cargos = DB::connection('si_solmar')->table('TIPO_CARGO')
-            ->where('CODI_TIPO_CARG')
-            ->select(['CODI_TIPO_CARG', 'DESC_TIPO_CARG'])
-            ->get()
-            ->keyBy('CODI_TIPO_CARG');
-
-
-        if (request()->ajax()) {
-            return view('usuarios.partials.form-edit', compact('user', 'cargos'));
-        }
-
-        return view('usuarios.edit', compact('user', 'cargos'));
-    }
 
     public function update(Request $request, User $user)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-            'password' => 'nullable|string|min:8|confirmed',
-            'cargo'    => 'required|string|max:10',
+            'dni'        => 'nullable|digits:8|unique:users,dni,' . $user->id,
+            'nombres'    => 'required|string|max:120',
+            'apellidos'  => 'required|string|max:120',
+            'name'       => 'required|string|max:60|unique:users,usuario,' . $user->id . ',id',
+            'contrasena' => 'nullable|string|min:8',
+            'rol'        => 'required|exists:roles,name',
         ]);
 
-        $userData = [
-            'name' => $request->name,
-            'email' => $request->email,
-            'cargo' => $request->cargo,
+        $data = [
+            'name'    => trim($request->nombres . ' ' . $request->apellidos),
+            'usuario' => $request->name,
+            'dni'     => $request->filled('dni') ? (int)preg_replace('/\D/', '', $request->dni) : null,
+            'rol'     => $request->rol,
         ];
-
-        if ($request->filled('password')) {
-            $userData['password'] = Hash::make($request->password);
+        if ($request->filled('contrasena')) {
+            $hash = bcrypt($request->contrasena);
+            $data['contrasena'] = $hash;
+            $data['password']   = $hash;
         }
+        $user->update($data);
+        $user->syncRoles([$request->rol]);
 
-        $user->update($userData);
-
-        if ($request->ajax()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Usuario actualizado exitosamente'
-            ]);
-        }
-
-        return redirect()->route('usuarios.index')
-            ->with('success', 'Usuario actualizado exitosamente');
+        return $request->ajax()
+            ? response()->json(['success' => true, 'message' => 'Usuario editado con éxito'])
+            : redirect()->route('usuarios.index')->with('success', 'Usuario editado con éxito');
     }
+
+    public function edit(User $user)
+    {
+        if (request()->ajax()) {
+            return view('usuarios.partials.form-edit', compact('user'));
+        }
+        return view('usuarios.form-edit', compact('user')); // página completa sólo si la navegas directa
+    }
+
+
 
     public function destroy(User $user)
     {
