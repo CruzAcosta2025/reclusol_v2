@@ -48,7 +48,6 @@
                     </select>
                 </div>
 
-
                 <div class="flex items-end">
                     <div class="flex space-x-2 w-full">
                         <button type="submit"
@@ -80,7 +79,7 @@
                     <p class="text-gray-600 text-sm">Usuarios registrados</p>
                 </div>
 
-                {{-- Usuarios Activos --}}
+                {{-- Usuarios Habilitados --}}
                 <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow card-hover">
                     <div class="flex items-center justify-between mb-4">
                         <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
@@ -88,11 +87,11 @@
                         </div>
                         <span class="text-green-500 text-sm font-medium">Habilitados</span>
                     </div>
-                    {{-- <h3 class="text-3xl font-bold text-gray-800 mb-1">{{ $activeUsers }}</h3> --}}
+                    <h3 class="text-3xl font-bold text-gray-800 mb-1">{{ $activeUsers }}</h3>
                     <p class="text-gray-600 text-sm">Usuarios Habilitados</p>
                 </div>
 
-                {{-- Usuarios Inactivos --}}
+                {{-- Usuarios Inhabilitados --}}
                 <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow card-hover">
                     <div class="flex items-center justify-between mb-4">
                         <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
@@ -100,7 +99,7 @@
                         </div>
                         <span class="text-red-500 text-sm font-medium">Inhabilitados</span>
                     </div>
-                    {{-- <h3 class="text-3xl font-bold text-gray-800 mb-1">{{ $inactiveUsers }}</h3> --}}
+                    <h3 class="text-3xl font-bold text-gray-800 mb-1">{{ $inactiveUsers }}</h3>
                     <p class="text-gray-600 text-sm">Usuarios Inhabilitados</p>
                 </div>
 
@@ -186,9 +185,10 @@
                                             </span>
                                         @endif
                                     </td>
+
                                     <td class="px-6 py-4">
                                         <div class="flex items-center justify-center space-x-2">
-                                            <button type="button" onclick="window.openEditModal({{ $user->id }})"
+                                            <button onclick="openEditModal({{ $user->id }})"
                                                 class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-50 hover:bg-green-100 text-green-600 transition"
                                                 title="Editar">
                                                 <i class="fas fa-edit"></i>
@@ -279,7 +279,8 @@
         </div>
     </div>
     <script>
-        window.ROUTE_DNI_SIMPLE = @json(route('usuarios.dni.simple', ['dni' => 'DNI_PLACEHOLDER']));
+        // Ruta para consultar DNI (RENIEC simple)
+        window.ROUTE_DNI_SIMPLE = "{{ route('usuarios.dni.simple', ['dni' => 'DNI_PLACEHOLDER']) }}";
 
         let deleteUserId = null;
 
@@ -289,14 +290,19 @@
             window.location.href = window.location.pathname;
         }
 
-        // ------ Modales ------
+        // ------ MODAL: CREAR USUARIO ------
         function openCreateModal() {
-            fetch('/usuarios/create')
+            fetch('/usuarios/create', {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'text/html'
+                    }
+                })
                 .then(response => response.text())
                 .then(html => {
                     document.getElementById('create-modal-content').innerHTML = html;
                     document.getElementById('create-modal').classList.remove('hidden');
-                    inicializarEventosCreateModal(); // Importante!
+                    inicializarEventosCreateModal();
                 });
         }
 
@@ -304,45 +310,13 @@
             document.getElementById('create-modal').classList.add('hidden');
         }
 
-        function toggleUserStatus(userId) {
-            fetch(`/usuarios/${userId}/habilitar`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                        'Accept': 'application/json',
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        window.location.reload();
-                    } else {
-                        alert(data.message || 'No se pudo cambiar el estado');
-                    }
-                })
-                .catch(() => {
-                    alert('Ocurrió un error');
-                });
-        }
-
-        // ... Aquí las demás funciones de modales, editar, eliminar, etc. (igual que antes) ...
-
-        // ------ Cerrar modales al hacer clic fuera ------
-        document.addEventListener('click', function(event) {
-            const modals = ['create-modal', 'edit-modal', 'view-modal'];
-            modals.forEach(modalId => {
-                const modal = document.getElementById(modalId);
-                if (modal && event.target === modal) {
-                    modal.classList.add('hidden');
-                }
-            });
-        });
-
-        // ------ Función para el modal de crear usuario ------
         function inicializarEventosCreateModal() {
-            // PASSWORD
-            const passEyeBtn = document.getElementById('contrasena-eye');
-            const passField = document.getElementById('contrasena');
+            const modal = document.getElementById('create-modal-content');
+
+            // --- Mostrar / ocultar contraseña ---
+            const passEyeBtn = modal.querySelector('#contrasena-eye');
+            const passField = modal.querySelector('#contrasena');
+
             if (passEyeBtn && passField) {
                 passEyeBtn.onclick = function() {
                     if (passField.type === 'password') {
@@ -357,15 +331,16 @@
                 };
             }
 
-            // SUBMIT FORMULARIO
-            const form = document.getElementById('create-user-form');
+            // --- Envío del formulario de creación ---
+            const form = modal.querySelector('#create-user-form');
             if (form) {
                 form.addEventListener('submit', function(e) {
                     e.preventDefault();
                     const formData = new FormData(form);
 
                     // Limpiar errores anteriores
-                    form.querySelectorAll('.error-message').forEach(el => {
+                    const errorMessages = form.querySelectorAll('.error-message');
+                    errorMessages.forEach(function(el) {
                         el.classList.add('hidden');
                         el.textContent = '';
                     });
@@ -376,8 +351,7 @@
                                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
                                     'content'),
                                 'Accept': 'application/json',
-                                'X-Requested-With': 'XMLHttpRequest', // ← AGREGA ESTA LÍNEA
-
+                                'X-Requested-With': 'XMLHttpRequest'
                             },
                             body: formData
                         })
@@ -395,13 +369,16 @@
                             }
                         })
                         .catch(error => {
-                            if (error.errors) {
-                                Object.keys(error.errors).forEach(field => {
-                                    const errorDiv = form.querySelector(`[name="${field}"]`)?.parentNode
-                                        ?.querySelector('.error-message');
-                                    if (errorDiv) {
-                                        errorDiv.textContent = error.errors[field][0];
-                                        errorDiv.classList.remove('hidden');
+                            if (error && error.errors) {
+                                Object.keys(error.errors).forEach(function(field) {
+                                    const input = form.querySelector('[name="' + field + '"]');
+                                    if (input && input.parentNode) {
+                                        const errorDiv = input.parentNode.querySelector(
+                                            '.error-message');
+                                        if (errorDiv) {
+                                            errorDiv.textContent = error.errors[field][0];
+                                            errorDiv.classList.remove('hidden');
+                                        }
                                     }
                                 });
                             } else {
@@ -412,13 +389,14 @@
             }
 
             // --- AUTOCOMPLETADO POR DNI (RENIEC) ---
-            const modal = document.getElementById('create-modal-content');
             const dni = modal.querySelector('#dni');
             const nombres = modal.querySelector('#nombres');
             const apellidos = modal.querySelector('#apellidos');
 
             if (dni && nombres && apellidos) {
-                const urlFor = d => window.ROUTE_DNI_SIMPLE.replace('DNI_PLACEHOLDER', d);
+                const urlFor = function(d) {
+                    return window.ROUTE_DNI_SIMPLE.replace('DNI_PLACEHOLDER', d);
+                };
                 let t = null;
 
                 async function lookup(d) {
@@ -441,25 +419,34 @@
                     }
                 }
 
-                dni.addEventListener('input', (e) => {
+                dni.addEventListener('input', function(e) {
                     const v = e.target.value.replace(/\D/g, '').slice(0, 8);
                     e.target.value = v;
                     clearTimeout(t);
-                    if (v.length === 8) t = setTimeout(() => lookup(v), 300);
+                    if (v.length === 8) {
+                        t = setTimeout(function() {
+                            lookup(v);
+                        }, 300);
+                    }
                 });
 
-                dni.addEventListener('blur', (e) => {
+                dni.addEventListener('blur', function(e) {
                     const v = e.target.value.replace(/\D/g, '');
-                    if (v.length === 8) lookup(v);
+                    if (v.length === 8) {
+                        lookup(v);
+                    }
                 });
 
-                // Si ya llega con 8 dígitos (por autofill), dispara:
-                if (dni.value && dni.value.length === 8) lookup(dni.value);
+                // Si ya viene con 8 dígitos (autofill)
+                if (dni.value && dni.value.length === 8) {
+                    lookup(dni.value);
+                }
             }
         }
 
+        // ------ MODAL: EDITAR USUARIO ------
         function openEditModal(id) {
-            fetch(`/usuarios/${id}/edit`, {
+            fetch('/usuarios/' + id + '/edit', {
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
                         'Accept': 'text/html'
@@ -473,7 +460,6 @@
                 });
         }
 
-
         function closeEditModal() {
             document.getElementById('edit-modal').classList.add('hidden');
         }
@@ -481,34 +467,76 @@
         function inicializarEventosEditModal() {
             const modal = document.getElementById('edit-modal-content');
             const form = modal.querySelector('#edit-user-form');
+
+            // --- Mostrar / ocultar contraseña ---
+            const passEyeBtn = modal.querySelector('#contrasena-eye');
+            const passField = modal.querySelector('#contrasena');
+
+            if (passEyeBtn && passField) {
+                passEyeBtn.onclick = function() {
+                    if (passField.type === 'password') {
+                        passField.type = 'text';
+                        passEyeBtn.classList.remove('fa-eye');
+                        passEyeBtn.classList.add('fa-eye-slash');
+                    } else {
+                        passField.type = 'password';
+                        passEyeBtn.classList.remove('fa-eye-slash');
+                        passEyeBtn.classList.add('fa-eye');
+                    }
+                };
+            }
+
             if (form) {
-                form.addEventListener('submit', (e) => {
+                form.addEventListener('submit', function(e) {
                     e.preventDefault();
                     const fd = new FormData(form); // incluye @method('PUT')
+
+                    // Limpiar errores anteriores
+                    const errorMessages = form.querySelectorAll('.error-message');
+                    errorMessages.forEach(function(el) {
+                        el.classList.add('hidden');
+                        el.textContent = '';
+                    });
+
                     fetch(form.action, {
                             method: 'POST',
                             headers: {
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                                    'content'),
                                 'Accept': 'application/json',
                                 'X-Requested-With': 'XMLHttpRequest'
                             },
                             body: fd
                         })
-
-                        .then(r => r.ok ? r.json() : r.json().then(Promise.reject))
-                        .then(j => j.success ? window.location.reload() : alert(j.message || 'Error al editar'))
-                        .catch(err => {
+                        .then(function(r) {
+                            if (r.ok) return r.json();
+                            return r.json().then(function(err) {
+                                return Promise.reject(err);
+                            });
+                        })
+                        .then(function(j) {
+                            if (j.success) {
+                                window.location.reload();
+                            } else {
+                                alert(j.message || 'Error al editar');
+                            }
+                        })
+                        .catch(function(err) {
                             console.log(err);
-                            if (err.errors) {
-                                Object.entries(err.errors).forEach(([field, msgs]) => {
-                                    const el = form.querySelector(`[name="${field}"]`)?.parentNode
-                                        ?.querySelector('.error-message');
-                                    if (el) {
-                                        el.textContent = msgs[0];
-                                        el.classList.remove('hidden');
+                            if (err && err.errors) {
+                                Object.keys(err.errors).forEach(function(field) {
+                                    const input = form.querySelector('[name="' + field + '"]');
+                                    if (input && input.parentNode) {
+                                        const el = input.parentNode.querySelector('.error-message');
+                                        if (el) {
+                                            el.textContent = err.errors[field][0];
+                                            el.classList.remove('hidden');
+                                        }
                                     }
                                 });
-                            } else alert('Error al editar el usuario');
+                            } else {
+                                alert('Error al editar el usuario');
+                            }
                         });
                 });
             }
@@ -517,9 +545,13 @@
             const dni = modal.querySelector('#dni');
             const nombres = modal.querySelector('#nombres');
             const apellidos = modal.querySelector('#apellidos');
+
             if (dni && nombres && apellidos) {
-                const urlFor = d => window.ROUTE_DNI_SIMPLE.replace('DNI_PLACEHOLDER', d);
+                const urlFor = function(d) {
+                    return window.ROUTE_DNI_SIMPLE.replace('DNI_PLACEHOLDER', d);
+                };
                 let t = null;
+
                 async function lookup(d) {
                     const r = await fetch(urlFor(d), {
                         headers: {
@@ -532,17 +564,96 @@
                         apellidos.value = j.data.apellidos || '';
                     }
                 }
-                dni.addEventListener('input', e => {
+
+                dni.addEventListener('input', function(e) {
                     const v = e.target.value.replace(/\D/g, '').slice(0, 8);
                     e.target.value = v;
                     clearTimeout(t);
-                    if (v.length === 8) t = setTimeout(() => lookup(v), 300);
+                    if (v.length === 8) {
+                        t = setTimeout(function() {
+                            lookup(v);
+                        }, 300);
+                    }
                 });
-                dni.addEventListener('blur', e => {
+
+                dni.addEventListener('blur', function(e) {
                     const v = e.target.value.replace(/\D/g, '');
-                    if (v.length === 8) lookup(v);
+                    if (v.length === 8) {
+                        lookup(v);
+                    }
                 });
             }
         }
+
+        // ------ CAMBIAR ESTADO (HABILITAR / INHABILITAR) ------
+        function toggleUserStatus(userId) {
+            fetch('/usuarios/' + userId + '/habilitar', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.reload();
+                    } else {
+                        alert(data.message || 'No se pudo cambiar el estado');
+                    }
+                })
+                .catch(() => {
+                    alert('Ocurrió un error');
+                });
+        }
+
+        // ------ ELIMINAR USUARIO ------
+        function deleteUser(id) {
+            deleteUserId = id;
+            document.getElementById('delete-modal').classList.remove('hidden');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('delete-modal').classList.add('hidden');
+            deleteUserId = null;
+        }
+
+        function confirmDelete() {
+            if (!deleteUserId) return;
+
+            const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+            fetch('/usuarios/' + deleteUserId, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': token,
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                    },
+                    body: '_method=DELETE'
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.reload();
+                    } else {
+                        alert(data.message || 'No se pudo eliminar el usuario');
+                    }
+                })
+                .catch(() => alert('Error al eliminar usuario'));
+        }
+
+        // ------ Cerrar modales al hacer clic fuera ------
+        document.addEventListener('click', function(event) {
+            const modals = ['create-modal', 'edit-modal', 'view-modal', 'delete-modal'];
+            modals.forEach(function(modalId) {
+                const modal = document.getElementById(modalId);
+                if (modal && event.target === modal) {
+                    modal.classList.add('hidden');
+                }
+            });
+        });
     </script>
 @endsection

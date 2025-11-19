@@ -17,6 +17,57 @@ class UserController extends Controller
 {
     public function index()
     {
+        $buscar = request('buscar');
+        $estado = request('estado');
+        $cargo  = request('cargo');
+
+        $users = User::query()
+            // Filtro por nombre completo o usuario
+            ->when($buscar, function ($query, $buscar) {
+                $query->where(function ($q) use ($buscar) {
+                    $q->where('name', 'like', "%{$buscar}%")   // nombres + apellidos
+                        ->orWhere('usuario', 'like', "%{$buscar}%");
+                });
+            })
+            // Filtro por cargo (si lo usas)
+            ->when($cargo, function ($query, $cargo) {
+                $query->where('cargo', $cargo);
+            })
+            // Filtro por estado HABILITADO / INHABILITADO
+            ->when($estado, function ($query, $estado) {
+                if ($estado === 'habilitado') {
+                    $query->where('habilitado', 1);
+                } elseif ($estado === 'inhabilitado') {
+                    $query->where('habilitado', 0);
+                }
+            })
+            ->orderBy('name')
+            ->paginate(15)
+            ->withQueryString(); // mantiene los filtros en la paginación
+
+        // Estadísticas globales
+        $totalUsers        = User::count();
+        $activeUsers       = User::where('habilitado', 1)->count();
+        $inactiveUsers     = User::where('habilitado', 0)->count();
+        $newUsersThisMonth = User::whereMonth('created_at', Carbon::now()->month)
+            ->whereYear('created_at', Carbon::now()->year)
+            ->count();
+
+        $cargos = Cargo::forSelect();
+
+        return view('usuarios.index', compact(
+            'users',
+            'totalUsers',
+            'activeUsers',
+            'inactiveUsers',
+            'newUsersThisMonth',
+            'cargos'
+        ));
+    }
+
+    /*
+    public function index()
+    {
         $users = User::query()
             ->when(request('buscar'), function ($query, $buscar) {
                 $query->where(function ($q) use ($buscar) {
@@ -54,6 +105,7 @@ class UserController extends Controller
             'cargos'
         ));
     }
+    */
 
     public function create()
     {
@@ -118,7 +170,7 @@ class UserController extends Controller
         return response()->json(['ok' => true, 'data' => $data]);
     }
 
-
+    /*
     public function buscarPersonal(Request $request)
     {
         Log::info('Buscar personal', [
@@ -147,8 +199,9 @@ class UserController extends Controller
 
         return response()->json(['results' => $result]);
     }
+    */
 
-
+    /*
     public function personalPorSucursal($codigo)
     {
         // Log para depurar
@@ -162,6 +215,7 @@ class UserController extends Controller
 
         return response()->json($personal);
     }
+    */
 
     public function habilitarUsuario(User $user)
     {

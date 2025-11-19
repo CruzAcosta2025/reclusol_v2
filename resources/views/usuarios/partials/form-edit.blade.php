@@ -29,6 +29,8 @@
         @csrf
         @method('PUT')
 
+        {{-- 
+
         <div class="grid grid-cols-1 gap-4">
             <div class="space-y-2">
                 <label for="dni" class="block text-sm font-semibold text-gray-700">
@@ -42,6 +44,7 @@
                 <span class="error-message text-red-500 text-sm hidden"></span>
             </div>
         </div>
+        --}}
 
         <div class="grid grid-cols-2 gap-4">
             {{-- Nombres --}}
@@ -50,8 +53,8 @@
                     <i class="fas fa-user mr-2 text-blue-500"></i>
                     Nombres *
                 </label>
-                <input type="text" id="nombres" name="nombres" value="{{ old('nombres', $nombresPref) }}"
-                    class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300"
+                <input type="text" id="nombres" name="nombres" value="{{ old('nombres', $nombresPref) }}" readonly
+                    class="form-input w-full px-4 py-3 border border-gray-300 bg-gray-100 text-gray-600 rounded-lg focus:outline-none cursor-not-allowed"
                     placeholder="Ingresa nombres">
                 <span class="error-message text-red-500 text-sm hidden"></span>
             </div>
@@ -63,7 +66,8 @@
                     Apellidos *
                 </label>
                 <input type="text" id="apellidos" name="apellidos" value="{{ old('apellidos', $apellidosPref) }}"
-                    class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300"
+                    readonly
+                    class="form-input w-full px-4 py-3 border border-gray-300 bg-gray-100 text-gray-600 rounded-lg focus:outline-none cursor-not-allowed"
                     placeholder="Ingresa apellidos">
                 <span class="error-message text-red-500 text-sm hidden"></span>
             </div>
