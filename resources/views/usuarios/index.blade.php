@@ -56,8 +56,8 @@
                             <span>Filtrar</span>
                         </button>
                         <button type="button" onclick="limpiarFiltros()"
-                            class="px-4 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl transition-colors">
-                            <i class="fas fa-times"></i>
+                            class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 transition">
+                            <i class="fas fa-times"></i> Limpiar filtros
                         </button>
                     </div>
                 </div>

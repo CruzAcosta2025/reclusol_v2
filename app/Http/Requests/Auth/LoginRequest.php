@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -24,6 +25,8 @@ class LoginRequest extends FormRequest
         ];
     }
 
+
+    /*
     public function authenticate(): void
     {
         $this->ensureIsNotRateLimited();
@@ -44,6 +47,46 @@ class LoginRequest extends FormRequest
         // Si llegamos aquí es porque la autenticación fue exitosa -> limpiar contador
         RateLimiter::clear($this->throttleKey());
     }
+
+    */
+
+    public function authenticate(): void
+    {
+        $this->ensureIsNotRateLimited();
+
+        $usuario    = $this->input('usuario');
+        $contrasena = $this->input('contrasena');
+
+        // 1️⃣ Verificar si el usuario existe y está inhabilitado
+        $user = User::where('usuario', $usuario)->first();
+
+        if ($user && ! $user->habilitado) {
+            // Cuenta como intento fallido para el rate limiter
+            RateLimiter::hit($this->throttleKey());
+
+            throw ValidationException::withMessages([
+                'usuario' => 'Tu usuario ha sido inhabilitado. Contacta con el administrador.',
+            ]);
+        }
+
+        // 2️⃣ Intentar autenticación SOLO si está habilitado (o no existe)
+        if (! Auth::attempt([
+            'usuario'  => $usuario,
+            'password' => $contrasena,
+            'habilitado' => 1, // doble seguro: sólo usuarios habilitados
+        ], $this->boolean('remember'))) {
+
+            RateLimiter::hit($this->throttleKey());
+
+            throw ValidationException::withMessages([
+                'usuario' => trans('auth.failed'),
+            ]);
+        }
+
+        // 3️⃣ Si todo OK, limpiar contador de intentos
+        RateLimiter::clear($this->throttleKey());
+    }
+
 
     public function ensureIsNotRateLimited(): void
     {

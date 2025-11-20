@@ -87,32 +87,34 @@ Route::middleware('auth')->group(function () {
     ->name('api.cargos');
 
 
+  Route::middleware('role:ADMINISTRADOR')->group(function () {
+    // RUTAS PARA AFICHES 
+    Route::get('/afiches', [PosterController::class, 'index'])->name('afiches.index');
 
-  // RUTAS PARA AFICHES 
-  Route::get('/afiches', [PosterController::class, 'index'])->name('afiches.index');
+    Route::get('/poster/{req}/{template}', [PosterController::class, 'show'])->name('poster.show');
+    Route::get('/historial-afiches', [HistorialController::class, 'index'])->name('afiches.historial');
 
-  Route::get('/poster/{req}/{template}', [PosterController::class, 'show'])->name('poster.show');
-  Route::get('/historial-afiches', [HistorialController::class, 'index'])->name('afiches.historial');
+    // RUTAS PARA GESTIÓN DE USUARIOS
 
-  // RUTAS PARA GESTIÓN DE USUARIOS
-  // Siempre pon las rutas "específicas" antes de las que usan {user}
-  Route::get('/usuarios/buscar-personal', [UserController::class, 'buscarPersonal'])->name('usuarios.buscarPersonal');
-  Route::get('usuarios/personal-por-sucursal/{codigo}', [UserController::class, 'personalPorSucursal']);
+    Route::get('/usuarios/buscar-personal', [UserController::class, 'buscarPersonal'])->name('usuarios.buscarPersonal');
+    Route::get('usuarios/personal-por-sucursal/{codigo}', [UserController::class, 'personalPorSucursal']);
 
-  // Rutas CRUD
-  Route::get('/usuarios', [UserController::class, 'index'])->name('usuarios.index');
-  Route::get('/usuarios/create', [UserController::class, 'create'])->name('usuarios.create');
-  Route::post('/usuarios', [UserController::class, 'store'])->name('usuarios.store');
-  Route::get('/usuarios/{user}', [UserController::class, 'show'])->name('usuarios.show');
-  Route::post('/usuarios/{user}/habilitar', [UserController::class, 'habilitarUsuario'])->name('usuarios.habilitarUsuario');
+    // Rutas CRUD
+    Route::get('/usuarios', [UserController::class, 'index'])->name('usuarios.index');
+    Route::get('/usuarios/create', [UserController::class, 'create'])->name('usuarios.create');
+    Route::post('/usuarios', [UserController::class, 'store'])->name('usuarios.store');
+    Route::get('/usuarios/{user}', [UserController::class, 'show'])->name('usuarios.show');
+    Route::post('/usuarios/{user}/habilitar', [UserController::class, 'habilitarUsuario'])->name('usuarios.habilitarUsuario');
 
-  Route::get('/usuarios/{user}/edit', [UserController::class, 'edit'])->name('usuarios.edit');
-  Route::put('/usuarios/{user}',      [UserController::class, 'update'])->name('usuarios.update');
+    Route::get('/usuarios/{user}/edit', [UserController::class, 'edit'])->name('usuarios.edit');
+    Route::put('/usuarios/{user}',      [UserController::class, 'update'])->name('usuarios.update');
 
 
-  Route::delete('/usuarios/{user}', [UserController::class, 'destroy'])->name('usuarios.destroy');
-  Route::get('/usuarios/dni-simple/{dni}', [UserController::class, 'buscarDniSimple'])->middleware(['auth', 'throttle:30,1'])->name('usuarios.dni.simple');
-  Route::post('/usuarios/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('usuarios.toggleStatus');
+    Route::delete('/usuarios/{user}', [UserController::class, 'destroy'])->name('usuarios.destroy');
+    Route::get('/usuarios/dni-simple/{dni}', [UserController::class, 'buscarDniSimple'])->middleware(['auth', 'throttle:30,1'])->name('usuarios.dni.simple');
+    Route::post('/usuarios/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('usuarios.toggleStatus');
+  });
+  
 });
 
 require __DIR__ . '/auth.php';
