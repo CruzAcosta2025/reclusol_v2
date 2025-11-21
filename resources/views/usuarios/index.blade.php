@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+
     <div class="min-h-screen gradient-bg py-8 pt-24">
         {{-- Botón volver --}}
         <a href="{{ route('dashboard') }}"

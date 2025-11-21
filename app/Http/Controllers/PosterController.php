@@ -12,7 +12,9 @@ use App\Models\Distrito;
 use App\Models\TipoCargo;
 use App\Models\TipoPersonal;
 use App\Models\Cargo;
+use Illuminate\Support\Str;
 use App\Models\Sucursal;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Response;
 use Intervention\Image\Laravel\Facades\Image;
 use Intervention\Image\Encoders\PngEncoder;
@@ -22,6 +24,7 @@ use Illuminate\Support\Facades\Log;
 
 class PosterController extends Controller
 {
+
     public function index()
     {
         // Traer requerimientos
@@ -29,179 +32,174 @@ class PosterController extends Controller
 
         $cargos = Cargo::forSelect();
         $sucursales = Sucursal::forSelect();
+
         $departamentos = Departamento::forSelect();
         $provincias = Provincia::forSelect();
         $distritos = Distrito::forSelect();
 
         foreach ($requerimientos as $r) {
-            $codigoCargo = ltrim((string)$r->cargo_solicitado, '0');
-            $codigoSucursal = ltrim((string)$r->sucursal, '0');
-            $codigoDepartamento = ltrim((string)$r->departamento, '0');
-            $codigoProvincia = ltrim((string)$r->provincia, '0');
-            $codigoDistrito = ltrim((string)$r->distrito, '0');
+            $codigoCargo = str_pad($r->cargo_solicitado, 4, '0', STR_PAD_LEFT);
+            $codigoSucursal = str_pad($r->sucursal, 2, '0', STR_PAD_LEFT);
 
-            $r->cargo_nombre = $cargos->get($codigoCargo)?->DESC_CARGO ?? $r->cargo_solicitado;
-            $r->sucursal_nombre = $sucursales->get($codigoSucursal)?->SUCU_DESCRIPCION ?? $r->sucursal;
-            $r->departamento_nombre = $departamentos->get($codigoDepartamento)?->DEPA_DESCRIPCION ?? $r->departamento;
-            $r->provincia_nombre = $provincias->get($codigoProvincia)?->PROVI_DESCRIPCION ?? $r->provincia;
-            $r->distrito_nombre = $distritos->get($codigoDistrito)?->DIST_DESCRIPCION ?? $r->distrito;
+            // $codigoDepartamento = ltrim((string)$r->departamento, '0');
+            // $codigoProvincia = ltrim((string)$r->provincia, '0');
+            //$codigoDistrito = ltrim((string)$r->distrito, '0');
+
+            $r->cargo_nombre = $cargos->get($codigoCargo) ?? $r->cargo_solicitado;
+            $r->sucursal_nombre = $sucursales->get($codigoSucursal) ?? $r->sucursal;
+            //$r->departamento_nombre = $departamentos->get($codigoDepartamento)?->DEPA_DESCRIPCION ?? $r->departamento;
+            //$r->provincia_nombre = $provincias->get($codigoProvincia)?->PROVI_DESCRIPCION ?? $r->provincia;
+            //$r->distrito_nombre = $distritos->get($codigoDistrito)?->DIST_DESCRIPCION ?? $r->distrito;
         }
-
-        /*
-        // Cargar catálogos
-        $cargos = DB::connection('si_solmar')
-            ->table('CARGOS')
-            ->select('CODI_CARG', 'DESC_CARGO')
-            ->where('CARG_VIGENCIA', 'SI')
-            ->get()
-            ->keyBy(function ($item) {
-                return ltrim($item->CODI_CARG, '0');
-            });
-
-        $sucursales = DB::connection('si_solmar')
-            ->table('SISO_SUCURSAL')
-            ->select('SUCU_CODIGO', 'SUCU_DESCRIPCION')
-            ->where('SUCU_VIGENCIA', 'SI')
-            ->get()
-            ->keyBy(function ($item) {
-                return ltrim($item->SUCU_CODIGO, '0');
-            });
-
-        $departamentos = DB::connection('si_solmar')
-            ->table('ADMI_DEPARTAMENTO')
-            ->select('DEPA_CODIGO', 'DEPA_DESCRIPCION')
-            ->where('DEPA_VIGENCIA', 'SI')
-            ->orderBy('DEPA_DESCRIPCION')
-            ->get()
-            ->keyBy(function ($item) {
-                return ltrim($item->DEPA_CODIGO, '0');
-            });
-
-        $provincias = DB::connection('si_solmar')
-            ->table('ADMI_PROVINCIA')
-            ->select('PROVI_CODIGO', 'PROVI_DESCRIPCION', 'DEPA_CODIGO')
-            ->where('PROVI_VIGENCIA', 'SI')
-            ->orderBy('PROVI_DESCRIPCION')
-            ->get()
-            ->keyBy(function ($item) {
-                return ltrim($item->PROVI_CODIGO, '0');
-            });
-
-        $distritos = DB::connection('si_solmar')
-            ->table('ADMI_DISTRITO')
-            ->select('DIST_CODIGO', 'DIST_DESCRIPCION', 'PROVI_CODIGO')
-            ->where('DIST_VIGENCIA', 'SI')
-            ->orderBy('DIST_DESCRIPCION')
-            ->get()
-            ->keyBy(function ($item) {
-                return ltrim($item->DIST_CODIGO, '0');
-            });
-
-        // Mapear nombres legibles
-        foreach ($requerimientos as $r) {
-            $codigoCargo = ltrim((string)$r->cargo_solicitado, '0');
-            $codigoSucursal = ltrim((string)$r->sucursal, '0');
-            $codigoDepartamento = ltrim((string)$r->departamento, '0');
-            $codigoProvincia = ltrim((string)$r->provincia, '0');
-            $codigoDistrito = ltrim((string)$r->distrito, '0');
-            // Debug temporal para ver si vienen vacíos
-            if (empty($codigoProvincia)) {
-                Log::warning("Requerimiento {$r->id} tiene provincia vacía");
-            }
-            if (empty($codigoDistrito)) {
-                Log::warning("Requerimiento {$r->id} tiene distrito vacío");
-            }
-
-            $r->cargo_nombre = $cargos->get($codigoCargo)?->DESC_CARGO ?? $r->cargo_solicitado;
-            $r->sucursal_nombre = $sucursales->get($codigoSucursal)?->SUCU_DESCRIPCION ?? $r->sucursal;
-            $r->departamento_nombre = $departamentos->get($codigoDepartamento)?->DEPA_DESCRIPCION ?? $r->departamento;
-            $r->provincia_nombre = $provincias->get($codigoProvincia)?->PROVI_DESCRIPCION ?? $r->provincia;
-            $r->distrito_nombre = $distritos->get($codigoDistrito)?->DIST_DESCRIPCION ?? $r->distrito;
-        }
-        */
-
         return view('afiches.afiche', compact('requerimientos'));
+    }
+
+    // Procesa el formulario y guarda el archivo en la carpeta correspondiente
+    public function assetsUpload(Request $request)
+    {
+        $request->validate([
+            'tipo'    => 'required|in:plantilla,iconG,iconCheck,iconPhone,iconEmail,font',
+            'archivo' => 'required|file|max:4096', // 4 MB
+        ]);
+
+        $tipo = $request->input('tipo');
+        $file = $request->file('archivo');
+
+        // Carpeta destino según el tipo
+        $relativePath = match ($tipo) {
+            'plantilla'  => 'assets/plantillas',
+            'iconG'      => 'assets/icons/iconG',
+            'iconCheck'  => 'assets/icons/iconCheck',
+            'iconPhone'  => 'assets/icons/iconPhone',
+            'iconEmail'  => 'assets/icons/iconEmail',
+            'font'       => 'fonts',
+            default      => 'assets/otros',
+        };
+
+        $destPath = public_path($relativePath);
+
+        if (!is_dir($destPath)) {
+            mkdir($destPath, 0775, true);
+        }
+
+        $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+        $extension    = $file->getClientOriginalExtension();
+
+        $slugName = Str::slug($originalName, '-');
+        if ($slugName === '') {
+            $slugName = 'archivo';
+        }
+
+        $filename = $slugName . '.' . strtolower($extension);
+
+        if (file_exists($destPath . DIRECTORY_SEPARATOR . $filename)) {
+            $filename = $slugName . '-' . time() . '.' . strtolower($extension);
+        }
+
+        $file->move($destPath, $filename);
+
+        return redirect()
+            ->back()
+            ->with('success', "Archivo subido correctamente a {$relativePath}/{$filename}");
+    }
+
+    private function scanImages(string $relativePath)
+    {
+        $fullPath = public_path($relativePath);
+
+        if (!is_dir($fullPath)) {
+            return collect();
+        }
+
+        return collect(File::files($fullPath))->map(function ($file) use ($relativePath) {
+            $filename = $file->getFilename();                     // ej. modern.png
+            $slug     = pathinfo($filename, PATHINFO_FILENAME);   // modern
+
+            return (object) [
+                'slug'     => $slug,
+                'name'     => Str::headline($slug),               // "modern" -> "Modern"
+                'path'     => $relativePath . '/' . $filename,    // assets/plantillas/modern.png
+                'filename' => $filename,                          // solo el nombre del archivo
+            ];
+        });
+    }
+
+    public function assetsForm()
+    {
+        $plantillas   = $this->scanImages('assets/plantillas');
+        $iconosG      = $this->scanImages('assets/icons/iconG');
+        $iconosCheck  = $this->scanImages('assets/icons/iconCheck');
+        $iconosPhone  = $this->scanImages('assets/icons/iconPhone');
+        $iconosEmail  = $this->scanImages('assets/icons/iconEmail');
+        $fonts        = $this->scanImages('fonts'); // aquí serán .ttf/.otf
+
+        return view('afiches.recursos', compact(
+            'plantillas',
+            'iconosG',
+            'iconosCheck',
+            'iconosPhone',
+            'iconosEmail',
+            'fonts'
+        ));
+    }
+
+    public function assetsDelete(Request $request)
+    {
+        $request->validate([
+            'tipo'     => 'required|in:plantilla,iconG,iconCheck,iconPhone,iconEmail,font',
+            'filename' => 'required|string',
+        ]);
+
+        $tipo = $request->input('tipo');
+
+        $relativePath = match ($tipo) {
+            'plantilla'  => 'assets/plantillas',
+            'iconG'      => 'assets/icons/iconG',
+            'iconCheck'  => 'assets/icons/iconCheck',
+            'iconPhone'  => 'assets/icons/iconPhone',
+            'iconEmail'  => 'assets/icons/iconEmail',
+            'font'       => 'fonts',
+            default      => null,
+        };
+
+        if (!$relativePath) {
+            return back()->with('error', 'Tipo de recurso inválido.');
+        }
+
+        // Seguridad: nos quedamos solo con el nombre, sin rutas raras
+        $filename = basename($request->input('filename'));
+        $fullPath = public_path($relativePath . DIRECTORY_SEPARATOR . $filename);
+
+        if (file_exists($fullPath)) {
+            unlink($fullPath);
+            return back()->with('success', "Archivo eliminado: {$filename}");
+        }
+
+        return back()->with('error', 'El archivo ya no existe en el servidor.');
     }
 
 
     public function show(Request $request, Requerimiento $req, string $template)
     {
-        /*
+
         // Cargar catálogos
-        $cargos = DB::connection('si_solmar')
-            ->table('CARGOS')
-            ->select('CODI_CARG', 'DESC_CARGO')
-            ->where('CARG_VIGENCIA', 'SI')
-            ->get()
-            ->keyBy(function ($item) {
-                return ltrim($item->CODI_CARG, '0');
-            });
-
-        $sucursales = DB::connection('si_solmar')
-            ->table('SISO_SUCURSAL')
-            ->select('SUCU_CODIGO', 'SUCU_DESCRIPCION')
-            ->where('SUCU_VIGENCIA', 'SI')
-            ->get()
-            ->keyBy(function ($item) {
-                return ltrim($item->SUCU_CODIGO, '0');
-            });
-
-        $nivelEducativo = DB::connection('si_solmar')
-            ->table('SUNAT_NIVEL_EDUCATIVO')
-            ->select('NIED_CODIGO', 'NIED_DESCRIPCION')
-            ->get()
-            ->keyBy('NIED_CODIGO');
-
-        $departamentos = DB::connection('si_solmar')
-            ->table('ADMI_DEPARTAMENTO')
-            ->select('DEPA_CODIGO', 'DEPA_DESCRIPCION')
-            ->where('DEPA_VIGENCIA', 'SI')
-            ->orderBy('DEPA_DESCRIPCION')
-            ->get()
-            ->keyBy(function ($item) {
-                return ltrim($item->DEPA_CODIGO, '0');
-            });
-
-
-        $provincias = DB::connection('si_solmar')
-            ->table('ADMI_PROVINCIA')
-            ->select('PROVI_CODIGO', 'PROVI_DESCRIPCION', 'DEPA_CODIGO')
-            ->where('PROVI_VIGENCIA', 'SI')
-            ->orderBy('PROVI_DESCRIPCION')
-            ->get()
-            ->keyBy(function ($item) {
-                return ltrim($item->PROVI_CODIGO, '0');
-            });
-
-
-
-        $distritos = DB::connection('si_solmar')
-            ->table('ADMI_DISTRITO')
-            ->select('DIST_CODIGO', 'DIST_DESCRIPCION', 'PROVI_CODIGO')
-            ->where('DIST_VIGENCIA', 'SI')
-            ->orderBy('DIST_DESCRIPCION')
-            ->get()
-            ->keyBy(function ($item) {
-                return ltrim($item->DIST_CODIGO, '0');
-            });
-
-
+        $cargos = Cargo::forSelect();
+        $sucursales = Sucursal::forSelect();
 
         // Mapear nombres legibles
-        $codigoCargo = ltrim((string)$req->cargo_solicitado, '0');
-        $codigoSucursal = ltrim((string)$req->sucursal, '0');
+        $codigoCargo = str_pad($req->cargo_solicitado, 4, '0', STR_PAD_LEFT);
+        $codigoSucursal = str_pad($req->sucursal, 2, '0', STR_PAD_LEFT);
+
         $codigoNivelEducativo = (string)$req->nivel_estudios;
         $codigoDepartamento = ltrim((string)$req->departamento, '0');
         $codigoProvincia = ltrim((string)$req->provincia, '0');
         $codigoDistrito = ltrim((string)$req->distrito, '0');
 
-        $req->cargo_nombre = $cargos->get($codigoCargo)?->DESC_CARGO ?? $req->cargo_solicitado;
-        $req->sucursal_nombre = $sucursales->get($codigoSucursal)?->SUCU_DESCRIPCION ?? $req->sucursal;
-        $req->nivel_estudio = $nivelEducativo->get($codigoNivelEducativo)?->NIED_DESCRIPCION ?? $req->nivel_estudios;
-        $req->nombre_departamento = $departamentos->get($codigoDepartamento)?->DEPA_DESCRIPCION ?? $req->departamento;
-        $req->nombre_provincia = $provincias->get($codigoProvincia)?->PROVI_DESCRIPCION ?? $req->provinca;
-        $req->nombre_distrito = $distritos->get($codigoDistrito)?->DIST_DESCRIPCION ?? $req->distrito;
+        $req->cargo_nombre = $cargos->get($codigoCargo) ?? $req->cargo_solicitado;
+        $req->sucursal_nombre = $sucursales->get($codigoSucursal) ?? $req->sucursal;
 
+        //$req->cargo_nombre = $cargos->get($codigoCargo)?->DESC_CARGO ?? $req->cargo_solicitado;
+        //$req->sucursal_nombre = $sucursales->get($codigoSucursal)?->SUCU_DESCRIPCION ?? $req->sucursal;
 
         // Recoger íconos y fuente (con valores por defecto)
         $iconGPath     = $request->string('iconG',    'assets/images/guardia.png');          // Ícono grande principal
@@ -350,7 +348,6 @@ class PosterController extends Controller
                 'Content-Disposition' => "attachment; filename=\"poster_{$req->id}.pdf\"",
             ]
         );
-        */
     }
 
     // Helper para formato de texto
