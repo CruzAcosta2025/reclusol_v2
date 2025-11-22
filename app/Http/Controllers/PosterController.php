@@ -50,8 +50,57 @@ class PosterController extends Controller
             //$r->departamento_nombre = $departamentos->get($codigoDepartamento)?->DEPA_DESCRIPCION ?? $r->departamento;
             //$r->provincia_nombre = $provincias->get($codigoProvincia)?->PROVI_DESCRIPCION ?? $r->provincia;
             //$r->distrito_nombre = $distritos->get($codigoDistrito)?->DIST_DESCRIPCION ?? $r->distrito;
+            // ================== RECURSOS DINÁMICOS ==================
+            // OJO: revisa que estos paths coincidan con lo que usas en tu AssetsController
+            $plantillas  = $this->collectAssets('assets/plantillas');          // fondos 1080x1080
+            $iconosG     = $this->collectAssets('assets/images');              // íconos grandes (guardia, etc.)
+            $iconosCheck = $this->collectAssets('assets/icons/check');         // checks
+            $iconosPhone = $this->collectAssets('assets/icons/phone');         // teléfonos
+            $iconosEmail = $this->collectAssets('assets/icons/email');         // emails
+            $fonts       = $this->collectAssets('fonts', ['ttf', 'otf']);      // fuentes
         }
-        return view('afiches.afiche', compact('requerimientos'));
+        return view('afiches.afiche', [
+            'requerimientos' => $requerimientos,
+            'plantillas'     => $plantillas,
+            'iconosG'        => $iconosG,
+            'iconosCheck'    => $iconosCheck,
+            'iconosPhone'    => $iconosPhone,
+            'iconosEmail'    => $iconosEmail,
+            'fonts'          => $fonts,
+        ]);
+    }
+
+    private function collectAssets(string $relativePath, array $exts = ['png', 'jpg', 'jpeg'])
+    {
+        $full = public_path($relativePath);
+
+        if (!is_dir($full)) {
+            return collect();
+        }
+
+        return collect(File::files($full))
+            ->filter(function ($file) use ($exts) {
+                return in_array(strtolower($file->getExtension()), $exts, true);
+            })
+            ->map(function ($file) use ($relativePath) {
+                $filename = $file->getFilename();
+
+                // Nombre bonito para mostrar en la UI
+                $name = Str::title(
+                    str_replace(
+                        ['_', '-'],
+                        ' ',
+                        Str::beforeLast($filename, '.')
+                    )
+                );
+
+                return (object) [
+                    'filename' => $filename,
+                    'name'     => $name,
+                    'path'     => $relativePath . '/' . $filename,
+                ];
+            })
+            ->values();
     }
 
     // Procesa el formulario y guarda el archivo en la carpeta correspondiente

@@ -22,11 +22,11 @@
                         <p class="text-gray-600 mt-1">Crea afiches automáticamente basados en los requerimientos activos</p>
                     </div>
                     <!-- <div class="flex items-center space-x-4">
-                                        <a href="{{ route('afiches.historial') }}" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center space-x-2 transition-all duration-300 hover:-translate-y-1">
-                                            <i class="fas fa-history"></i>
-                                            <span>Historial</span>
-                                        </a>
-                                    </div> -->
+                                                                            <a href="{{ route('afiches.historial') }}" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center space-x-2 transition-all duration-300 hover:-translate-y-1">
+                                                                                <i class="fas fa-history"></i>
+                                                                                <span>Historial</span>
+                                                                            </a>
+                                                                        </div> -->
                 </div>
             </div>
         </div>
@@ -144,205 +144,113 @@
                                 class="option-tab px-4 py-2 font-semibold text-gray-700 border-b-2 border-transparent focus:outline-none"
                                 onclick="showTab('tab-font', this)">Fuente</button>
                         </div>
+
                         <div id="tab-plantillas" class="option-tab-content">
-                            <!-- Plantillas de Afiche -->
                             <div class="grid grid-cols-2 gap-3">
-                                {{-- ...tu bloque de plantillas (igual que antes)... --}}
-                                <div class="template-option p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 transition-all duration-300 text-center"
-                                    onclick="selectTemplate('modern',this)">
-                                    <div
-                                        class="w-full h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg mb-2 flex items-center justify-center">
-                                        <img src="{{ asset('assets/plantillas/modern.png') }}" alt="Plantilla Moderno"
-                                            class="w-full h-full object-cover">
+                                @forelse($plantillas ?? [] as $tpl)
+                                    @php
+                                        // Clave que se enviará al controlador: nombre del archivo sin extensión
+                                        $tplKey = Str::beforeLast($tpl->filename, '.'); // ej: modern, classic, etc.
+                                    @endphp
+
+                                    <div class="template-option p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 transition-all duration-300 text-center"
+                                        onclick="selectTemplate('{{ $tplKey }}', this)">
+                                        <div
+                                            class="w-full h-20 rounded-lg mb-2 flex items-center justify-center overflow-hidden">
+                                            <img src="{{ asset($tpl->path) }}" alt="{{ $tpl->name }}"
+                                                class="w-full h-full object-cover">
+                                        </div>
+                                        <p class="text-sm font-medium text-gray-700">{{ $tpl->name }}</p>
                                     </div>
-                                    <p class="text-sm font-medium text-gray-700">Moderno</p>
-                                </div>
-                                <div class="template-option p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 transition-all duration-300 text-center"
-                                    onclick="selectTemplate('classic',this)">
-                                    <div
-                                        class="w-full h-20 bg-gradient-to-br from-gray-600 to-gray-800 rounded-lg mb-2 flex items-center justify-center">
-                                        <img src="{{ asset('assets/plantillas/classic.png') }}" alt="Plantilla Clasica"
-                                            class="w-full h-full object-cover">
-                                    </div>
-                                    <p class="text-sm font-medium text-gray-700">Clásico</p>
-                                </div>
-                                <div class="template-option p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 transition-all duration-300 text-center"
-                                    onclick="selectTemplate('colorful',this)">
-                                    <div
-                                        class="w-full h-20 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg mb-2 flex items-center justify-center">
-                                        <img src="{{ asset('assets/plantillas/colorful.png') }}" alt="Plantilla Colorido"
-                                            class="w-full h-full object-cover">
-                                    </div>
-                                    <p class="text-sm font-medium text-gray-700">Colorido</p>
-                                </div>
-                                <div class="template-option p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 transition-all duration-300 text-center"
-                                    onclick="selectTemplate('minimal',this)">
-                                    <div
-                                        class="w-full h-20 bg-gradient-to-br from-green-500 to-teal-600 rounded-lg mb-2 flex items-center justify-center">
-                                        <img src="{{ asset('assets/plantillas/minimal.png') }}" alt="Plantilla Minimalista"
-                                            class="w-full h-full object-cover">
-                                    </div>
-                                    <p class="text-sm font-medium text-gray-700">Minimalista</p>
-                                </div>
+                                @empty
+                                    <p class="text-xs text-gray-500 col-span-full">
+                                        No hay plantillas cargadas.
+                                        <a href="{{ route('afiches.assets.upload') }}" class="text-blue-500 underline">
+                                            Ir a “Cargar recursos”
+                                        </a>
+                                    </p>
+                                @endforelse
                             </div>
                         </div>
+
                         <div id="tab-iconG" class="option-tab-content hidden">
-                            <!-- Ícono Principal -->
                             <div class="grid grid-cols-3 gap-3">
-                                {{-- ...tu bloque de iconG igual que antes... --}}
-                                <div class="iconG-option p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 text-center"
-                                    onclick="selectIconG('assets/images/guardia.png', this)">
-                                    <img src="{{ asset('assets/images/guardia.png') }}" alt="Guardia"
-                                        class="w-full h-16 object-contain mx-auto">
-                                    <span class="block text-sm mt-2">Guardia</span>
-                                </div>
-                                <div class="iconG-option p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 text-center"
-                                    onclick="selectIconG('assets/images/supervisor.png', this)">
-                                    <img src="{{ asset('assets/images/supervisor.png') }}" alt="Supervisor"
-                                        class="w-full h-16 object-contain mx-auto">
-                                    <span class="block text-sm mt-2">Supervisor</span>
-                                </div>
-                                <div class="iconG-option p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 text-center"
-                                    onclick="selectIconG('assets/images/arquitecto.png', this)">
-                                    <img src="{{ asset('assets/images/arquitecto.png') }}" alt="Arquitecto"
-                                        class="w-full h-16 object-contain mx-auto">
-                                    <span class="block text-sm mt-2">Arquitecto</span>
-                                </div>
-                                <div class="iconG-option p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 text-center"
-                                    onclick="selectIconG('assets/images/contabilidad.png', this)">
-                                    <img src="{{ asset('assets/images/contabilidad.png') }}" alt="Contabilidad"
-                                        class="w-full h-16 object-contain mx-auto">
-                                    <span class="block text-sm mt-2">Contabilidad</span>
-                                </div>
-                                <div class="iconG-option p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 text-center"
-                                    onclick="selectIconG('assets/images/programador.png', this)">
-                                    <img src="{{ asset('assets/images/programador.png') }}" alt="Programador"
-                                        class="w-full h-16 object-contain mx-auto">
-                                    <span class="block text-sm mt-2">Programador</span>
-                                </div>
-                                <div class="iconG-option p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 text-center"
-                                    onclick="selectIconG('assets/images/guardia1.png', this)">
-                                    <img src="{{ asset('assets/images/guardia1.png') }}" alt="Guardia 1"
-                                        class="w-full h-16 object-contain mx-auto">
-                                    <span class="block text-sm mt-2">Guardia 1</span>
-                                </div>
+                                @forelse($iconosG ?? [] as $icon)
+                                    <div class="iconG-option p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 text-center"
+                                        onclick="selectIconG('{{ $icon->path }}', this)">
+                                        <img src="{{ asset($icon->path) }}" alt="{{ $icon->name }}"
+                                            class="w-full h-16 object-contain mx-auto">
+                                        <span class="block text-sm mt-2 truncate">{{ $icon->name }}</span>
+                                    </div>
+                                @empty
+                                    <p class="text-xs text-gray-500 col-span-full">
+                                        No hay íconos principales cargados.
+                                    </p>
+                                @endforelse
                             </div>
                         </div>
+
                         <div id="tab-iconCheck" class="option-tab-content hidden">
-                            <!-- Ícono de Check para Requisitos -->
                             <div class="grid grid-cols-3 gap-3">
-                                <div class="iconCheck-option p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 text-center"
-                                    onclick="selectIconCheck('assets/icons/icon_check1.png', this)">
-                                    <img src="{{ asset('assets/icons/icon_check1.png') }}" alt="Check 1"
-                                        class="w-full h-12 object-contain mx-auto">
-                                </div>
-                                <div class="iconCheck-option p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 text-center"
-                                    onclick="selectIconCheck('assets/icons/icon_check2.png', this)">
-                                    <img src="{{ asset('assets/icons/icon_check2.png') }}" alt="Check 2"
-                                        class="w-full h-12 object-contain mx-auto">
-                                </div>
-                                <div class="iconCheck-option p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 text-center"
-                                    onclick="selectIconCheck('assets/icons/icon_check3.png', this)">
-                                    <img src="{{ asset('assets/icons/icon_check3.png') }}" alt="Check 3"
-                                        class="w-full h-12 object-contain mx-auto">
-                                </div>
-                                <div class="iconCheck-option p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 text-center"
-                                    onclick="selectIconCheck('assets/icons/icon_check4.png', this)">
-                                    <img src="{{ asset('assets/icons/icon_check4.png') }}" alt="Check 4"
-                                        class="w-full h-12 object-contain mx-auto">
-                                </div>
+                                @forelse($iconosCheck ?? [] as $icon)
+                                    <div class="iconCheck-option p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 text-center"
+                                        onclick="selectIconCheck('{{ $icon->path }}', this)">
+                                        <img src="{{ asset($icon->path) }}" alt="{{ $icon->name }}"
+                                            class="w-full h-12 object-contain mx-auto">
+                                    </div>
+                                @empty
+                                    <p class="text-xs text-gray-500 col-span-full">
+                                        No hay íconos de check cargados.
+                                    </p>
+                                @endforelse
                             </div>
                         </div>
+
                         <div id="tab-iconPhone" class="option-tab-content hidden">
-                            <!-- Ícono de Phone para Requisitos -->
                             <div class="grid grid-cols-3 gap-3">
-                                <div class="iconPhone-option p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 text-center"
-                                    onclick="selectIconPhone('assets/icons/icon_phone1.png', this)">
-                                    <img src="{{ asset('assets/icons/icon_phone1.png') }}" alt="Phone 1"
-                                        class="w-full h-12 object-contain mx-auto">
-                                </div>
-                                <div class="iconPhone-option p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 text-center"
-                                    onclick="selectIconPhone('assets/icons/icon_phone2.png', this)">
-                                    <img src="{{ asset('assets/icons/icon_phone2.png') }}" alt="Phone 2"
-                                        class="w-full h-12 object-contain mx-auto">
-                                </div>
-                                <div class="iconPhone-option p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 text-center"
-                                    onclick="selectIconPhone('assets/icons/icon_phone3.png', this)">
-                                    <img src="{{ asset('assets/icons/icon_phone3.png') }}" alt="Phone 3"
-                                        class="w-full h-12 object-contain mx-auto">
-                                </div>
-                                <div class="iconPhone-option p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 text-center"
-                                    onclick="selectIconPhone('assets/icons/icon_phone4.png', this)">
-                                    <img src="{{ asset('assets/icons/icon_phone4.png') }}" alt="Phone 4"
-                                        class="w-full h-12 object-contain mx-auto">
-                                </div>
-                                <div class="iconPhone-option p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 text-center"
-                                    onclick="selectIconPhone('assets/icons/icon_phone5.png', this)">
-                                    <img src="{{ asset('assets/icons/icon_phone5.png') }}" alt="Phone 5"
-                                        class="w-full h-12 object-contain mx-auto">
-                                </div>
-                                <div class="iconPhone-option p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 text-center"
-                                    onclick="selectIconPhone('assets/icons/icon_phone6.png', this)">
-                                    <img src="{{ asset('assets/icons/icon_phone6.png') }}" alt="Phone 6"
-                                        class="w-full h-12 object-contain mx-auto">
-                                </div>
+                                @forelse($iconosPhone ?? [] as $icon)
+                                    <div class="iconPhone-option p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 text-center"
+                                        onclick="selectIconPhone('{{ $icon->path }}', this)">
+                                        <img src="{{ asset($icon->path) }}" alt="{{ $icon->name }}"
+                                            class="w-full h-12 object-contain mx-auto">
+                                    </div>
+                                @empty
+                                    <p class="text-xs text-gray-500 col-span-full">
+                                        No hay íconos de teléfono cargados.
+                                    </p>
+                                @endforelse
                             </div>
                         </div>
+
                         <div id="tab-iconEmail" class="option-tab-content hidden">
-                            <!-- Ícono de Email para Requisitos -->
                             <div class="grid grid-cols-3 gap-3">
-                                <div class="iconEmail-option p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 text-center"
-                                    onclick="selectIconEmail('assets/icons/icon_email1.png', this)">
-                                    <img src="{{ asset('assets/icons/icon_email1.png') }}" alt="Email 1"
-                                        class="w-full h-12 object-contain mx-auto">
-                                </div>
-                                <div class="iconEmail-option p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 text-center"
-                                    onclick="selectIconEmail('assets/icons/icon_email2.png', this)">
-                                    <img src="{{ asset('assets/icons/icon_email2.png') }}" alt="Email 2"
-                                        class="w-full h-12 object-contain mx-auto">
-                                </div>
-                                <div class="iconEmail-option p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 text-center"
-                                    onclick="selectIconEmail('assets/icons/icon_email3.png', this)">
-                                    <img src="{{ asset('assets/icons/icon_email3.png') }}" alt="Email 3"
-                                        class="w-full h-12 object-contain mx-auto">
-                                </div>
-                                <div class="iconEmail-option p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 text-center"
-                                    onclick="selectIconEmail('assets/icons/icon_email4.png', this)">
-                                    <img src="{{ asset('assets/icons/icon_email4.png') }}" alt="Email 4"
-                                        class="w-full h-12 object-contain mx-auto">
-                                </div>
-                                <div class="iconEmail-option p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 text-center"
-                                    onclick="selectIconEmail('assets/icons/icon_email5.png', this)">
-                                    <img src="{{ asset('assets/icons/icon_email5.png') }}" alt="Email 5"
-                                        class="w-full h-12 object-contain mx-auto">
-                                </div>
-                                <div class="iconEmail-option p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 text-center"
-                                    onclick="selectIconEmail('assets/icons/icon_email6.png', this)">
-                                    <img src="{{ asset('assets/icons/icon_email6.png') }}" alt="Email 6"
-                                        class="w-full h-12 object-contain mx-auto">
-                                </div>
+                                @forelse($iconosEmail ?? [] as $icon)
+                                    <div class="iconEmail-option p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 text-center"
+                                        onclick="selectIconEmail('{{ $icon->path }}', this)">
+                                        <img src="{{ asset($icon->path) }}" alt="{{ $icon->name }}"
+                                            class="w-full h-12 object-contain mx-auto">
+                                    </div>
+                                @empty
+                                    <p class="text-xs text-gray-500 col-span-full">
+                                        No hay íconos de email cargados.
+                                    </p>
+                                @endforelse
                             </div>
                         </div>
+
                         <div id="tab-font" class="option-tab-content hidden">
-                            <!-- Fuente de letra -->
                             <select id="font-select"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none">
-                                <option value="fonts/OpenSans-Regular.ttf">Open Sans Regular</option>
-                                <option value="fonts/OpenSans-Bold.ttf">Open Sans Bold</option>
-                                <option value="fonts/Roboto-Bold.ttf">Roboto Bold</option>
-                                <option value="fonts/Roboto-Light.ttf">Roboto Light</option>
-                                <option value="fonts/Roboto-Regular.ttf">Roboto Regular</option>
-                                <option value="fonts/VERDANA.ttf">Verdana</option>
-                                <option value="fonts/VERDANAB.ttf">Verdana Bold</option>
-                                <option value="fonts/Vampire Wars Italic.ttf">Vampire Wars Italic</option>
-                                <option value="fonts/ARIAL.ttf">Arial</option>
-                                <option value="fonts/ARIALBD.ttf">Arial Bold</option>
-                                <option value="fonts/Hey Comic.ttf">Comic</option>
-                                <option value="fonts/GODOFWAR.ttf">God of War</option>
+                                <option value="">(Fuente por defecto)</option>
+
+                                @foreach ($fonts ?? [] as $font)
+                                    <option value="{{ $font->path }}">{{ $font->filename }}</option>
+                                @endforeach
                             </select>
                         </div>
                     </div>
                 </div>
+
                 <!-- Vista Previa del Afiche -->
                 <div class="lg:col-span-2">
                     <div class="bg-white rounded-2xl shadow-lg p-6 card-hover">
@@ -412,7 +320,6 @@
         </div>
     </div>
 
-
     <style>
         .card-hover {
             transition: all 0.3s ease;
@@ -454,21 +361,29 @@
         const fontSelect = document.getElementById('font-select');
 
         let selectedRequirement = null;
-        let selectedTemplate = 'modern';
-        let selectedFont = fontSelect.value;
-        let selectedIconG = 'assets/images/guardia.png'; // Valor por defecto
-        let selectedIconCheck = 'assets/icons/icon_check1.png'; // Valor por defecto
-        let selectedIconPhone = 'assets/icons/icon_phone1.png'; // Valor por defecto
-        let selectedIconEmail = 'assets/icons/icon_email1.png'; // Valor por defecto
+        let selectedTemplate = null; // antes 'modern'
+        let selectedFont = fontSelect ? fontSelect.value : null;
+        let selectedIconG = null;
+        let selectedIconCheck = null;
+        let selectedIconPhone = null;
+        let selectedIconEmail = null;
+
 
         // Mostrar la primera tab por defecto
         document.addEventListener('DOMContentLoaded', () => {
             showTab('tab-plantillas', document.querySelector('.option-tab'));
-            const first = document.querySelector('.requirement-item');
-            if (first) first.click();
-            const tpl = document.querySelector(".template-option[onclick*=\"'modern'\"]");
-            if (tpl) tpl.classList.add('selected');
+
+            const firstReq = document.querySelector('.requirement-item');
+            if (firstReq) firstReq.click();
+
+            const firstTpl = document.querySelector('.template-option');
+            if (firstTpl) firstTpl.click(); // esto llama a selectTemplate(...)
+
+            if (fontSelect) {
+                fontSelect.addEventListener('change', () => selectFont(fontSelect.value));
+            }
         });
+
 
         function showTab(tabId, btn) {
             document.querySelectorAll('.option-tab-content').forEach(el => el.classList.add('hidden'));
@@ -589,8 +504,19 @@
         // También actualízalo cuando cambies de plantilla o lo que sea relevante
 
         function updatePreview(id) {
+            if (!selectedTemplate) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Selecciona una plantilla',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                return;
+            }
+
             const req = requerimientosData[id];
             if (!req) return;
+
             let url = `/poster/${id}/${selectedTemplate}?preview=1&logo=1`;
             if (selectedIconG) url += `&iconG=${encodeURIComponent(selectedIconG)}`;
             if (selectedIconCheck) url += `&iconCheck=${encodeURIComponent(selectedIconCheck)}`;
@@ -598,12 +524,11 @@
             if (selectedIconEmail) url += `&iconEmail=${encodeURIComponent(selectedIconEmail)}`;
             if (selectedFont) url += `&font=${encodeURIComponent(selectedFont)}`;
 
-
             posterImage.classList.remove('hidden');
             posterImage.onerror = () => posterImage.src = '/assets/plantillas/placeholder.png';
-            //posterImage.onload = () => console.log('✅ Preview listo:', url);
             posterImage.src = url;
         }
+
 
 
         function selectTemplate(template, el) {
@@ -612,6 +537,7 @@
             selectedTemplate = template.trim();
             if (selectedRequirement) updatePreview(selectedRequirement);
         }
+
 
         function selectIconG(path, el) {
             document.querySelectorAll('.iconG-option').forEach(opt => opt.classList.remove('selected'));
