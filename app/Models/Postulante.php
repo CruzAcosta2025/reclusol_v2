@@ -48,8 +48,8 @@ class Postulante extends Model
         'cul',
         'origin',
         'created_by',
-        'estado',        
-        'decision',     
+        'estado',
+        'decision',
         'comentario'
     ];
 
@@ -62,5 +62,10 @@ class Postulante extends Model
     public function creador()
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function entrevistas()
+    {
+        return $this->hasMany(Entrevista::class);
     }
 }

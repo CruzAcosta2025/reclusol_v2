@@ -571,7 +571,7 @@
             selectedFont = fontUrl;
             if (selectedRequirement) updatePreview(selectedRequirement);
         }
-        fontSelect.addEventListener('change', () => selectFont(fontSelect.value));
+        
 
         function downloadPoster(format = 'png') {
             if (!selectedRequirement) return alert('Selecciona un requerimiento primero');

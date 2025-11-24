@@ -16,13 +16,13 @@ class Entrevista extends Model
         'requerimiento_id',
         'entrevistador_id',
         'fecha_entrevista',
-        'preguntas_json',
+        'preguntas',        // 👈 JSON con todo el detalle de la evaluación
         'comentario_final',
         'resultado',
     ];
 
     protected $casts = [
-        'preguntas' => 'array',
+        'preguntas'       => 'array',     // 👈 se guarda como JSON
         'fecha_entrevista' => 'datetime',
     ];
 
@@ -41,9 +41,4 @@ class Entrevista extends Model
     {
         return $this->belongsTo(User::class, 'entrevistador_id');
     }
-
-    //public function respuestas()
-   // {
-     //   return $this->hasMany(EntrevistaRespuesta::class);
-   // }
 }

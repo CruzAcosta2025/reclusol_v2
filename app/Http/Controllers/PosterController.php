@@ -53,10 +53,10 @@ class PosterController extends Controller
             // ================== RECURSOS DINÁMICOS ==================
             // OJO: revisa que estos paths coincidan con lo que usas en tu AssetsController
             $plantillas  = $this->collectAssets('assets/plantillas');          // fondos 1080x1080
-            $iconosG     = $this->collectAssets('assets/images');              // íconos grandes (guardia, etc.)
-            $iconosCheck = $this->collectAssets('assets/icons/check');         // checks
-            $iconosPhone = $this->collectAssets('assets/icons/phone');         // teléfonos
-            $iconosEmail = $this->collectAssets('assets/icons/email');         // emails
+            $iconosG     = $this->collectAssets('assets/icons/iconG');         // íconos principales
+            $iconosCheck = $this->collectAssets('assets/icons/iconCheck');         // checks
+            $iconosPhone = $this->collectAssets('assets/icons/iconPhone');         // teléfonos
+            $iconosEmail = $this->collectAssets('assets/icons/iconEmail');         // emails
             $fonts       = $this->collectAssets('fonts', ['ttf', 'otf']);      // fuentes
         }
         return view('afiches.afiche', [
@@ -132,25 +132,37 @@ class PosterController extends Controller
         }
 
         $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-        $extension    = $file->getClientOriginalExtension();
+        $extension    = strtolower($file->getClientOriginalExtension()); // ← minúsculas
 
         $slugName = Str::slug($originalName, '-');
         if ($slugName === '') {
             $slugName = 'archivo';
         }
 
-        $filename = $slugName . '.' . strtolower($extension);
+        $filename = $slugName . '.' . $extension;
 
         if (file_exists($destPath . DIRECTORY_SEPARATOR . $filename)) {
-            $filename = $slugName . '-' . time() . '.' . strtolower($extension);
+            $filename = $slugName . '-' . time() . '.' . $extension;
         }
 
-        $file->move($destPath, $filename);
+        $fullPath = $destPath . DIRECTORY_SEPARATOR . $filename;
+
+        // 👉 Solo PLANTILLAS a 1080x1080
+        if ($tipo === 'plantilla') {
+            $image = Image::read($file->getRealPath())
+                ->cover(1080, 1080);   // recorta/ajusta a 1080x1080 sin deformar
+
+            $image->save($fullPath);
+        } else {
+            // Íconos y fuentes se guardan tal cual
+            $file->move($destPath, $filename);
+        }
 
         return redirect()
             ->back()
             ->with('success', "Archivo subido correctamente a {$relativePath}/{$filename}");
     }
+
 
     private function scanImages(string $relativePath)
     {
@@ -250,33 +262,43 @@ class PosterController extends Controller
         //$req->cargo_nombre = $cargos->get($codigoCargo)?->DESC_CARGO ?? $req->cargo_solicitado;
         //$req->sucursal_nombre = $sucursales->get($codigoSucursal)?->SUCU_DESCRIPCION ?? $req->sucursal;
 
-        // Recoger íconos y fuente (con valores por defecto)
-        $iconGPath     = $request->string('iconG',    'assets/images/guardia.png');          // Ícono grande principal
-        $iconCheckPath = $request->string('iconCheck', 'assets/icons/icon_check1.png');        // Ícono de check (requisitos)
-        $iconPhonePath = $request->string('iconPhone', 'assets/icons/icon_phone1.png');        // Ícono de teléfono (footer)
-        $iconEmailPath  = $request->string('iconEmail', 'assets/icons/icon_email1.png');        // Ícono de email (footer)
-        $fontPath      = $request->string('font',     'fonts/OpenSans-Regular.ttf');          // Fuente
+        // Rutas relativas que llegan por query (desde el JS)
+        $iconGPath     = $request->input('iconG');      // ej: assets/icons/iconG/guardia.png
+        $iconCheckPath = $request->input('iconCheck');  // ej: assets/icons/iconCheck/icon_check1.png
+        $iconPhonePath = $request->input('iconPhone');  // ej: assets/icons/iconPhone/icon_phone1.png
+        $iconEmailPath = $request->input('iconEmail');  // ej: assets/icons/iconEmail/icon_email1.png
+        $fontPath      = $request->input('font');       // ej: fonts/OpenSans-Regular.ttf
 
-        // Validar existencia de archivos (evita errores 500)
-        $iconGFull     = public_path($iconGPath);
-        abort_unless(file_exists($iconGFull), 500, "Ícono principal no encontrado: {$iconGPath}");
+        // Fallbacks si no viene nada en el querystring
+        $iconGPath     = $iconGPath     ?: 'assets/icons/iconG/guardia.png';
+        $iconCheckPath = $iconCheckPath ?: 'assets/icons/iconCheck/icon_check1.png';
+        $iconPhonePath = $iconPhonePath ?: 'assets/icons/iconPhone/icon_phone1.png';
+        $iconEmailPath = $iconEmailPath ?: 'assets/icons/iconEmail/icon_email1.png';
+        $fontPath      = $fontPath      ?: 'fonts/OpenSans-Regular.ttf';
 
-        $iconCheckFull = public_path($iconCheckPath);
-        abort_unless(file_exists($iconCheckFull), 500, "Ícono de check no encontrado: {$iconCheckPath}");
+        // Resolver a rutas absolutas y, si no existen, simplemente no usamos ese ícono
+        $iconGFull     = file_exists(public_path($iconGPath))     ? public_path($iconGPath)     : null;
+        $iconCheckFull = file_exists(public_path($iconCheckPath)) ? public_path($iconCheckPath) : null;
+        $iconPhoneFull = file_exists(public_path($iconPhonePath)) ? public_path($iconPhonePath) : null;
+        $iconMailFull  = file_exists(public_path($iconEmailPath)) ? public_path($iconEmailPath) : null;
 
-        $iconPhoneFull = public_path($iconPhonePath);
-        abort_unless(file_exists($iconPhoneFull), 500, "Ícono de teléfono no encontrado: {$iconPhonePath}");
+        // La fuente sí es obligatoria → fallback + abort si ni la de fallback existe
+        $fontFull = file_exists(public_path($fontPath))
+            ? public_path($fontPath)
+            : public_path('fonts/OpenSans-Regular.ttf');
 
-        $iconMailFull  = public_path($iconEmailPath);
-        abort_unless(file_exists($iconMailFull), 500, "Ícono de email no encontrado: {$iconEmailPath}");
+        if (!file_exists($fontFull)) {
+            abort(500, 'No se encontró ninguna fuente para generar el afiche.');
+        }
 
-        $fontFull      = public_path($fontPath);
-        abort_unless(file_exists($fontFull), 500, "Fuente no encontrada: {$fontPath}");
 
         // Cargar la plantilla
-        $tpl = public_path("assets/plantillas/{$template}.png");
-        abort_unless(file_exists($tpl), 404, "Plantilla {$template} no encontrada");
-        $bg = Image::read($tpl); // lienzo base 1080×1080
+        //$tpl = public_path("assets/plantillas/{$template}.png");
+        //abort_unless(file_exists($tpl), 404, "Plantilla {$template} no encontrada");
+        //$bg = Image::read($tpl); // lienzo base 1080×1080
+
+        $tpl = $this->findPlantillaFile($template);
+        $bg = Image::read($tpl); // lienzo base
 
         // Logo opcional
         if ($request->boolean('logo', true)) {
@@ -320,24 +342,29 @@ class PosterController extends Controller
             300,
             225
         );
+
+        /*
         $bg->text(
             'SOLMAR SECURITY',
             540,
             265,
             fn($f) => $this->font($f, $fontFull, 48, '#FDFEFE')
         );
+        */
 
         // Cargo
         $bg->text(
-            "REQUIERE {$req->cargo_nombre}",
+            "{$req->cargo_nombre}",
             620,
             350,
-            fn($f) => $this->font($f, $fontFull, 38, '#ccd1d1')
+            fn($f) => $this->font($f, $fontFull, 38, '#000909ff')
         );
 
         // Imagen principal de icono (guardia, supervisor, etc)
-        $iconImage = Image::read($iconGFull)->resize(300, 300);
-        $bg->place($iconImage, 'top-left', 30, 390);
+        if ($iconGFull) {
+            $iconImage = Image::read($iconGFull)->resize(300, 300);
+            $bg->place($iconImage, 'top-left', 30, 390);
+        }
 
         // Título requisitos
         $bg->text(
@@ -349,9 +376,10 @@ class PosterController extends Controller
 
         // Dibujar requisitos, pasando el ícono de check y la fuente seleccionada
         $this->dibujarRequisitos($bg, $req, $fontFull, $iconCheckFull);
+        $this->dibujarFooter($bg, $fontFull, $iconPhoneFull, $iconMailFull);
 
         // Pie de contacto con íconos de teléfono y email
-        $this->dibujarFooter($bg, $fontFull, $iconPhoneFull, $iconMailFull);
+        //$this->dibujarFooter($bg, $fontFull, $iconPhoneFull, $iconMailFull);
 
         // Formato de salida (png, jpg, pdf)
         $format = strtolower($request->string('format', 'png'));
@@ -399,6 +427,22 @@ class PosterController extends Controller
         );
     }
 
+    private function findPlantillaFile(string $template): string
+    {
+        $base = public_path('assets/plantillas/' . $template);
+        $exts = ['png', 'jpg', 'jpeg'];
+
+        foreach ($exts as $ext) {
+            $candidate = "{$base}.{$ext}";
+            if (file_exists($candidate)) {
+                return $candidate;
+            }
+        }
+
+        abort(404, "Plantilla {$template} no encontrada");
+    }
+
+
     // Helper para formato de texto
     private function font($f, string $path, int $size, string $color): void
     {
@@ -410,24 +454,26 @@ class PosterController extends Controller
     }
 
     // Dibuja la lista de requisitos usando el icono de check y la fuente elegida
-    private function dibujarRequisitos($bg, Requerimiento $req, string $fontFull, string $iconCheckFull): void
+    private function dibujarRequisitos($bg, Requerimiento $req, string $fontFull, ?string $iconCheckFull): void
     {
         $lines = [
-            "Estudios mínimos: {$req->nivel_estudio}",
-            "Vacantes: {$req->cantidad_requerida}",
-            "Fecha límite: " . ($req->fecha_limite?->format('d/m/Y') ?? 'No definida'),
-            "Edad: {$req->edad_minima} - {$req->edad_maxima}",
-            "Extras: {$req->requisitos_adicionales}",
+            "Estudios mínimos: {$req->nivel_estudios}",   // ojo, aquí era nivel_estudio
         ];
 
-        $icon = Image::read($iconCheckFull)->resize(32, 32); // Ícono de check
-        $y = 450;
-        $iconX = 420;
-        $textX = 480;
+        $icon = $iconCheckFull && file_exists($iconCheckFull)
+            ? Image::read($iconCheckFull)->resize(32, 32)
+            : null;
+
+        $y          = 450;
+        $iconX      = 420;
+        $textX      = 480;
         $lineHeight = 50;
 
         foreach ($lines as $text) {
-            $bg->place($icon, 'top-left', $iconX, $y);
+            if ($icon) {
+                $bg->place($icon, 'top-left', $iconX, $y);
+            }
+
             $bg->text($text, $textX, $y + 5, function ($f) use ($fontFull) {
                 $f->file($fontFull)
                     ->size(30)
@@ -435,10 +481,10 @@ class PosterController extends Controller
                     ->align('left')
                     ->valign('top');
             });
+
             $y += $lineHeight;
         }
 
-        // Nota final
         $bg->text(
             'NOTA: SERVICIO NO ACUARTELADO',
             540,
@@ -447,18 +493,23 @@ class PosterController extends Controller
         );
     }
 
+
     // Pie de página con contacto (ahora recibe íconos de teléfono y mail)
-    private function dibujarFooter($bg, string $fontFull, string $iconPhoneFull, string $iconEmailFull): void
+    private function dibujarFooter($bg, string $fontFull, ?string $iconPhoneFull, ?string $iconEmailFull): void
     {
         $footer = Image::read(public_path('assets/rectangles/text-bg-blue.png'))
             ->resize(1080, 180);
         $bg->place($footer, 'bottom', 0);
 
-        $phone = Image::read($iconPhoneFull)->resize(30, 30);
-        $mail  = Image::read($iconEmailFull)->resize(30, 30);
+        if ($iconPhoneFull && file_exists($iconPhoneFull)) {
+            $phone = Image::read($iconPhoneFull)->resize(30, 30);
+            $bg->place($phone, 'top-left', 410, 985);
+        }
 
-        $bg->place($phone, 'top-left', 410, 985);
-        $bg->place($mail,  'top-left', 280, 1028);
+        if ($iconEmailFull && file_exists($iconEmailFull)) {
+            $mail = Image::read($iconEmailFull)->resize(30, 30);
+            $bg->place($mail, 'top-left', 280, 1028);
+        }
 
         $bg->text(
             'Interesados comunicarse a:',

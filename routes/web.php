@@ -87,9 +87,17 @@ Route::middleware('auth')->group(function () {
 
 
   Route::middleware('role:ADMINISTRADOR|USUARIO OPERATIVO')->group(function () {
+    // RUTAS PARA ENTREVISTAS
     Route::get('/entrevistas', [EntrevistaController::class, 'listadoInicial'])->name('entrevistas.index');
-    //Route::get('/entrevistas', [EntrevistaController::class, 'listadoInicial'])->name('entrevistas.listadoInicial');
-    Route::get('/entrevistas/evaluar/{id}', [EntrevistaController::class, 'evaluar'])->name('entrevistas.evaluar');
+    Route::get('/entrevistas/evaluar/{postulante}', [EntrevistaController::class, 'evaluar'])->name('entrevistas.evaluar');
+    Route::get('/entrevistas-virtuales/aptos', [EntrevistaController::class, 'aptos'])->name('entrevistas-virtuales.aptos');
+    Route::post('/entrevistas/{postulante}/guardar', [EntrevistaController::class, 'guardarEvaluacion'])->name('entrevistas.guardar-evaluacion');
+    Route::get('/entrevistas/{postulante}/archivo/{tipo}', [EntrevistaController::class, 'verArchivo'])
+      ->whereIn('tipo', ['cv', 'cul'])->name('entrevistas.ver-archivo');
+
+    Route::get('/entrevistas/{postulante}/descargar/{tipo}', [EntrevistaController::class, 'descargarArchivo'])
+      ->whereIn('tipo', ['cv', 'cul'])
+      ->name('entrevistas.descargar-archivo');
   });
 
   // RUTAS PARA GESTIÓN DE USUARIOS
