@@ -16,15 +16,23 @@ class Entrevista extends Model
         'requerimiento_id',
         'entrevistador_id',
         'fecha_entrevista',
-        'preguntas',        // 👈 JSON con todo el detalle de la evaluación
-        'comentario_final',
-        'resultado',
+        'formacion',
+        'otros_cursos',
+        'competencias',
+        'fortalezas',
+        'oportunidades',
+        'es_apto',
+        'otro_puesto',
+        'comentario',
     ];
 
     protected $casts = [
-        'preguntas'       => 'array',     // 👈 se guarda como JSON
         'fecha_entrevista' => 'datetime',
+        // estos dos asumo que los vas a guardar como JSON (checkboxes, etc.)
+        'formacion'    => 'array',
+        'competencias' => 'array',
     ];
+
 
     // Relaciones
     public function postulante()

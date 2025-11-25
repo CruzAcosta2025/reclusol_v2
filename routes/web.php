@@ -18,20 +18,19 @@ Route::get('/', function () {
 Route::get('/dashboard', [HomeController::class, 'index'])
   ->middleware(['auth', 'verified'])
   ->name('dashboard');
+  
+// Registro externo (publico)
+Route::get('/postulantes/registro', [PostulanteController::class, 'formExterno'])->name('postulantes.formExterno');
+Route::post('/postulantes/registro', [PostulanteController::class, 'storeExterno'])->name('postulantes.storeExterno');
+Route::get('/api-publico/cargos-por-tipo/{tipo}', [PostulanteController::class, 'getCargosPorTipo']);
+Route::get('/api-publico/provincias/{depa}', [PostulanteController::class, 'getProvincias']);
+Route::get('/api-publico/distritos/{prov}',  [PostulanteController::class, 'getDistritos']);
+Route::get('/api-publico/cargo-tipo/{codiCarg}', [PostulanteController::class, 'cargoTipo']);
 
 Route::middleware('auth')->group(function () {
   Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
   Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
   Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
-  // Registro externo (publico)
-  Route::get('/postulantes/registro', [PostulanteController::class, 'formExterno'])->name('postulantes.formExterno');
-  Route::post('/postulantes/registro', [PostulanteController::class, 'storeExterno'])->name('postulantes.storeExterno');
-  Route::get('/api-publico/cargos-por-tipo/{tipo}', [PostulanteController::class, 'getCargosPorTipo']);
-  Route::get('/api-publico/provincias/{depa}', [PostulanteController::class, 'getProvincias']);
-  Route::get('/api-publico/distritos/{prov}',  [PostulanteController::class, 'getDistritos']);
-  Route::get('/api-publico/cargo-tipo/{codiCarg}', [PostulanteController::class, 'cargoTipo']);
-
   // Registro interno (solo usuarios logueados)
   Route::middleware(['auth', 'role:ADMINISTRADOR|USUARIO OPERATIVO'])->group(function () {
     Route::get('/postulantes/crear', [PostulanteController::class, 'formInterno'])->name('postulantes.formInterno');

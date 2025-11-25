@@ -5,34 +5,11 @@
         <div class="bg-gradient-to-r from-teal-500 to-teal-600 text-white px-6 py-4">
             <h2 class="flex items-center text-lg font-semibold">
                 <i class="fas fa-user-shield mr-2"></i>
-                Evaluación Específica - Personal Operativo (FAS-05-014)
+                Evaluación Específica - Personal Operativo
             </h2>
         </div>
 
         <div class="p-6 space-y-8">
-            {{-- EDUCACIÓN --}}
-            <div>
-                <h3 class="text-sm font-semibold text-gray-700 mb-3">Nivel de Educación</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-                    <label class="flex items-center p-2 bg-gray-50 rounded-lg border hover:bg-gray-100 cursor-pointer">
-                        <input type="checkbox" name="edu_universitaria" value="1" class="rounded mr-2">
-                        <span class="text-sm text-gray-800">Universitaria</span>
-                    </label>
-                    <label class="flex items-center p-2 bg-gray-50 rounded-lg border hover:bg-gray-100 cursor-pointer">
-                        <input type="checkbox" name="edu_carrera_tecnica" value="1" class="rounded mr-2">
-                        <span class="text-sm text-gray-800">Carrera Técnica</span>
-                    </label>
-                    <label class="flex items-center p-2 bg-gray-50 rounded-lg border hover:bg-gray-100 cursor-pointer">
-                        <input type="checkbox" name="edu_ffaa_ffpp" value="1" class="rounded mr-2">
-                        <span class="text-sm text-gray-800">Egresado de las FFAA / FFPP</span>
-                    </label>
-                    <label class="flex items-center p-2 bg-gray-50 rounded-lg border hover:bg-gray-100 cursor-pointer">
-                        <input type="checkbox" name="edu_secundaria" value="1" class="rounded mr-2">
-                        <span class="text-sm text-gray-800">5° grado de secundaria</span>
-                    </label>
-                </div>
-            </div>
-
             {{-- FORMACIÓN / CURSOS --}}
             <div>
                 <h3 class="text-sm font-semibold text-gray-700 mb-3">Formación / Cursos</h3>
@@ -52,29 +29,6 @@
                     <label class="flex items-center p-2 bg-gray-50 rounded-lg border hover:bg-gray-100 cursor-pointer">
                         <input type="checkbox" name="curso_sgsst" value="1" class="rounded mr-2">
                         <span class="text-sm text-gray-800">SGSST</span>
-                    </label>
-                </div>
-            </div>
-
-            {{-- EXPERIENCIA --}}
-            <div>
-                <h3 class="text-sm font-semibold text-gray-700 mb-3">Experiencia en el cargo</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-                    <label class="flex items-center p-2 bg-gray-50 rounded-lg border hover:bg-gray-100 cursor-pointer">
-                        <input type="radio" name="exp_cargo_operativo" value="<1" class="mr-2">
-                        <span class="text-sm text-gray-800">Menos de 1 año</span>
-                    </label>
-                    <label class="flex items-center p-2 bg-gray-50 rounded-lg border hover:bg-gray-100 cursor-pointer">
-                        <input type="radio" name="exp_cargo_operativo" value="1-2" class="mr-2">
-                        <span class="text-sm text-gray-800">Entre 1 y 2 años</span>
-                    </label>
-                    <label class="flex items-center p-2 bg-gray-50 rounded-lg border hover:bg-gray-100 cursor-pointer">
-                        <input type="radio" name="exp_cargo_operativo" value="3-4" class="mr-2">
-                        <span class="text-sm text-gray-800">Entre 3 y 4 años</span>
-                    </label>
-                    <label class="flex items-center p-2 bg-gray-50 rounded-lg border hover:bg-gray-100 cursor-pointer">
-                        <input type="radio" name="exp_cargo_operativo" value="4+" class="mr-2">
-                        <span class="text-sm text-gray-800">Más de 4 años</span>
                     </label>
                 </div>
             </div>

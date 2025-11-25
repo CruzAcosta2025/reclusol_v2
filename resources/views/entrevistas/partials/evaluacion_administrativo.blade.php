@@ -5,41 +5,11 @@
         <div class="bg-gradient-to-r from-sky-500 to-sky-600 text-white px-6 py-4">
             <h2 class="flex items-center text-lg font-semibold">
                 <i class="fas fa-user-tie mr-2"></i>
-                Evaluación Específica - Personal Administrativo (FAS-05-019)
+                Evaluación Específica - Personal Administrativo
             </h2>
         </div>
 
         <div class="p-6 space-y-8">
-            {{-- EDUCACIÓN --}}
-            <div>
-                <h3 class="text-sm font-semibold text-gray-700 mb-3">Nivel de Educación</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                    <label class="flex items-center p-2 bg-gray-50 rounded-lg border hover:bg-gray-100 cursor-pointer">
-                        <input type="checkbox" name="adm_edu_titulado" value="1" class="rounded mr-2">
-                        <span class="text-sm text-gray-800">Titulado / Colegiado</span>
-                    </label>
-                    <label class="flex items-center p-2 bg-gray-50 rounded-lg border hover:bg-gray-100 cursor-pointer">
-                        <input type="checkbox" name="adm_edu_egresado" value="1" class="rounded mr-2">
-                        <span class="text-sm text-gray-800">Egresado</span>
-                    </label>
-                    <label class="flex items-center p-2 bg-gray-50 rounded-lg border hover:bg-gray-100 cursor-pointer">
-                        <input type="checkbox" name="adm_edu_est_universitario" value="1" class="rounded mr-2">
-                        <span class="text-sm text-gray-800">Estudiante universitario</span>
-                    </label>
-                    <label class="flex items-center p-2 bg-gray-50 rounded-lg border hover:bg-gray-100 cursor-pointer">
-                        <input type="checkbox" name="adm_edu_est_tecnico" value="1" class="rounded mr-2">
-                        <span class="text-sm text-gray-800">Estudiante de carrera técnica</span>
-                    </label>
-                    <div class="flex items-center p-2 bg-gray-50 rounded-lg border md:col-span-2">
-                        <input type="checkbox" name="adm_edu_otro_flag" value="1" class="rounded mr-2">
-                        <span class="text-sm text-gray-800 mr-2">Otro:</span>
-                        <input type="text" name="adm_edu_otro"
-                            class="flex-1 text-sm border-0 bg-transparent focus:ring-0"
-                            placeholder="Especifique">
-                    </div>
-                </div>
-            </div>
-
             {{-- FORMACIÓN / CURSOS --}}
             <div>
                 <h3 class="text-sm font-semibold text-gray-700 mb-3">Formación / Cursos</h3>
@@ -60,32 +30,8 @@
                         <input type="checkbox" name="adm_curso_otros_flag" value="1" class="rounded mr-2">
                         <span class="text-sm text-gray-800 mr-2">Otros cursos / especializaciones:</span>
                         <input type="text" name="adm_curso_otros"
-                            class="flex-1 text-sm border-0 bg-transparent focus:ring-0"
-                            placeholder="Especifique">
+                            class="flex-1 text-sm border-0 bg-transparent focus:ring-0" placeholder="Especifique">
                     </div>
-                </div>
-            </div>
-
-            {{-- EXPERIENCIA --}}
-            <div>
-                <h3 class="text-sm font-semibold text-gray-700 mb-3">Experiencia en el puesto / área</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-                    <label class="flex items-center p-2 bg-gray-50 rounded-lg border hover:bg-gray-100 cursor-pointer">
-                        <input type="radio" name="adm_exp_rango" value="<6m" class="mr-2">
-                        <span class="text-sm text-gray-800">Menos de 6 meses</span>
-                    </label>
-                    <label class="flex items-center p-2 bg-gray-50 rounded-lg border hover:bg-gray-100 cursor-pointer">
-                        <input type="radio" name="adm_exp_rango" value="1a" class="mr-2">
-                        <span class="text-sm text-gray-800">Alrededor de 1 año</span>
-                    </label>
-                    <label class="flex items-center p-2 bg-gray-50 rounded-lg border hover:bg-gray-100 cursor-pointer">
-                        <input type="radio" name="adm_exp_rango" value="2-3a" class="mr-2">
-                        <span class="text-sm text-gray-800">Entre 2 y 3 años</span>
-                    </label>
-                    <label class="flex items-center p-2 bg-gray-50 rounded-lg border hover:bg-gray-100 cursor-pointer">
-                        <input type="radio" name="adm_exp_rango" value="4+a" class="mr-2">
-                        <span class="text-sm text-gray-800">Más de 4 años</span>
-                    </label>
                 </div>
             </div>
 

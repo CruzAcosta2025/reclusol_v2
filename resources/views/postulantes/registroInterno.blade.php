@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="min-h-screen gradient-bg py-8 pt-24">
-    
+    <div class="min-h-screen gradient-bg py-8 pt-24">
+
         {{-- Botón volver --}}
         <a href="{{ route('dashboard') }}"
             class="absolute top-6 left-6 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold rounded-xl shadow-lg transition-colors flex items-center space-x-3 px-6 py-3 text-lg z-10 group">
@@ -32,13 +32,13 @@
         </div>
 
         @if ($errors->any())
-        <div class="bg-red-100 text-red-800 p-4 rounded mb-6">
-            <ul class="list-disc pl-5">
-                @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
+            <div class="bg-red-100 text-red-800 p-4 rounded mb-6">
+                <ul class="list-disc pl-5">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
         @endif
 
         <form method="POST" action="{{ route('postulantes.storeInterno') }}" enctype="multipart/form-data"
@@ -138,7 +138,7 @@
                                 class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300">
                                 <option value="">Selecciona un departamento</option>
                                 @foreach ($departamentos as $codigo => $descripcion)
-                                <option value="{{ $codigo }}">{{ $descripcion }}</option>
+                                    <option value="{{ $codigo }}">{{ $descripcion }}</option>
                                 @endforeach
                             </select>
                             <span class="error-message text-red-500 text-sm hidden"></span>
@@ -239,6 +239,7 @@
 
                     <div class="grid md:grid-cols-2 gap-6">
 
+                        {{--
                         <div class="space-y-2">
                             <label for="tipo_cargo" class="block text-sm font-semibold text-gray-700">
                                 <i class="fas fa-briefcase mr-2 text-green-500"></i>
@@ -263,6 +264,26 @@
                             <select id="cargo" name="cargo"
                                 class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300">
                                 <option value="">Selecciona el cargo</option>
+                            </select>
+                            <span class="error-message text-red-500 text-sm hidden"></span>
+                        </div>
+                        --}}
+
+                        {{-- Vacante / Requerimiento --}}
+                        <div class="space-y-2 md:col-span-2">
+                            <label for="requerimiento_id" class="block text-sm font-semibold text-gray-700">
+                                <i class="fas fa-bullseye mr-2 text-green-500"></i>
+                                Vacante / Requerimiento al que postula
+                            </label>
+                            <select id="requerimiento_id" name="requerimiento_id"
+                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300">
+                                <option value="">Selecciona una vacante</option>
+
+                                @foreach ($requerimientos as $req)
+                                    <option value="{{ $req->id }}">
+                                        {{ $req->label }}
+                                    </option>
+                                @endforeach
                             </select>
                             <span class="error-message text-red-500 text-sm hidden"></span>
                         </div>
@@ -337,8 +358,7 @@
 
                         <!-- Licencia de conducir -->
                         <div class="space-y-2">
-                            <label for="licencia_conducir"
-                                class="block text-xs sm:text-sm font-semibold text-gray-700">
+                            <label for="licencia_conducir" class="block text-xs sm:text-sm font-semibold text-gray-700">
                                 <i class="fas fa-id-card-alt mr-2 text-green-500"></i>
                                 Licencia de conducir A1 *
                             </label>
@@ -491,9 +511,9 @@
             };
 
             // Valores iniciales (edición / old())
-            const initialDep = @json(old('departamento', isset($postulante) ? $postulante -> departamento : null));
-            const initialProv = @json(old('provincia', isset($postulante) ? $postulante -> provincia : null));
-            const initialDist = @json(old('distrito', isset($postulante) ? $postulante -> distrito : null));
+            const initialDep = @json(old('departamento', isset($postulante) ? $postulante->departamento : null));
+            const initialProv = @json(old('provincia', isset($postulante) ? $postulante->provincia : null));
+            const initialDist = @json(old('distrito', isset($postulante) ? $postulante->distrito : null));
 
             // Helper: poblar select con items [{codeField, descField}, ...]
             function populate(selectEl, items, valueKey, textKey, selectedValue = null, emptyLabel =
@@ -630,8 +650,8 @@
             const cargoSelect = document.getElementById('cargo');
             const cache = new Map();
 
-            const initialTipo = @json(old('tipo_cargo', isset($postulante) ? $postulante -> tipo_cargo : null));
-            const initialCargo = @json(old('cargo', isset($postulante) ? $postulante -> cargo : null));
+            const initialTipo = @json(old('tipo_cargo', isset($postulante) ? $postulante->tipo_cargo : null));
+            const initialCargo = @json(old('cargo', isset($postulante) ? $postulante->cargo : null));
 
             // === NUEVO: IDs de campos que solo van para Operativo ===
             const opIds = ['sucamec', 'carne_sucamec', 'licencia_arma', 'licencia_conducir'];
@@ -926,4 +946,4 @@
         }
     </style>
 
-    @endsection
+@endsection

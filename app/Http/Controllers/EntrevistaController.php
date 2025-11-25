@@ -93,14 +93,17 @@ class EntrevistaController extends Controller
         $tipoCargos    = TipoCargo::forSelect();
         $cargos        = Cargo::forSelect();
         $departamentos = Departamento::forSelect();
+        $distritos = Distrito::forSelect();
 
         $tipo  = str_pad((string)$postulante->tipo_cargo,   2, '0', STR_PAD_LEFT);
         $cargo = str_pad((string)$postulante->cargo,        4, '0', STR_PAD_LEFT);
         $depa  = str_pad((string)$postulante->departamento, 2, '0', STR_PAD_LEFT);
+        $disti = str_pad((string)$postulante->distrito, 6, '0', STR_PAD_LEFT);
 
         $postulante->tipo_cargo_nombre   = $tipoCargos->get($tipo) ?? $postulante->tipo_cargo;
         $postulante->cargo_nombre        = $cargos->get($cargo) ?? $postulante->cargo;
         $postulante->departamento_nombre = $departamentos->get($depa) ?? $postulante->departamento;
+        $postulante->distrito_nombre = $distritos->get($disti) ?? $postulante->distrito;
 
         // Determinar si es operativo o administrativo (para luego incluir el parcial adecuado)
         $esOperativo = $postulante->tipo_personal_codigo === '01'
@@ -158,6 +161,8 @@ class EntrevistaController extends Controller
         return Storage::disk('postulantes')->download($rel, basename($rel));
     }
 
+
+    /*
     public function guardarEvaluacion(Request $request, Postulante $postulante)
     {
         $esBorrador = $request->boolean('borrador');
@@ -259,6 +264,101 @@ class EntrevistaController extends Controller
         }
 
         // Respuesta normal (submit final)
+        return redirect()
+            ->route('entrevistas.index')
+            ->with('success', 'Evaluación registrada correctamente.');
+    }
+    */
+
+    public function guardarEvaluacion(Request $request, Postulante $postulante)
+    {
+        $esBorrador = $request->boolean('borrador');
+
+        // Reglas base
+        $rules = [
+            // Formación / cursos (checkboxes → array)
+            'formacion'       => ['nullable', 'array'],
+            'formacion.*'     => ['string', 'max:50'],
+
+            'otros_cursos'    => ['nullable', 'string', 'max:255'],
+
+            // Textareas del formato
+            'fortalezas'      => ['nullable', 'string'],
+            'oportunidades'   => ['nullable', 'string'],
+
+            // Comentarios generales de la evaluación
+            'comentarios_evaluacion' => ['nullable', 'string'],
+
+            // Preguntas adicionales (las de tu bloque final)
+            'experiencia_previa'        => ['nullable', Rule::in(['si', 'no'])],
+            'disponibilidad_inmediata'  => ['nullable', Rule::in(['si', 'no'])],
+            'horarios_rotativos'        => ['nullable', Rule::in(['si', 'no'])],
+            'disponibilidad_viajes'     => ['nullable', Rule::in(['si', 'no'])],
+            'herramientas_tecnologicas' => ['nullable', Rule::in(['si', 'no'])],
+            'referencias_laborales'     => ['nullable', Rule::in(['si', 'no'])],
+        ];
+
+        // Apto para el puesto (radio)
+        $rules['apto_puesto'] = $esBorrador
+            ? ['nullable', Rule::in(['si', 'no', 'otro_puesto'])]
+            : ['required', Rule::in(['si', 'no', 'otro_puesto'])];
+
+        $rules['otro_puesto_especifico'] = ['nullable', 'string', 'max:150'];
+
+        $data = $request->validate($rules);
+
+        // ------------ ARMANDO LOS CAMPOS PARA LA BD ------------
+
+        // Formación: guardamos como array (Eloquent lo serializa a JSON)
+        $formacion = $data['formacion'] ?? [];
+
+        // Competencias y preguntas adicionales juntas en un JSON
+        $competencias = [
+            'experiencia_previa'        => $data['experiencia_previa']        ?? null,
+            'disponibilidad_inmediata'  => $data['disponibilidad_inmediata']  ?? null,
+            'horarios_rotativos'        => $data['horarios_rotativos']        ?? null,
+            'disponibilidad_viajes'     => $data['disponibilidad_viajes']     ?? null,
+            'herramientas_tecnologicas' => $data['herramientas_tecnologicas'] ?? null,
+            'referencias_laborales'     => $data['referencias_laborales']     ?? null,
+        ];
+
+        // es_apto: guardamos el mismo valor del radio (si / no / otro_puesto)
+        $esApto = $data['apto_puesto'] ?? null;
+
+        // ------------ CREAR / ACTUALIZAR ENTREVISTA ------------
+
+        $entrevista = Entrevista::updateOrCreate(
+            [
+                'postulante_id'   => $postulante->id,
+                'requerimiento_id' => $request->input('requerimiento_id'), // si aún no lo usas, puede ir null
+            ],
+            [
+                'entrevistador_id' => Auth::id(),
+                'fecha_entrevista' => now(),
+
+                'formacion'     => $formacion,
+                'otros_cursos'  => $data['otros_cursos'] ?? null,
+                'competencias'  => $competencias,
+                'fortalezas'    => $data['fortalezas'] ?? null,
+                'oportunidades' => $data['oportunidades'] ?? null,
+
+                'es_apto'       => $esApto,
+                'otro_puesto'   => $data['otro_puesto_especifico'] ?? null,
+                'comentario'    => $data['comentarios_evaluacion'] ?? null,
+            ]
+        );
+
+        // ------------ RESPUESTA SEGÚN SI ES BORRADOR O FINAL ------------
+
+        if ($esBorrador) {
+            // Para tu fetch() en "Guardar Borrador"
+            return response()->json([
+                'success'       => true,
+                'entrevista_id' => $entrevista->id,
+            ]);
+        }
+
+        // Submit normal del formulario (Finalizar Evaluación)
         return redirect()
             ->route('entrevistas.index')
             ->with('success', 'Evaluación registrada correctamente.');

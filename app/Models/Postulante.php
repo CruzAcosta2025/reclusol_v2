@@ -50,7 +50,8 @@ class Postulante extends Model
         'created_by',
         'estado',
         'decision',
-        'comentario'
+        'comentario',
+        'requerimiento_id'
     ];
 
     protected $casts = [
@@ -67,5 +68,10 @@ class Postulante extends Model
     public function entrevistas()
     {
         return $this->hasMany(Entrevista::class);
+    }
+
+    public function requerimiento()
+    {
+        return $this->belongsTo(Requerimiento::class);
     }
 }

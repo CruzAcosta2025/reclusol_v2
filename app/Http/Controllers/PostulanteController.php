@@ -9,6 +9,9 @@ use App\Models\Distrito;
 use App\Models\TipoCargo;
 use App\Models\TipoPersonal;
 use App\Models\Cargo;
+use App\Models\Cliente;
+use App\Models\Sucursal;
+use App\Models\Requerimiento;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Request;
@@ -139,6 +142,97 @@ class PostulanteController extends Controller
 
     public function storeExterno(Request $request)
     {
+        // 0) Buscar el requerimiento seleccionado
+        $requerimiento = Requerimiento::findOrFail($request->input('requerimiento_id'));
+
+        // 1) Inferir si es OPERATIVO según el requerimiento
+        $esOperativo = $requerimiento->tipo_personal_codigo === '01'
+            || strtoupper($requerimiento->tipo_personal) === 'OPERATIVO';
+
+        // 2) Validación
+        $validated = $request->validate([
+            'fecha_postula'      => ['required', 'date'],
+            'dni'                => ['required', 'string', 'size:8', 'unique:postulantes,dni'],
+            'nombres'            => ['required', 'string', 'max:50'],
+            'apellidos'          => ['required', 'string', 'max:50'],
+            'fecha_nacimiento'   => ['required', 'date'],
+            'edad'               => ['required', 'integer', 'min:18', 'max:120'],
+            'departamento'       => ['required', 'string', 'max:50'],
+            'provincia'          => ['required', 'string', 'max:50'],
+            'distrito'           => ['required', 'string', 'max:50'],
+            'nacionalidad'       => ['required', 'string', 'max:50'],
+            'grado_instruccion'  => ['required', 'string', 'max:50'],
+            'celular'            => ['required', 'digits:9'],
+            'celular_referencia' => ['nullable', 'digits:9'],
+
+            // 👇 nuevo: el requerimiento es obligatorio
+            'requerimiento_id'   => ['required', 'exists:requerimientos,id'],
+
+            // ya NO confiamos en lo que venga del formulario para tipo_cargo/cargo
+            // 'tipo_cargo'       => ['required', 'string', 'max:50'],
+            // 'cargo'            => ['required', 'exists:cargos,CODI_CARG'],
+
+            'experiencia_rubro'  => ['required', 'string', 'max:50'],
+
+            // === Solo obligatorios si $esOperativo ===
+            'sucamec'           => [Rule::requiredIf($esOperativo), 'nullable', 'in:SI,NO'],
+            'carne_sucamec'     => [Rule::requiredIf($esOperativo), 'nullable', 'in:SI,NO'],
+            'licencia_arma'     => [Rule::requiredIf($esOperativo), 'nullable', 'string', 'max:10'],
+            'licencia_conducir' => [Rule::requiredIf($esOperativo), 'nullable', 'string', 'max:10'],
+
+            // Archivos
+            'cv'  => ['required', 'file', 'mimes:pdf', 'max:5120'],
+            'cul' => ['required', 'file', 'mimes:pdf', 'max:5120'],
+        ], [
+            'required' => 'El campo :attribute es obligatorio.',
+            'exists'   => 'El valor seleccionado en :attribute no es válido.',
+            'in'       => 'Selecciona una opción válida en :attribute.',
+            'mimes'    => 'El archivo :attribute debe ser PDF.',
+        ], [
+            'carne_sucamec'     => 'carné SUCAMEC vigente',
+            'sucamec'           => 'curso SUCAMEC vigente',
+            'licencia_arma'     => 'licencia de arma',
+            'licencia_conducir' => 'licencia de conducir',
+            'experiencia_rubro' => 'experiencia en el rubro',
+            'requerimiento_id'  => 'vacante / requerimiento',
+            'cv'                => 'Currículum (PDF)',
+            'cul'               => 'Certificado Único Laboral (PDF)',
+        ]);
+
+        // 3) Si NO es operativo, limpiar campos
+        if (!$esOperativo) {
+            $validated['sucamec']           = null;
+            $validated['carne_sucamec']     = null;
+            $validated['licencia_arma']     = null;
+            $validated['licencia_conducir'] = null;
+        }
+
+        // 4) Subida de archivos
+        $dni  = $validated['dni'];
+        $disk = config('filesystems.default', 'local');
+        $dir  = "postulantes/{$dni}";
+        $validated['cv']  = $request->file('cv')->store($dir, $disk);
+        $validated['cul'] = $request->file('cul')->store($dir, $disk);
+
+        // 5) Copiar datos del requerimiento al postulante
+        $validated['requerimiento_id']     = $requerimiento->id;
+        $validated['tipo_cargo']           = $requerimiento->tipo_cargo;
+        $validated['cargo']                = $requerimiento->cargo;
+        $validated['tipo_personal_codigo'] = $requerimiento->tipo_personal_codigo;
+        $validated['tipo_personal']        = $requerimiento->tipo_personal;
+
+        $validated['origin']     = 'externo';
+        $validated['created_by'] = auth()->id();
+
+        DB::transaction(fn() => \App\Models\Postulante::create($validated));
+
+        return back()->with('success', 'Información guardada');
+    }
+
+
+    /*
+    public function storeExterno(Request $request)
+    {
         // 1) Inferir si el cargo es OPERATIVO ('01') con una sola consulta
         $esOperativo = (string) Cargo::where('CODI_CARG', $request->input('cargo'))
             ->value('CARGO_TIPO') === '01';
@@ -212,7 +306,7 @@ class PostulanteController extends Controller
 
         return back()->with('success', 'Información guardada');
     }
-
+    */
 
 
     /* ---------- FUNCION PARA GUARDAR UN REGISTRO INTERNO
@@ -324,6 +418,7 @@ class PostulanteController extends Controller
 
 
     /* ---------- GUARDAR POSTULANTE INTERNO ---------- */
+    /*
     public function storeInterno(Request $request)
     {
         // 0) Fuente de verdad: el cargo y su tipo desde BD
@@ -420,7 +515,96 @@ class PostulanteController extends Controller
         Log::info('Postulante guardado (interno)', ['dni' => $dni, 'tipo' => $tipoCodigo]);
         return back()->with('success', 'Información guardada');
     }
+    */
 
+    public function storeInterno(Request $request)
+    {
+        // 0) Buscar el requerimiento seleccionado
+        $requerimiento = Requerimiento::findOrFail($request->input('requerimiento_id'));
+
+        // 1) Inferir si es OPERATIVO según el requerimiento
+        $esOperativo = $requerimiento->tipo_personal_codigo === '01'
+            || strtoupper($requerimiento->tipo_personal) === 'OPERATIVO';
+
+        // 2) Validación
+        $validated = $request->validate([
+            'fecha_postula'      => ['required', 'date'],
+            'dni'                => ['required', 'string', 'size:8', 'unique:postulantes,dni'],
+            'nombres'            => ['required', 'string', 'max:50'],
+            'apellidos'          => ['required', 'string', 'max:50'],
+            'fecha_nacimiento'   => ['required', 'date'],
+            'edad'               => ['required', 'integer', 'min:18', 'max:120'],
+            'departamento'       => ['required', 'string', 'max:50'],
+            'provincia'          => ['required', 'string', 'max:50'],
+            'distrito'           => ['required', 'string', 'max:50'],
+            'nacionalidad'       => ['required', 'string', 'max:50'],
+            'grado_instruccion'  => ['required', 'string', 'max:50'],
+            'celular'            => ['required', 'digits:9'],
+            'celular_referencia' => ['nullable', 'digits:9'],
+
+            // 👇 nuevo: el requerimiento es obligatorio
+            'requerimiento_id'   => ['required', 'exists:requerimientos,id'],
+
+            // ya NO confiamos en lo que venga del formulario para tipo_cargo/cargo
+            // 'tipo_cargo'       => ['required', 'string', 'max:50'],
+            // 'cargo'            => ['required', 'exists:cargos,CODI_CARG'],
+
+            'experiencia_rubro'  => ['required', 'string', 'max:50'],
+
+            // === Solo obligatorios si $esOperativo ===
+            'sucamec'           => [Rule::requiredIf($esOperativo), 'nullable', 'in:SI,NO'],
+            'carne_sucamec'     => [Rule::requiredIf($esOperativo), 'nullable', 'in:SI,NO'],
+            'licencia_arma'     => [Rule::requiredIf($esOperativo), 'nullable', 'string', 'max:10'],
+            'licencia_conducir' => [Rule::requiredIf($esOperativo), 'nullable', 'string', 'max:10'],
+
+            // Archivos
+            'cv'  => ['required', 'file', 'mimes:pdf', 'max:5120'],
+            'cul' => ['required', 'file', 'mimes:pdf', 'max:5120'],
+        ], [
+            'required' => 'El campo :attribute es obligatorio.',
+            'exists'   => 'El valor seleccionado en :attribute no es válido.',
+            'in'       => 'Selecciona una opción válida en :attribute.',
+            'mimes'    => 'El archivo :attribute debe ser PDF.',
+        ], [
+            'carne_sucamec'     => 'carné SUCAMEC vigente',
+            'sucamec'           => 'curso SUCAMEC vigente',
+            'licencia_arma'     => 'licencia de arma',
+            'licencia_conducir' => 'licencia de conducir',
+            'experiencia_rubro' => 'experiencia en el rubro',
+            'requerimiento_id'  => 'vacante / requerimiento',
+            'cv'                => 'Currículum (PDF)',
+            'cul'               => 'Certificado Único Laboral (PDF)',
+        ]);
+
+        // 3) Si NO es operativo, limpiar campos
+        if (!$esOperativo) {
+            $validated['sucamec']           = null;
+            $validated['carne_sucamec']     = null;
+            $validated['licencia_arma']     = null;
+            $validated['licencia_conducir'] = null;
+        }
+
+        // 4) Subida de archivos
+        $dni  = $validated['dni'];
+        $disk = config('filesystems.default', 'local');
+        $dir  = "postulantes/{$dni}";
+        $validated['cv']  = $request->file('cv')->store($dir, $disk);
+        $validated['cul'] = $request->file('cul')->store($dir, $disk);
+
+        // 5) Copiar datos del requerimiento al postulante
+        $validated['requerimiento_id']     = $requerimiento->id;
+        $validated['tipo_cargo']           = $requerimiento->tipo_cargo;
+        $validated['cargo']                = $requerimiento->cargo;
+        $validated['tipo_personal_codigo'] = $requerimiento->tipo_personal_codigo;
+        $validated['tipo_personal']        = $requerimiento->tipo_personal;
+
+        $validated['origin']     = 'interno';
+        $validated['created_by'] = auth()->id();
+
+        DB::transaction(fn() => \App\Models\Postulante::create($validated));
+
+        return back()->with('success', 'Información guardada');
+    }
 
 
     /* ---------- FUNCION PARA VERIFICAR SI UN POSTULANTE ESTUVO O NO
@@ -697,13 +881,16 @@ class PostulanteController extends Controller
         // Usar forSelect() cuando el modelo lo provee
         $departamentos = Departamento::forSelect();   // [DEPA_CODIGO => DEPA_DESCRIPCION]
         $tipoCargos    = TipoCargo::forSelect();      // [CODI_TIPO_CARG => DESC_TIPO_CARG]
-
         // Inicialmente dejamos cargos vacío (se llenará por AJAX según tipo seleccionado)
         $cargos = collect();
-
         // Provincias / distritos: si no vas a precargar, déjalos vacíos y los pides por AJAX
         $provincias = collect();
         $distritos  = collect();
+
+        $requerimientos = Requerimiento::where('estado', 1)
+            // ->where('origen', 'EXTERNO') // si tienes esa columna
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return view('postulantes.registroExterno', compact(
             'departamentos',
@@ -711,6 +898,7 @@ class PostulanteController extends Controller
             'distritos',
             'cargos',
             'tipoCargos',
+            'requerimientos'
             //'nivelEducativo',
             //'estadoCivil'
         ));
@@ -718,29 +906,60 @@ class PostulanteController extends Controller
 
     public function formInterno()
     {
+        // Catálogos
+        $departamentos = Departamento::forSelect();
+        $tipoCargos    = TipoCargo::forSelect();
+        $cargos        = Cargo::forSelect();        // ['0008' => 'AGENTE...', ...]
+        $sucursales    = Sucursal::forSelect();     // ['01'   => 'CHANCAY', ...]
+        $clientes      = Cliente::forSelectPadded(); // ['00059' => 'COSMOS', ...]
 
-        // Usar forSelect() cuando el modelo lo provee
-        $departamentos = Departamento::forSelect();   // [DEPA_CODIGO => DEPA_DESCRIPCION]
-        $tipoCargos    = TipoCargo::forSelect();      // [CODI_TIPO_CARG => DESC_TIPO_CARG]
-
-        // Inicialmente dejamos cargos vacío (se llenará por AJAX según tipo seleccionado)
-        $cargos = collect();
-
-        // Provincias / distritos: si no vas a precargar, déjalos vacíos y los pides por AJAX
         $provincias = collect();
         $distritos  = collect();
 
+        // Requerimientos activos
+        $requerimientos = Requerimiento::where('estado', 1)
+            ->orderByDesc('created_at')
+            ->get();
+
+        // Decorar cada requerimiento con nombres legibles
+        foreach ($requerimientos as $r) {
+            $codigoCargo    = str_pad((string)$r->cargo_solicitado, 4, '0', STR_PAD_LEFT);
+            $codigoSucursal = str_pad((string)$r->sucursal,        2, '0', STR_PAD_LEFT);
+
+            // en tu tabla requerimientos el campo del cliente se llama "cliente"
+            $codigoCliente  = $r->cliente
+                ? str_pad((string)$r->cliente, 5, '0', STR_PAD_LEFT)
+                : null;
+
+            $r->cargo_nombre    = $cargos->get($codigoCargo)       ?? $r->cargo_solicitado;
+            $r->sucursal_nombre = $sucursales->get($codigoSucursal) ?? $r->sucursal;
+            $r->cliente_codigo  = $codigoCliente;
+            $r->cliente_nombre  = $codigoCliente
+                ? ($clientes->get($codigoCliente) ?? $r->cliente)
+                : null;
+
+            // Texto cliente: "COSMOS (00059)" por ejemplo
+            $clienteTexto = $r->cliente_nombre
+                ? $r->cliente_nombre
+                : '';
+
+            $r->label = trim(
+                $r->cargo_nombre
+                    . ' - ' . $r->sucursal_nombre
+                    . ($clienteTexto ? ' - ' . $clienteTexto : '')
+            );
+        }
 
         return view('postulantes.registroInterno', compact(
             'departamentos',
             'provincias',
             'distritos',
-            'cargos',
             'tipoCargos',
-            //'nivelEducativo',
-            //'estadoCivil'
+            'requerimientos'
         ));
     }
+
+
 
     public function getCargosPorTipo($tipoCodigo)
     {
