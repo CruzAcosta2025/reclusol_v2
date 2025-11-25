@@ -238,7 +238,6 @@
                     </div>
 
                     <div class="grid md:grid-cols-2 gap-6">
-
                         {{--
                         <div class="space-y-2">
                             <label for="tipo_cargo" class="block text-sm font-semibold text-gray-700">
@@ -254,7 +253,6 @@
                             </select>
                             <span class="error-message text-red-500 text-sm hidden"></span>
                         </div>
-
                         <!-- Cargo Especifico solicitado -->
                         <div class="space-y-2">
                             <label for="cargo" class="block text-sm font-semibold text-gray-700">
@@ -273,14 +271,14 @@
                         <div class="space-y-2 md:col-span-2">
                             <label for="requerimiento_id" class="block text-sm font-semibold text-gray-700">
                                 <i class="fas fa-bullseye mr-2 text-green-500"></i>
-                                Vacante / Requerimiento al que postula
+                                Puesto al que postula
                             </label>
                             <select id="requerimiento_id" name="requerimiento_id"
                                 class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300">
                                 <option value="">Selecciona una vacante</option>
-
                                 @foreach ($requerimientos as $req)
-                                    <option value="{{ $req->id }}">
+                                    <option value="{{ $req->id }}"
+                                        data-tipo-personal="{{ $req->tipo_personal ?? $req->tipo_personal_codigo }}">
                                         {{ $req->label }}
                                     </option>
                                 @endforeach
@@ -646,148 +644,61 @@
 
 
         document.addEventListener('DOMContentLoaded', function() {
-            const tipoSelect = document.getElementById('tipo_cargo');
-            const cargoSelect = document.getElementById('cargo');
-            const cache = new Map();
+            const reqSelect = document.getElementById('requerimiento_id');
 
-            const initialTipo = @json(old('tipo_cargo', isset($postulante) ? $postulante->tipo_cargo : null));
-            const initialCargo = @json(old('cargo', isset($postulante) ? $postulante->cargo : null));
+            // Campos que solo aplican a personal operativo
+            const opIds = [
+                //'experiencia_rubro',
+                'sucamec',
+                'carne_sucamec',
+                'licencia_arma',
+                'licencia_conducir',
+            ];
 
-            // === NUEVO: IDs de campos que solo van para Operativo ===
-            const opIds = ['sucamec', 'carne_sucamec', 'licencia_arma', 'licencia_conducir'];
-
-            // === NUEVO: mostrar/ocultar + required/disabled ===
             function setOperativoUI(isOperativo) {
                 opIds.forEach(id => {
                     const el = document.getElementById(id);
                     if (!el) return;
-                    const box = el.closest('.space-y-2') || el.parentElement; // wrapper visual
+
+                    const box = el.closest('.space-y-2') || el.parentElement;
 
                     if (isOperativo) {
-                        box.style.display = '';
+                        // Mostrar y exigir
+                        box.classList.remove('hidden');
                         el.disabled = false;
                         el.setAttribute('required', '');
                     } else {
-                        box.style.display = 'none';
+                        // Ocultar y limpiar
+                        box.classList.add('hidden');
                         el.disabled = true;
                         el.removeAttribute('required');
-                        el.value = ''; // limpia valor para que no “ensucie” el submit
+                        el.value = '';
                     }
                 });
             }
 
-            // === NUEVO: consulta mínima al backend para saber si el cargo es 01/02 ===
-            async function syncUIByCargo(codiCarg) {
-                if (!codiCarg) {
+            function syncByRequerimiento() {
+                const opt = reqSelect?.selectedOptions[0];
+                if (!opt) {
                     setOperativoUI(false);
                     return;
                 }
-                try {
-                    const res = await fetch(`/api/cargo-tipo/${encodeURIComponent(codiCarg)}`, {
-                        headers: {
-                            'Accept': 'application/json'
-                        }
-                    });
-                    if (!res.ok) throw new Error('HTTP ' + res.status);
-                    const data = await res.json();
-                    const isOperativo = String(data.cargo_tipo || '').padStart(2, '0') === '01';
-                    setOperativoUI(isOperativo);
-                } catch (e) {
-                    console.error('Error obteniendo cargo_tipo:', e);
-                    setOperativoUI(false);
-                }
+
+                const tipoRaw = (opt.dataset.tipoPersonal || '').toString().toUpperCase();
+                // Acepta tanto código como texto
+                const isOperativo = ['01', '1', 'OPERATIVO'].includes(tipoRaw);
+                setOperativoUI(isOperativo);
             }
 
-            // === Tu función existente: solo agrego una línea para sincronizar UI ===
-            async function loadCargosForTipo(tipoCodigo, selectedCargo = null) {
-                cargoSelect.innerHTML = '<option value="">Cargando...</option>';
-                cargoSelect.disabled = true;
+            // Estado inicial: oculto hasta elegir vacante
+            setOperativoUI(false);
 
-                if (!tipoCodigo) {
-                    cargoSelect.innerHTML = '<option value="">Selecciona un cargo</option>';
-                    cargoSelect.disabled = false;
-                    setOperativoUI(false); // NUEVO
-                    return;
-                }
+            reqSelect?.addEventListener('change', syncByRequerimiento);
 
-                if (cache.has(tipoCodigo)) {
-                    populateOptions(cache.get(tipoCodigo), selectedCargo);
-                    return;
-                }
-
-                try {
-                    const res = await fetch(`/api/cargos-por-tipo/${encodeURIComponent(tipoCodigo)}`, {
-                        method: 'GET',
-                        headers: {
-                            'Accept': 'application/json'
-                        }
-                    });
-
-                    if (!res.ok) throw new Error('Error en la petición: ' + res.status);
-                    const data = await res.json();
-                    cache.set(tipoCodigo, data);
-                    populateOptions(data, selectedCargo);
-
-                } catch (err) {
-                    console.error('No se pudieron cargar los cargos:', err);
-                    cargoSelect.innerHTML = '<option value="">Error cargando cargos</option>';
-                    cargoSelect.disabled = false;
-                    setOperativoUI(false); // NUEVO
-                }
+            // Si vienes de un "old()" o edición, sincroniza al cargar
+            if (reqSelect && reqSelect.value) {
+                syncByRequerimiento();
             }
-
-            // === Tu función existente: solo agrego syncUIByCargo al final ===
-            function populateOptions(items, selectedCargo = null) {
-                cargoSelect.innerHTML = '<option value="">Selecciona un cargo</option>';
-
-                if (!items || items.length === 0) {
-                    cargoSelect.innerHTML = '<option value="">No hay cargos para este tipo</option>';
-                    cargoSelect.disabled = false;
-                    setOperativoUI(false); // NUEVO
-                    return;
-                }
-
-                items.forEach(item => {
-                    const opt = document.createElement('option');
-                    opt.value = item.CODI_CARG;
-                    opt.textContent = item.DESC_CARGO;
-                    if (selectedCargo && String(selectedCargo) === String(item.CODI_CARG)) {
-                        opt.selected = true;
-                    }
-                    cargoSelect.appendChild(opt);
-                });
-
-                cargoSelect.disabled = false;
-
-                // NUEVO: sincroniza UI con la opción actualmente seleccionada (si existe)
-                syncUIByCargo(cargoSelect.value);
-            }
-
-            // Eventos
-            tipoSelect?.addEventListener('change', function() {
-                loadCargosForTipo(this.value, null);
-            });
-
-            // NUEVO: al cambiar cargo, refresca UI Operativo/Administrativo
-            cargoSelect?.addEventListener('change', function() {
-                syncUIByCargo(this.value);
-            });
-
-            // Init
-            setOperativoUI(false); // NUEVO: arranca oculto hasta elegir cargo
-            (function initOnLoad() {
-                const tipoInicial = initialTipo || tipoSelect?.value || null;
-                const cargoInicial = initialCargo || null;
-                if (tipoInicial) {
-                    if (tipoSelect && tipoSelect.value !== tipoInicial) {
-                        try {
-                            tipoSelect.value = tipoInicial;
-                        } catch (e) {}
-                    }
-                    loadCargosForTipo(tipoInicial, cargoInicial); // populateOptions llamará a syncUIByCargo
-                }
-            })();
-
         });
 
 

@@ -137,9 +137,149 @@ class PostulanteController extends Controller
 
         return back()->with('success', 'Información guardada');
     }
-
     */
 
+
+    public function storeExterno(Request $request)
+    {
+        // 0) Buscar el requerimiento seleccionado
+        $requerimiento = Requerimiento::findOrFail($request->input('requerimiento_id'));
+
+        /* ================= DETECCIÓN TIPO PERSONAL + LOG ================= */
+
+        $rawCodigo = trim((string) $requerimiento->tipo_personal_codigo); // puede venir NULL o vacío
+        $rawTexto  = strtoupper(trim((string) $requerimiento->tipo_personal)); // puede venir "01", "OPERATIVO 4º", etc.
+
+        // Si en tipo_personal guardas "01" o "OPERATIVO 4º", saco solo dígitos
+        $codigoDesdeTexto = preg_replace('/\D+/', '', $rawTexto); // "OPERATIVO 4º" => "4", "01" => "01"
+        if ($codigoDesdeTexto === '') {
+            $codigoDesdeTexto = null;
+        }
+
+        // Prioridad: primero tipo_personal_codigo, si está vacío uso lo que saqué del texto
+        $codigoBase = $rawCodigo !== '' ? $rawCodigo : $codigoDesdeTexto;
+        $codigoBase = $codigoBase !== null ? $codigoBase : '00';
+
+        // Normalizo a 2 dígitos
+        $tipoCodigo = str_pad($codigoBase, 2, '0', STR_PAD_LEFT);
+
+        // En tu tabla ADMI_TIPO_PERSONAL:
+        // 01 OPERATIVO 4º
+        // 03 OPERATIVO 5º
+        // 02,05,06 no son operativos
+        $esOperativo = in_array($tipoCodigo, ['01', '03'], true);
+
+        Log::info('POSTULANTE storeExterno - detección tipo personal', [
+            'req_id'                   => $requerimiento->id,
+            'raw_tipo_personal_codigo' => $rawCodigo,
+            'raw_tipo_personal'        => $rawTexto,
+            'codigoDesdeTexto'         => $codigoDesdeTexto,
+            'tipoCodigo_final'         => $tipoCodigo,
+            'esOperativo'              => $esOperativo,
+            'request_sucamec'          => $request->input('sucamec'),
+            'request_carne_sucamec'    => $request->input('carne_sucamec'),
+            'request_licencia_arma'    => $request->input('licencia_arma'),
+            'request_licencia_conducir' => $request->input('licencia_conducir'),
+        ]);
+
+        /* ================= VALIDACIÓN ================= */
+
+        $validated = $request->validate([
+            'fecha_postula'      => ['required', 'date'],
+            'dni'                => ['required', 'string', 'size:8', 'unique:postulantes,dni'],
+            'nombres'            => ['required', 'string', 'max:50'],
+            'apellidos'          => ['required', 'string', 'max:50'],
+            'fecha_nacimiento'   => ['required', 'date'],
+            'edad'               => ['required', 'integer', 'min:18', 'max:120'],
+            'departamento'       => ['required', 'string', 'max:50'],
+            'provincia'          => ['required', 'string', 'max:50'],
+            'distrito'           => ['required', 'string', 'max:50'],
+            'nacionalidad'       => ['required', 'string', 'max:50'],
+            'grado_instruccion'  => ['required', 'string', 'max:50'],
+            'celular'            => ['required', 'digits:9'],
+            'celular_referencia' => ['nullable', 'digits:9'],
+
+            'requerimiento_id'   => ['required', 'exists:requerimientos,id'],
+
+            'experiencia_rubro'  => ['required', 'string', 'max:50'],
+
+            // SOLO obligatorios si es operativo
+            'sucamec'           => [$esOperativo ? 'required' : 'nullable', 'in:SI,NO'],
+            'carne_sucamec'     => [$esOperativo ? 'required' : 'nullable', 'in:SI,NO'],
+            'licencia_arma'     => [$esOperativo ? 'required' : 'nullable', 'string', 'max:10'],
+            'licencia_conducir' => [$esOperativo ? 'required' : 'nullable', 'string', 'max:10'],
+
+            // Archivos
+            'cv'  => ['required', 'file', 'mimes:pdf', 'max:5120'],
+            'cul' => ['required', 'file', 'mimes:pdf', 'max:5120'],
+        ], [
+            'required' => 'El campo :attribute es obligatorio.',
+            'exists'   => 'El valor seleccionado en :attribute no es válido.',
+            'in'       => 'Selecciona una opción válida en :attribute.',
+            'mimes'    => 'El archivo :attribute debe ser PDF.',
+        ], [
+            'carne_sucamec'     => 'carné SUCAMEC vigente',
+            'sucamec'           => 'curso SUCAMEC vigente',
+            'licencia_arma'     => 'licencia de arma',
+            'licencia_conducir' => 'licencia de conducir',
+            'experiencia_rubro' => 'experiencia en el rubro',
+            'requerimiento_id'  => 'vacante / requerimiento',
+            'cv'                => 'Currículum (PDF)',
+            'cul'               => 'Certificado Único Laboral (PDF)',
+        ]);
+
+        /* ================= NORMALIZAR CAMPOS OPERATIVOS ================= */
+
+        if ($esOperativo) {
+            // Me aseguro de que SIEMPRE se seteen estos 4 campos
+            $validated['sucamec']           = $request->input('sucamec');
+            $validated['carne_sucamec']     = $request->input('carne_sucamec');
+            $validated['licencia_arma']     = $request->input('licencia_arma');
+            $validated['licencia_conducir'] = $request->input('licencia_conducir');
+        } else {
+            $validated['sucamec']           = null;
+            $validated['carne_sucamec']     = null;
+            $validated['licencia_arma']     = null;
+            $validated['licencia_conducir'] = null;
+        }
+
+        /* ================= ARCHIVOS ================= */
+
+        $dni  = $validated['dni'];
+        $disk = config('filesystems.default', 'local');
+        $dir  = "postulantes/{$dni}";
+        $validated['cv']  = $request->file('cv')->store($dir, $disk);
+        $validated['cul'] = $request->file('cul')->store($dir, $disk);
+
+        /* ================= COPIAR DATOS DEL REQUERIMIENTO ================= */
+
+        $validated['requerimiento_id']     = $requerimiento->id;
+        $validated['tipo_cargo']           = $requerimiento->tipo_cargo;
+        $validated['cargo']                = $requerimiento->cargo;
+        $validated['tipo_personal_codigo'] = $tipoCodigo;            // ya corregido
+        $validated['tipo_personal']        = $requerimiento->tipo_personal;
+
+        $validated['origin']     = 'externo';
+        $validated['created_by'] = auth()->id();
+
+        Log::info('POSTULANTE storeExterno - datos finales validados', [
+            'dni'                 => $validated['dni'],
+            'esOperativo'         => $esOperativo,
+            'tipo_personal_codigo' => $validated['tipo_personal_codigo'],
+            'tipo_personal'       => $validated['tipo_personal'],
+            'sucamec'             => $validated['sucamec'],
+            'carne_sucamec'       => $validated['carne_sucamec'],
+            'licencia_arma'       => $validated['licencia_arma'],
+            'licencia_conducir'   => $validated['licencia_conducir'],
+        ]);
+
+        DB::transaction(fn() =>Postulante::create($validated));
+
+        return back()->with('success', 'Información guardada');
+    }
+
+
+    /*
     public function storeExterno(Request $request)
     {
         // 0) Buscar el requerimiento seleccionado
@@ -228,6 +368,7 @@ class PostulanteController extends Controller
 
         return back()->with('success', 'Información guardada');
     }
+    */
 
 
     /*
@@ -307,7 +448,6 @@ class PostulanteController extends Controller
         return back()->with('success', 'Información guardada');
     }
     */
-
 
     /* ---------- FUNCION PARA GUARDAR UN REGISTRO INTERNO
     POR EL USUARIO DEL SISTEMA ---------- 
@@ -415,8 +555,6 @@ class PostulanteController extends Controller
     }
     */
 
-
-
     /* ---------- GUARDAR POSTULANTE INTERNO ---------- */
     /*
     public function storeInterno(Request $request)
@@ -522,6 +660,145 @@ class PostulanteController extends Controller
         // 0) Buscar el requerimiento seleccionado
         $requerimiento = Requerimiento::findOrFail($request->input('requerimiento_id'));
 
+        /* ================= DETECCIÓN TIPO PERSONAL + LOG ================= */
+
+        $rawCodigo = trim((string) $requerimiento->tipo_personal_codigo); // puede venir NULL o vacío
+        $rawTexto  = strtoupper(trim((string) $requerimiento->tipo_personal)); // puede venir "01", "OPERATIVO 4º", etc.
+
+        // Si en tipo_personal guardas "01" o "OPERATIVO 4º", saco solo dígitos
+        $codigoDesdeTexto = preg_replace('/\D+/', '', $rawTexto); // "OPERATIVO 4º" => "4", "01" => "01"
+        if ($codigoDesdeTexto === '') {
+            $codigoDesdeTexto = null;
+        }
+
+        // Prioridad: primero tipo_personal_codigo, si está vacío uso lo que saqué del texto
+        $codigoBase = $rawCodigo !== '' ? $rawCodigo : $codigoDesdeTexto;
+        $codigoBase = $codigoBase !== null ? $codigoBase : '00';
+
+        // Normalizo a 2 dígitos
+        $tipoCodigo = str_pad($codigoBase, 2, '0', STR_PAD_LEFT);
+
+        // En tu tabla ADMI_TIPO_PERSONAL:
+        // 01 OPERATIVO 4º
+        // 03 OPERATIVO 5º
+        // 02,05,06 no son operativos
+        $esOperativo = in_array($tipoCodigo, ['01', '03'], true);
+
+        Log::info('POSTULANTE storeExterno - detección tipo personal', [
+            'req_id'                   => $requerimiento->id,
+            'raw_tipo_personal_codigo' => $rawCodigo,
+            'raw_tipo_personal'        => $rawTexto,
+            'codigoDesdeTexto'         => $codigoDesdeTexto,
+            'tipoCodigo_final'         => $tipoCodigo,
+            'esOperativo'              => $esOperativo,
+            'request_sucamec'          => $request->input('sucamec'),
+            'request_carne_sucamec'    => $request->input('carne_sucamec'),
+            'request_licencia_arma'    => $request->input('licencia_arma'),
+            'request_licencia_conducir' => $request->input('licencia_conducir'),
+        ]);
+
+        /* ================= VALIDACIÓN ================= */
+
+        $validated = $request->validate([
+            'fecha_postula'      => ['required', 'date'],
+            'dni'                => ['required', 'string', 'size:8', 'unique:postulantes,dni'],
+            'nombres'            => ['required', 'string', 'max:50'],
+            'apellidos'          => ['required', 'string', 'max:50'],
+            'fecha_nacimiento'   => ['required', 'date'],
+            'edad'               => ['required', 'integer', 'min:18', 'max:120'],
+            'departamento'       => ['required', 'string', 'max:50'],
+            'provincia'          => ['required', 'string', 'max:50'],
+            'distrito'           => ['required', 'string', 'max:50'],
+            'nacionalidad'       => ['required', 'string', 'max:50'],
+            'grado_instruccion'  => ['required', 'string', 'max:50'],
+            'celular'            => ['required', 'digits:9'],
+            'celular_referencia' => ['nullable', 'digits:9'],
+
+            'requerimiento_id'   => ['required', 'exists:requerimientos,id'],
+
+            'experiencia_rubro'  => ['required', 'string', 'max:50'],
+
+            // SOLO obligatorios si es operativo
+            'sucamec'           => [$esOperativo ? 'required' : 'nullable', 'in:SI,NO'],
+            'carne_sucamec'     => [$esOperativo ? 'required' : 'nullable', 'in:SI,NO'],
+            'licencia_arma'     => [$esOperativo ? 'required' : 'nullable', 'string', 'max:10'],
+            'licencia_conducir' => [$esOperativo ? 'required' : 'nullable', 'string', 'max:10'],
+
+            // Archivos
+            'cv'  => ['required', 'file', 'mimes:pdf', 'max:5120'],
+            'cul' => ['required', 'file', 'mimes:pdf', 'max:5120'],
+        ], [
+            'required' => 'El campo :attribute es obligatorio.',
+            'exists'   => 'El valor seleccionado en :attribute no es válido.',
+            'in'       => 'Selecciona una opción válida en :attribute.',
+            'mimes'    => 'El archivo :attribute debe ser PDF.',
+        ], [
+            'carne_sucamec'     => 'carné SUCAMEC vigente',
+            'sucamec'           => 'curso SUCAMEC vigente',
+            'licencia_arma'     => 'licencia de arma',
+            'licencia_conducir' => 'licencia de conducir',
+            'experiencia_rubro' => 'experiencia en el rubro',
+            'requerimiento_id'  => 'vacante / requerimiento',
+            'cv'                => 'Currículum (PDF)',
+            'cul'               => 'Certificado Único Laboral (PDF)',
+        ]);
+
+        /* ================= NORMALIZAR CAMPOS OPERATIVOS ================= */
+
+        if ($esOperativo) {
+            // Me aseguro de que SIEMPRE se seteen estos 4 campos
+            $validated['sucamec']           = $request->input('sucamec');
+            $validated['carne_sucamec']     = $request->input('carne_sucamec');
+            $validated['licencia_arma']     = $request->input('licencia_arma');
+            $validated['licencia_conducir'] = $request->input('licencia_conducir');
+        } else {
+            $validated['sucamec']           = null;
+            $validated['carne_sucamec']     = null;
+            $validated['licencia_arma']     = null;
+            $validated['licencia_conducir'] = null;
+        }
+
+        /* ================= ARCHIVOS ================= */
+
+        $dni  = $validated['dni'];
+        $disk = config('filesystems.default', 'local');
+        $dir  = "postulantes/{$dni}";
+        $validated['cv']  = $request->file('cv')->store($dir, $disk);
+        $validated['cul'] = $request->file('cul')->store($dir, $disk);
+
+        /* ================= COPIAR DATOS DEL REQUERIMIENTO ================= */
+
+        $validated['requerimiento_id']     = $requerimiento->id;
+        $validated['tipo_cargo']           = $requerimiento->tipo_cargo;
+        $validated['cargo']                = $requerimiento->cargo;
+        $validated['tipo_personal_codigo'] = $tipoCodigo;            // ya corregido
+        $validated['tipo_personal']        = $requerimiento->tipo_personal;
+
+        $validated['origin']     = 'interno';
+        $validated['created_by'] = auth()->id();
+
+        Log::info('POSTULANTE storeExterno - datos finales validados', [
+            'dni'                 => $validated['dni'],
+            'esOperativo'         => $esOperativo,
+            'tipo_personal_codigo' => $validated['tipo_personal_codigo'],
+            'tipo_personal'       => $validated['tipo_personal'],
+            'sucamec'             => $validated['sucamec'],
+            'carne_sucamec'       => $validated['carne_sucamec'],
+            'licencia_arma'       => $validated['licencia_arma'],
+            'licencia_conducir'   => $validated['licencia_conducir'],
+        ]);
+
+        DB::transaction(fn() => Postulante::create($validated));
+
+        return back()->with('success', 'Información guardada');
+    }
+
+    /*
+    public function storeInterno(Request $request)
+    {
+        // 0) Buscar el requerimiento seleccionado
+        $requerimiento = Requerimiento::findOrFail($request->input('requerimiento_id'));
+
         // 1) Inferir si es OPERATIVO según el requerimiento
         $esOperativo = $requerimiento->tipo_personal_codigo === '01'
             || strtoupper($requerimiento->tipo_personal) === 'OPERATIVO';
@@ -605,6 +882,7 @@ class PostulanteController extends Controller
 
         return back()->with('success', 'Información guardada');
     }
+    /*
 
 
     /* ---------- FUNCION PARA VERIFICAR SI UN POSTULANTE ESTUVO O NO
@@ -875,32 +1153,58 @@ class PostulanteController extends Controller
 
 
     /* ---------- FUNCION PARA ABRIR Y MOSTRAR LA VISTA ---------- */
-
     public function formExterno()
     {
-        // Usar forSelect() cuando el modelo lo provee
-        $departamentos = Departamento::forSelect();   // [DEPA_CODIGO => DEPA_DESCRIPCION]
-        $tipoCargos    = TipoCargo::forSelect();      // [CODI_TIPO_CARG => DESC_TIPO_CARG]
-        // Inicialmente dejamos cargos vacío (se llenará por AJAX según tipo seleccionado)
-        $cargos = collect();
-        // Provincias / distritos: si no vas a precargar, déjalos vacíos y los pides por AJAX
+        // Catálogos
+        $departamentos = Departamento::forSelect();
+        $tipoCargos    = TipoCargo::forSelect();
+        $cargos        = Cargo::forSelect();        // ['0008' => 'AGENTE...', ...]
+        $sucursales    = Sucursal::forSelect();     // ['01'   => 'CHANCAY', ...]
+        $clientes      = Cliente::forSelectPadded(); // ['00059' => 'COSMOS', ...]
+
         $provincias = collect();
         $distritos  = collect();
 
+        // Requerimientos activos
         $requerimientos = Requerimiento::where('estado', 1)
-            // ->where('origen', 'EXTERNO') // si tienes esa columna
-            ->orderBy('created_at', 'desc')
+            ->orderByDesc('created_at')
             ->get();
+
+        // Decorar cada requerimiento con nombres legibles
+        foreach ($requerimientos as $r) {
+            $codigoCargo    = str_pad((string)$r->cargo_solicitado, 4, '0', STR_PAD_LEFT);
+            $codigoSucursal = str_pad((string)$r->sucursal,        2, '0', STR_PAD_LEFT);
+
+            // en tu tabla requerimientos el campo del cliente se llama "cliente"
+            $codigoCliente  = $r->cliente
+                ? str_pad((string)$r->cliente, 5, '0', STR_PAD_LEFT)
+                : null;
+
+            $r->cargo_nombre    = $cargos->get($codigoCargo)       ?? $r->cargo_solicitado;
+            $r->sucursal_nombre = $sucursales->get($codigoSucursal) ?? $r->sucursal;
+            $r->cliente_codigo  = $codigoCliente;
+            $r->cliente_nombre  = $codigoCliente
+                ? ($clientes->get($codigoCliente) ?? $r->cliente)
+                : null;
+
+            // Texto cliente: "COSMOS (00059)" por ejemplo
+            $clienteTexto = $r->cliente_nombre
+                ? $r->cliente_nombre
+                : '';
+
+            $r->label = trim(
+                ($clienteTexto ? '' . $clienteTexto : '')
+                    . ' - ' . $r->cargo_nombre
+
+            );
+        }
 
         return view('postulantes.registroExterno', compact(
             'departamentos',
             'provincias',
             'distritos',
-            'cargos',
             'tipoCargos',
             'requerimientos'
-            //'nivelEducativo',
-            //'estadoCivil'
         ));
     }
 
@@ -944,9 +1248,9 @@ class PostulanteController extends Controller
                 : '';
 
             $r->label = trim(
-                $r->cargo_nombre
-                    . ' - ' . $r->sucursal_nombre
-                    . ($clienteTexto ? ' - ' . $clienteTexto : '')
+                ($clienteTexto ? '' . $clienteTexto : '')
+                    . ' - ' . $r->cargo_nombre
+
             );
         }
 
@@ -1219,7 +1523,7 @@ class PostulanteController extends Controller
     /* ---------- FUNCION PARA FILTRAR ---------- */
     public function filtrar(Request $request)
     {
-        $query = Postulante::query();
+        $query = Postulante::with('requerimiento');
 
         // Normalizadores
         $norm = function (?string $val, int $len = null) {
@@ -1285,7 +1589,16 @@ class PostulanteController extends Controller
             ->get(['CODI_CARG', 'DESC_CARGO', 'TIPO_CARG'])
             ->keyBy('CODI_CARG');
 
-        /* === Provincias y Distritos desde SQL Server (tablas reales) === */
+        $sucursales = Sucursal::forSelect();      // ['03' => 'PISCO', ...]
+        $clientes   = Cliente::forSelectPadded();
+
+        $reqIds = $postulantes->pluck('requerimiento_id')->filter()->unique();
+
+        $reqMap = collect();
+        if ($reqIds->isNotEmpty()) {
+            $reqMap = Requerimiento::whereIn('id', $reqIds)->get()->keyBy('id');
+        }
+
         // PROVINCIAS
         $provinciasList = DB::connection('sqlsrv')->table('ADMI_PROVINCIA')
             ->select('PROVI_CODIGO', 'PROVI_DESCRIPCION', 'DEPA_CODIGO')
@@ -1334,13 +1647,13 @@ class PostulanteController extends Controller
             $dist = $normDigits($r->distrito     ?? '', 6);
 
             $r->cargo_nombre        = $cargos->get((string)$r->cargo)->DESC_CARGO ?? $r->cargo;
-
-            // Departamentos: mapa simple [codigo => texto]
             $r->departamento_nombre = $departamentos[$dep] ?? $r->departamento;
-
-            // Provincias/Distritos: catálogos completos (dos índices)
             $r->provincia_nombre    = $label2($provinciasStr, $provinciasNum, $prov, 'PROVI_DESCRIPCION');
             $r->distrito_nombre     = $label2($distritosStr,  $distritosNum,  $dist, 'DIST_DESCRIPCION');
+
+            $provincias = $provinciasStr;
+            $distritos  = $distritosStr;
+
 
             if (!$distritosStr->has($dist) && !$distritosNum->has((int)$dist)) {
                 Log::warning('Distrito no encontrado en catálogo', [
@@ -1349,11 +1662,32 @@ class PostulanteController extends Controller
                     'valor_original' => $r->distrito,
                 ]);
             }
-        }
 
-        // Para la vista/JS seguimos exponiendo $provincias y $distritos
-        $provincias = $provinciasStr;
-        $distritos  = $distritosStr;
+            $label = $r->cargo_nombre;
+
+            if ($r->requerimiento_id && $reqMap->has($r->requerimiento_id)) {
+                $req = $reqMap->get($r->requerimiento_id);
+
+                $codCargo    = str_pad($req->cargo_solicitado, 4, '0', STR_PAD_LEFT);
+                $codSucursal = str_pad($req->sucursal,        2, '0', STR_PAD_LEFT);
+                // ajusta el nombre del campo si en Requerimiento no se llama "cliente"
+                $codCliente  = str_pad($req->cliente,         5, '0', STR_PAD_LEFT);
+
+                $cargoNombre    = optional($cargos->get($codCargo))->DESC_CARGO ?? $req->cargo_solicitado;
+                $sucursalNombre = $sucursales->get($codSucursal) ?? $req->sucursal;
+                $clienteNombre  = $clientes->get($codCliente) ?? null;
+
+                $parts = [$cargoNombre];
+                //if ($sucursalNombre) $parts[] = $sucursalNombre;
+                //if ($clienteNombre)  $parts[] = $clienteNombre;
+
+                // Ej: "AGENTE POLICIAL - PISCO - COSMOS"
+                $label = implode(' - ', $parts);
+            }
+
+            // Campo virtual para la vista
+            $r->puesto_postula = $label;
+        }
 
         return view('postulantes.filtrar', compact(
             'postulantes',
