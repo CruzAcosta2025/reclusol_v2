@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Response;
 use App\Models\Cargo;
+use App\Models\Cliente;
 use Illuminate\Support\Str;
 use App\Models\Sucursal;
 use App\Models\Departamento;
@@ -26,16 +27,16 @@ class EntrevistaController extends Controller
 
     public function listadoInicial(Request $request)
     {
-        // SOLO postulantes aptos para entrevista
-        $query = Postulante::where('estado', 2)      // código de "apto"
+        // 👈 importante: eager load del requerimiento
+        $query = Postulante::with('requerimiento')
+            ->where('estado', 2)      // apto
             ->where('decision', 'apto');
 
-        // Filtro por DNI
+        // filtros
         if ($request->filled('dni')) {
             $query->where('dni', 'like', '%' . $request->dni . '%');
         }
 
-        // Filtro por nombre o apellido
         if ($request->filled('nombre')) {
             $nombre = $request->nombre;
             $query->where(function ($q) use ($nombre) {
@@ -48,7 +49,38 @@ class EntrevistaController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        // --- Lista negra (igual que antes) ---
+        // catálogos
+        $cargos        = Cargo::forSelect();        // ['0008' => 'AGENTE...', ...]
+        $departamentos = Departamento::forSelect();
+        $provincias    = Provincia::forSelect();
+        $distritos     = Distrito::forSelect();
+
+        foreach ($postulantes as $p) {
+
+            // === CARGO DESDE EL REQUERIMIENTO (simple) ===
+            $codigoCargo = null;
+
+            if (!empty($p->cargo)) {
+                // por compatibilidad con registros viejos
+                $codigoCargo = str_pad($p->cargo, 4, '0', STR_PAD_LEFT);
+            } elseif ($p->requerimiento) {
+                // nuevos registros: lo sacamos del requerimiento
+                $codigoCargo = str_pad($p->requerimiento->cargo_solicitado, 4, '0', STR_PAD_LEFT);
+            }
+
+            if ($codigoCargo) {
+                $p->cargo_nombre = $cargos->get($codigoCargo) ?? $codigoCargo;
+            } else {
+                $p->cargo_nombre = 'N/A';
+            }
+
+            // Ubigeo
+            $p->departamento_nombre = $departamentos->get($p->departamento) ?? $p->departamento;
+            $p->provincia_nombre    = $provincias->get($p->provincia) ?? $p->provincia;
+            $p->distrito_nombre     = $distritos->get($p->distrito) ?? $p->distrito;
+        }
+
+        // lista negra igual que ya tenías
         $listaNegra = collect();
         if ($request->filled('dni') || $request->filled('nombre')) {
             $dni    = $request->dni ?? null;
@@ -60,25 +92,9 @@ class EntrevistaController extends Controller
             ));
         }
 
-        // --- Catálogos para mostrar nombres en vez de códigos ---
-        $cargos        = Cargo::forSelect();        // ['0008' => 'AGENTE DE PROTECCIÓN', ...]
-        $departamentos = Departamento::forSelect(); // ['12'   => 'JUNÍN', ...]
-        $provincias    = Provincia::forSelect();
-        $distritos     = Distrito::forSelect();
-
-        // Decorar cada postulante con los nombres legibles
-        foreach ($postulantes as $p) {
-            // ajusta el padding según cómo guardas los códigos en la tabla de cargos
-            $codigoCargo = str_pad($p->cargo, 4, '0', STR_PAD_LEFT);
-
-            $p->cargo_nombre        = $cargos->get($codigoCargo) ?? $p->cargo;
-            $p->departamento_nombre = $departamentos->get($p->departamento) ?? $p->departamento;
-            $p->provincia_nombre    = $provincias->get($p->provincia) ?? $p->provincia;
-            $p->distrito_nombre     = $distritos->get($p->distrito) ?? $p->distrito;
-        }
-
         return view('entrevistas.listadoInicial', compact('postulantes', 'listaNegra'));
     }
+
 
     public function evaluar(Request $request, Postulante $postulante)
     {
@@ -89,31 +105,62 @@ class EntrevistaController extends Controller
                 ->with('error', 'El postulante no está apto para entrevista.');
         }
 
-        // Catálogos para nombres legibles
+        // Cargar el requerimiento asociado
+        $postulante->load('requerimiento');
+
+        // Catálogos
         $tipoCargos    = TipoCargo::forSelect();
         $cargos        = Cargo::forSelect();
         $departamentos = Departamento::forSelect();
-        $distritos = Distrito::forSelect();
+        $distritos     = Distrito::forSelect();
 
         $tipo  = str_pad((string)$postulante->tipo_cargo,   2, '0', STR_PAD_LEFT);
-        $cargo = str_pad((string)$postulante->cargo,        4, '0', STR_PAD_LEFT);
         $depa  = str_pad((string)$postulante->departamento, 2, '0', STR_PAD_LEFT);
-        $disti = str_pad((string)$postulante->distrito, 6, '0', STR_PAD_LEFT);
+        $disti = str_pad((string)$postulante->distrito,     6, '0', STR_PAD_LEFT);
 
         $postulante->tipo_cargo_nombre   = $tipoCargos->get($tipo) ?? $postulante->tipo_cargo;
-        $postulante->cargo_nombre        = $cargos->get($cargo) ?? $postulante->cargo;
         $postulante->departamento_nombre = $departamentos->get($depa) ?? $postulante->departamento;
-        $postulante->distrito_nombre = $distritos->get($disti) ?? $postulante->distrito;
+        $postulante->distrito_nombre     = $distritos->get($disti) ?? $postulante->distrito;
 
-        // Determinar si es operativo o administrativo (para luego incluir el parcial adecuado)
+        // === AQUÍ LO SIMPLE PARA EL PUESTO ===
+        if ($postulante->requerimiento) {
+            // tomamos el código de cargo del requerimiento
+            $codCargo = str_pad(
+                (string)$postulante->requerimiento->cargo_solicitado,
+                4,
+                '0',
+                STR_PAD_LEFT
+            );
+
+            // nombre legible del cargo
+            $cargoNombre = $cargos->get($codCargo)
+                ?? $postulante->requerimiento->cargo_solicitado;
+
+            // Si quieres, puedes concatenar sucursal/cliente:
+            // $sucursal = $postulante->requerimiento->sucursal_nombre ?? '';
+            // $cliente  = $postulante->requerimiento->cliente_nombre  ?? '';
+            // $postulante->puesto_postula = trim("$cargoNombre - $sucursal - $cliente", ' -');
+
+            $postulante->puesto_postula = $cargoNombre;
+        } else {
+            // Fallback para postulantes viejos sin requerimiento_id
+            $codCargo = str_pad((string)$postulante->cargo, 4, '0', STR_PAD_LEFT);
+            $postulante->puesto_postula = $cargos->get($codCargo) ?? $postulante->cargo ?? 'N/A';
+        }
+
+        // Operativo / administrativo
         $esOperativo = $postulante->tipo_personal_codigo === '01'
             || strtoupper($postulante->tipo_personal) === 'OPERATIVO';
 
-        // Si quieres, podrías cargar la última entrevista para prefillear
+        $esAdministrativo = $postulante->tipo_personal_codigo === '02'
+            || strtoupper($postulante->tipo_personal) === 'ADMINISTRATIVO';
+        // Última entrevista, si existe
         $entrevista = $postulante->entrevistas()->latest('fecha_entrevista')->first();
 
-        return view('entrevistas.evaluar', compact('postulante', 'esOperativo', 'entrevista'));
+        return view('entrevistas.evaluar', compact('postulante', 'esOperativo', 'esAdministrativo', 'entrevista'));
     }
+
+
 
 
     public function verArchivo(Postulante $postulante, string $tipo): StreamedResponse

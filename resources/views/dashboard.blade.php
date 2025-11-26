@@ -13,7 +13,7 @@
                         </div>
                         <div class="text-white cursor-pointer" onclick="toggleUserDropdown()">
                             <h2 class="font-semibold text-sm"> {{ Auth::user()->name ?? 'INVITADO' }} </h2>
-                            <p class="text-xs text-blue-100"> {{ Auth::user()->cargoInfo?->DESC_TIPO_CARG ?? 'Sin rol' }}
+                            <p class="text-xs text-blue-100"> {{ Auth::user()->rol ?? 'Sin rol' }}
                             </p>
                         </div>
 
@@ -29,7 +29,7 @@
                                     <div>
                                         <h3 class="font-semibold text-gray-800">{{ Auth::user()->name ?? 'INVITADO' }}</h3>
                                         <p class="text-sm text-gray-600">
-                                            {{ Auth::user()->cargoInfo?->DESC_TIPO_CARG ?? 'Sin rol' }} </p>
+                                            {{ Auth::user()->rol ?? 'Sin rol' }} </p>
                                     </div>
                                 </div>
                             </div>
@@ -298,26 +298,23 @@ rounded-full flex items-center justify-center flex-shrink-0">
                     <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow card-hover">
                         <div class="flex items-center justify-between mb-4">
                             <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-chart-line text-purple-600 text-xl"></i>
+                                <i class="fa-solid fa-user-shield text-purple-600 text-x1"></i>
                             </div>
                             <span class="text-green-500 text-sm font-medium">+5</span>
                         </div>
                         <h3 class="text-3xl font-bold text-gray-800 mb-1">18</h3>
-                        <p class="text-gray-600 text-sm">Contrataciones este mes</p>
-                        <p class="text-xs text-gray-500 mt-1">contratados</p>
+                        <p class="text-gray-600 text-sm">Personal Operativo</p>
                     </div>
 
-                    <!-- Quick Actions -->
-                    <div
-                        class="bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow card-hover text-white">
-                        <div class="text-center">
-                            <i class="fas fa-plus-circle text-3xl mb-3"></i>
-                            <h3 class="font-semibold mb-2">Acciones Rápidas</h3>
-                            <a href="{{ route('requerimientos.requerimiento') }}"
-                                class="flex items-center space-x-3 text-white/80 hover:text-white hover:bg-white/10 px-4 py-3 rounded-lg transition-colors">
-                                <span> + Nuevo Requerimiento</span>
-                            </a>
+                    <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow card-hover">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                                <i class="fa-solid fa-user-tie text-purple-600 text-x1"></i>
+                            </div>
+                            <span class="text-green-500 text-sm font-medium">+5</span>
                         </div>
+                        <h3 class="text-3xl font-bold text-gray-800 mb-1">18</h3>
+                        <p class="text-gray-600 text-sm">Personal Administrativo</p>
                     </div>
                 </div>
 

@@ -53,7 +53,7 @@
                                 </label>
                                 <div class="p-3 bg-gray-50 rounded-xl border">
                                     <p class="text-sm font-semibold text-gray-900">
-                                        {{ $postulante->cargo_nombre ?? $postulante->cargo }}</p>
+                                        {{ $postulante->puesto_postula ?? 'N.A'}}</p>
                                 </div>
                             </div>
                             <div class="space-y-2">

@@ -173,7 +173,7 @@
                                     <td class="px-6 py-4 text-center">
                                         <span
                                             class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-                                            {{ $postulante->cargo_nombre }}
+                                            {{ $postulante->cargo_nombre ?? $postulante->cargo_nombre ?? 'N/A' }}
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 text-center">

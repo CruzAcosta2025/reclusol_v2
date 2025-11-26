@@ -72,14 +72,11 @@ Route::middleware('auth')->group(function () {
   Route::middleware('role:ADMINISTRADOR|USUARIO OPERATIVO')->group(function () {
     Route::get('/afiches', [PosterController::class, 'index'])->name('afiches.index');
     //Route::get('/afiches/agregarRecursos', [PosterController::class, 'mostrarFormularioRecursos'])->name('afiches.recursos');
-
     // Formulario para cargar recursos (la vista que ya hiciste)
     Route::get('/afiches/recursos', [PosterController::class, 'assetsForm'])->name('afiches.assets.form');
     // Procesar el formulario (SUBIR archivo)
     Route::post('/afiches/recursos', [PosterController::class, 'assetsUpload'])->name('afiches.assets.upload');
-
     Route::post('/afiches/recursos/eliminar', [PosterController::class, 'assetsDelete'])->name('afiches.assets.delete');
-
     Route::get('/poster/{req}/{template}', [PosterController::class, 'show'])->name('poster.show');
     Route::get('/historial-afiches', [HistorialController::class, 'index'])->name('afiches.historial');
   });
@@ -91,9 +88,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/entrevistas/evaluar/{postulante}', [EntrevistaController::class, 'evaluar'])->name('entrevistas.evaluar');
     Route::get('/entrevistas-virtuales/aptos', [EntrevistaController::class, 'aptos'])->name('entrevistas-virtuales.aptos');
     Route::post('/entrevistas/{postulante}/guardar', [EntrevistaController::class, 'guardarEvaluacion'])->name('entrevistas.guardar-evaluacion');
-    Route::get('/entrevistas/{postulante}/archivo/{tipo}', [EntrevistaController::class, 'verArchivo'])
-      ->whereIn('tipo', ['cv', 'cul'])->name('entrevistas.ver-archivo');
-
+    Route::get('/entrevistas/{postulante}/archivo/{tipo}', [EntrevistaController::class, 'verArchivo'])->whereIn('tipo', ['cv', 'cul'])->name('entrevistas.ver-archivo');
     Route::get('/entrevistas/{postulante}/descargar/{tipo}', [EntrevistaController::class, 'descargarArchivo'])
       ->whereIn('tipo', ['cv', 'cul'])
       ->name('entrevistas.descargar-archivo');
