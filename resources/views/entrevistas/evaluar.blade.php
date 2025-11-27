@@ -53,7 +53,7 @@
                                 </label>
                                 <div class="p-3 bg-gray-50 rounded-xl border">
                                     <p class="text-sm font-semibold text-gray-900">
-                                        {{ $postulante->puesto_postula ?? 'N.A'}}</p>
+                                        {{ $postulante->puesto_postula ?? 'N.A' }}</p>
                                 </div>
                             </div>
                             <div class="space-y-2">
@@ -215,7 +215,7 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
                 <div class="bg-white rounded-2xl shadow-lg p-6">
                     <div class="flex flex-col sm:flex-row gap-4 justify-end">
-                        <button type="button" onclick="guardarBorrador()"
+                        <button type="button" id="btn-guardar-borrador" onclick="guardarBorrador()"
                             class="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-xl transition-colors flex items-center justify-center space-x-2">
                             <i class="fas fa-save"></i>
                             <span>Guardar Borrador</span>
@@ -251,6 +251,8 @@
             </div>
         </div>
     </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         // ------ Cálculo automático de remuneración ------
@@ -261,8 +263,8 @@
             document.getElementById('total-remuneracion').textContent = `S/ ${total.toFixed(2)}`;
         }
 
-        document.querySelector('input[name="sueldo_basico"]').addEventListener('input', calcularTotal);
-        document.querySelector('input[name="bonificaciones"]').addEventListener('input', calcularTotal);
+        //document.querySelector('input[name="sueldo_basico"]').addEventListener('input', calcularTotal);
+        //document.querySelector('input[name="bonificaciones"]').addEventListener('input', calcularTotal);
 
         // ------ Mostrar/ocultar campo de otro puesto ------
         document.querySelectorAll('input[name="apto_puesto"]').forEach(radio => {
@@ -374,6 +376,63 @@
                 closePreviewModal();
             }
         });
+
+        async function guardarBorrador() {
+            const form = document.getElementById('evaluacion-form');
+            if (!form) return;
+
+            const url = form.action + '?borrador=1'; // usamos el mismo action pero marcando borrador
+            const data = new FormData(form);
+
+            try {
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json'
+                    },
+                    body: data
+                });
+
+                if (!res.ok) {
+                    let msg = 'Error al guardar el borrador.';
+                    try {
+                        const json = await res.json();
+                        if (json.message) msg = json.message;
+                    } catch (e) {}
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Ups...',
+                        text: msg,
+                    });
+                    return;
+                }
+
+                const json = await res.json();
+
+                if (json.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Borrador guardado',
+                        text: 'La evaluación se guardó como borrador correctamente.',
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Atención',
+                        text: 'No se pudo guardar el borrador, revisa los datos.',
+                    });
+                }
+
+            } catch (err) {
+                console.error(err);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error inesperado',
+                    text: 'Ocurrió un problema al guardar el borrador.',
+                });
+            }
+        }
     </script>
 
     {{-- Estilos adicionales --}}

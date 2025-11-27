@@ -317,6 +317,7 @@ class EntrevistaController extends Controller
     }
     */
 
+    /*
     public function guardarEvaluacion(Request $request, Postulante $postulante)
     {
         $esBorrador = $request->boolean('borrador');
@@ -406,6 +407,88 @@ class EntrevistaController extends Controller
         }
 
         // Submit normal del formulario (Finalizar Evaluación)
+        return redirect()
+            ->route('entrevistas.index')
+            ->with('success', 'Evaluación registrada correctamente.');
+    }
+    */
+
+    public function guardarEvaluacion(Request $request, Postulante $postulante)
+    {
+        $esBorrador = $request->boolean('borrador');
+
+        // Reglas base
+        $rules = [
+            'formacion'       => ['nullable', 'array'],
+            'formacion.*'     => ['string', 'max:50'],
+            'otros_cursos'    => ['nullable', 'string', 'max:255'],
+            'fortalezas'      => ['nullable', 'string'],
+            'oportunidades'   => ['nullable', 'string'],
+            'comentarios_evaluacion' => ['nullable', 'string'],
+
+            'experiencia_previa'        => ['nullable', Rule::in(['si', 'no'])],
+            'disponibilidad_inmediata'  => ['nullable', Rule::in(['si', 'no'])],
+            'horarios_rotativos'        => ['nullable', Rule::in(['si', 'no'])],
+            'disponibilidad_viajes'     => ['nullable', Rule::in(['si', 'no'])],
+            'herramientas_tecnologicas' => ['nullable', Rule::in(['si', 'no'])],
+            'referencias_laborales'     => ['nullable', Rule::in(['si', 'no'])],
+        ];
+
+        $rules['apto_puesto'] = $esBorrador
+            ? ['nullable', Rule::in(['si', 'no', 'otro_puesto'])]
+            : ['required', Rule::in(['si', 'no', 'otro_puesto'])];
+
+        $rules['otro_puesto_especifico'] = ['nullable', 'string', 'max:150'];
+
+        $data = $request->validate($rules);
+
+        // ------------ ARMANDO LOS CAMPOS PARA LA BD ------------
+
+        $formacion = $data['formacion'] ?? [];
+
+        $competencias = [
+            'experiencia_previa'        => $data['experiencia_previa']        ?? null,
+            'disponibilidad_inmediata'  => $data['disponibilidad_inmediata']  ?? null,
+            'horarios_rotativos'        => $data['horarios_rotativos']        ?? null,
+            'disponibilidad_viajes'     => $data['disponibilidad_viajes']     ?? null,
+            'herramientas_tecnologicas' => $data['herramientas_tecnologicas'] ?? null,
+            'referencias_laborales'     => $data['referencias_laborales']     ?? null,
+        ];
+
+        $esApto = $data['apto_puesto'] ?? null;
+
+        // ------------ CREAR / ACTUALIZAR ENTREVISTA ------------
+
+        $entrevista = Entrevista::updateOrCreate(
+            // Clave para buscar la entrevista: 1 por postulante
+            [
+                'postulante_id' => $postulante->id,
+            ],
+            // Datos a guardar/actualizar
+            [
+                'requerimiento_id' => $postulante->requerimiento_id,   // 👈 AQUÍ LA CLAVE
+                'entrevistador_id' => Auth::id(),
+                'fecha_entrevista' => now(),
+
+                'formacion'     => $formacion,
+                'otros_cursos'  => $data['otros_cursos'] ?? null,
+                'competencias'  => $competencias,
+                'fortalezas'    => $data['fortalezas'] ?? null,
+                'oportunidades' => $data['oportunidades'] ?? null,
+
+                'es_apto'       => $esApto,
+                'otro_puesto'   => $data['otro_puesto_especifico'] ?? null,
+                'comentario'    => $data['comentarios_evaluacion'] ?? null,
+            ]
+        );
+
+        if ($esBorrador) {
+            return response()->json([
+                'success'       => true,
+                'entrevista_id' => $entrevista->id,
+            ]);
+        }
+
         return redirect()
             ->route('entrevistas.index')
             ->with('success', 'Evaluación registrada correctamente.');
