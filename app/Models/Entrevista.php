@@ -24,6 +24,8 @@ class Entrevista extends Model
         'es_apto',
         'otro_puesto',
         'comentario',
+        'comentario_final', // 👈 añade esto
+        'resultado',        // si lo usas luego
     ];
 
     protected $casts = [
