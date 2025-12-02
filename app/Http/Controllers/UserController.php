@@ -170,6 +170,43 @@ class UserController extends Controller
         return response()->json(['ok' => true, 'data' => $data]);
     }
 
+    //Decolecta API
+    public function buscarDniDecolecta(string $dni)
+    {
+        $dni = preg_replace('/\D/', '', $dni);
+        if (strlen($dni) !== 8) {
+            return response()->json(['ok' => false, 'message' => 'DNI inválido'], 422);
+        }
+
+        $data = Cache::remember("decolecta:dni:$dni", now()->addHours(12), function () use ($dni) {
+
+            $resp = Http::withHeaders([
+                'Authorization' => 'Bearer ' . config('services.decolecta.api_key'),
+                'Accept'        => 'application/json'
+            ])->timeout(10)->get(config('services.decolecta.api_url'), [
+                'numero' => $dni
+            ]);
+
+            if (!$resp->ok()) {
+                return null;
+            }
+
+            $j = $resp->json();
+
+            return [
+                'nombres'   => $j['first_name'] ?? '',
+                'apellidos' => trim(($j['first_last_name'] ?? '') . ' ' . ($j['second_last_name'] ?? '')),
+                'completo'  => $j['full_name'] ?? '',
+            ];
+        });
+
+        if (!$data) {
+            return response()->json(['ok' => false, 'message' => 'No encontrado'], 404);
+        }
+
+        return response()->json(['ok' => true, 'data' => $data]);
+    }
+
     /*
     public function buscarPersonal(Request $request)
     {

@@ -41,12 +41,12 @@
 
             <!-- @if ($errors->any())
     <div class="bg-red-100 text-red-800 p-4 rounded mb-6">
-                              <ul class="list-disc pl-5">
-                                @foreach ($errors->all() as $error)
+                                                          <ul class="list-disc pl-5">
+                                                            @foreach ($errors->all() as $error)
     <li>{{ $error }}</li>
     @endforeach
-                              </ul>
-                             </div>
+                                                          </ul>
+                                                         </div>
     @endif -->
 
             <form method="POST" action="{{ route('postulantes.storeExterno') }}" enctype="multipart/form-data"
@@ -93,25 +93,24 @@
 
                             <!-- Nombres -->
                             <div class="space-y-2">
-                                <label for="nombres" class="block text-xs sm:text-sm font-semibold text-gray-700">
+                                <label for="nombres" class="block text-sm font-semibold text-gray-700">
                                     <i class="fas fa-user mr-2 text-blue-500"></i>
                                     Nombres *
                                 </label>
-                                <input type="text" id="nombres" name="nombres" required
-                                    class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300"
-                                    placeholder="Ingresa tus nombres">
+                                <input type="text" id="nombres" name="nombres"
+                                    class="form-input w-full px-4 py-3 border border-gray-300 bg-gray-100 text-gray-600 rounded-lg focus:outline-none cursor-not-allowed"
+                                    readonly placeholder="Nombres">
                                 <span class="error-message text-red-500 text-sm hidden"></span>
                             </div>
-
                             <!-- Apellidos -->
                             <div class="space-y-2">
-                                <label for="apellidos" class="block text-xs sm:text-sm font-semibold text-gray-700">
+                                <label for="apellidos" class="block text-sm font-semibold text-gray-700">
                                     <i class="fas fa-user mr-2 text-blue-500"></i>
                                     Apellidos *
                                 </label>
-                                <input type="text" id="apellidos" name="apellidos" required
-                                    class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300"
-                                    placeholder="Ingresa tus apellidos">
+                                <input type="text" id="apellidos" name="apellidos"
+                                    class="form-input w-full px-4 py-3 border border-gray-300 bg-gray-100 text-gray-600 rounded-lg focus:outline-none cursor-not-allowed"
+                                    readonly placeholder="Apellidos">
                                 <span class="error-message text-red-500 text-sm hidden"></span>
                             </div>
 
@@ -484,6 +483,64 @@
         </div>
 
         <script>
+            // Ruta para consultar DNI
+            window.ROUTE_DNI_SIMPLE = "{{ route('public.dni.decolecta', ['dni' => 'DNI_PLACEHOLDER']) }}";
+
+            // --- AUTOCOMPLETADO POR DNI (RENIEC) ---
+            const dni = document.querySelector('#dni');
+            const nombres = document.querySelector('#nombres');
+            const apellidos = document.querySelector('#apellidos');
+
+            if (dni && nombres && apellidos) {
+                const urlFor = function(d) {
+                    return window.ROUTE_DNI_SIMPLE.replace('DNI_PLACEHOLDER', d);
+                };
+                let t = null;
+
+                async function lookup(d) {
+                    try {
+                        const r = await fetch(urlFor(d), {
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        });
+                        const j = await r.json();
+                        if (j.ok) {
+                            nombres.value = j.data.nombres || '';
+                            apellidos.value = j.data.apellidos || '';
+                        } else {
+                            nombres.value = '';
+                            apellidos.value = '';
+                        }
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }
+
+                dni.addEventListener('input', function(e) {
+                    const v = e.target.value.replace(/\D/g, '').slice(0, 8);
+                    e.target.value = v;
+                    clearTimeout(t);
+                    if (v.length === 8) {
+                        t = setTimeout(function() {
+                            lookup(v);
+                        }, 300);
+                    }
+                });
+
+                dni.addEventListener('blur', function(e) {
+                    const v = e.target.value.replace(/\D/g, '');
+                    if (v.length === 8) {
+                        lookup(v);
+                    }
+                });
+
+                // Si ya viene con 8 dígitos (autofill)
+                if (dni.value && dni.value.length === 8) {
+                    lookup(dni.value);
+                }
+            }
+
             let currentStep = 1;
             const totalSteps = 3;
 

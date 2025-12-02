@@ -71,11 +71,11 @@
                         </div>
                         <!-- DNI -->
                         <div class="space-y-2">
-                            <label for="dni" class="block text-sm font-semibold text-gray-700">
+                            <label for="dni" class="block text-xs sm:text-sm font-semibold text-gray-700">
                                 <i class="fas fa-id-card mr-2 text-blue-500"></i>
                                 DNI *
                             </label>
-                            <input type="text" id="dni" name="dni" maxlength="8" pattern="[0-9]{8}"
+                            <input type="text" id="dni" name="dni" maxlength="8" pattern="[0-9]{8}" required
                                 class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300"
                                 placeholder="12345678">
                             <span class="error-message text-red-500 text-sm hidden"></span>
@@ -88,8 +88,8 @@
                                 Nombres *
                             </label>
                             <input type="text" id="nombres" name="nombres"
-                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300"
-                                placeholder="Ingresa tus nombres">
+                                class="form-input w-full px-4 py-3 border border-gray-300 bg-gray-100 text-gray-600 rounded-lg focus:outline-none cursor-not-allowed"
+                                readonly placeholder="Nombres">
                             <span class="error-message text-red-500 text-sm hidden"></span>
                         </div>
 
@@ -100,8 +100,8 @@
                                 Apellidos *
                             </label>
                             <input type="text" id="apellidos" name="apellidos"
-                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300"
-                                placeholder="Ingresa tus apellidos">
+                                class="form-input w-full px-4 py-3 border border-gray-300 bg-gray-100 text-gray-600 rounded-lg focus:outline-none cursor-not-allowed"
+                                readonly placeholder="Apellidos">
                             <span class="error-message text-red-500 text-sm hidden"></span>
                         </div>
 
@@ -111,7 +111,7 @@
                                 <i class="fas fa-calendar-alt mr-2 text-blue-500"></i>
                                 Fecha de Nacimiento *
                             </label>
-                            <input type="date" id="fecha_nacimiento" name="fecha_nacimiento"
+                            <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required
                                 class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all duration-300">
                             <span class="error-message text-red-500 text-sm hidden"></span>
                         </div>
@@ -122,7 +122,7 @@
                                 <i class="fas fa-calendar mr-2 text-blue-500"></i>
                                 Edad *
                             </label>
-                            <input type="number" id="edad" name="edad" min="18" max="45"
+                            <input type="number" id="edad" name="edad" min="18" max="45" required
                                 class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300"
                                 placeholder="25">
                             <span class="error-message text-red-500 text-sm hidden"></span>
@@ -134,7 +134,7 @@
                                 <i class="fas fa-city mr-2 text-blue-500"></i>
                                 Departamento *
                             </label>
-                            <select id="departamento" name="departamento"
+                            <select id="departamento" name="departamento" required
                                 class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300">
                                 <option value="">Selecciona un departamento</option>
                                 @foreach ($departamentos as $codigo => $descripcion)
@@ -150,7 +150,7 @@
                                 <i class="fas fa-map-marker-alt mr-2 text-blue-500"></i>
                                 Provincia *
                             </label>
-                            <select id="provincia" name="provincia"
+                            <select id="provincia" name="provincia" required
                                 class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300">
                                 <option value="">Selecciona una provincia</option>
                             </select>
@@ -163,7 +163,7 @@
                                 <i class="fas fa-map-marker-alt mr-2 text-blue-500"></i>
                                 Distrito *
                             </label>
-                            <select id="distrito" name="distrito"
+                            <select id="distrito" name="distrito" required
                                 class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300">
                                 <option value="">Selecciona un distrito</option>
                             </select>
@@ -176,7 +176,7 @@
                                 <i class="fas fa-flag mr-2 text-blue-500"></i>
                                 Nacionalidad *
                             </label>
-                            <select id="nacionalidad" name="nacionalidad"
+                            <select id="nacionalidad" name="nacionalidad" required
                                 class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300">
                                 <option value="">Selecciona tu nacionalidad</option>
                                 <option value="PERUANA">PERUANA</option>
@@ -190,7 +190,7 @@
                                 <i class="fas fa-heart mr-2 text-blue-500"></i>
                                 Grado de instrucción *
                             </label>
-                            <select id="grado_instruccion" name="grado_instruccion"
+                            <select id="grado_instruccion" name="grado_instruccion" required
                                 class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300">
                                 <option value="">Selecciona el cargo</option>
                                 <option value="Universitaria">Universitaria</option>
@@ -207,7 +207,7 @@
                                 <i class="fas fa-phone mr-2 text-blue-500"></i>
                                 Celular *
                             </label>
-                            <input type="tel" id="celular" name="celular" pattern="[0-9]{9}"
+                            <input type="tel" id="celular" name="celular" pattern="[0-9]{9}" required
                                 class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300"
                                 placeholder="987654321">
                             <span class="error-message text-red-500 text-sm hidden"></span>
@@ -494,6 +494,64 @@
     </div>
 
     <script>
+        // Ruta para consultar DNI
+        window.ROUTE_DNI_SIMPLE = "{{ route('postulantes.dni.decolecta', ['dni' => 'DNI_PLACEHOLDER']) }}";
+
+        // --- AUTOCOMPLETADO POR DNI (RENIEC) ---
+        const dni = document.querySelector('#dni');
+        const nombres = document.querySelector('#nombres');
+        const apellidos = document.querySelector('#apellidos');
+
+        if (dni && nombres && apellidos) {
+            const urlFor = function(d) {
+                return window.ROUTE_DNI_SIMPLE.replace('DNI_PLACEHOLDER', d);
+            };
+            let t = null;
+
+            async function lookup(d) {
+                try {
+                    const r = await fetch(urlFor(d), {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+                    const j = await r.json();
+                    if (j.ok) {
+                        nombres.value = j.data.nombres || '';
+                        apellidos.value = j.data.apellidos || '';
+                    } else {
+                        nombres.value = '';
+                        apellidos.value = '';
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+
+            dni.addEventListener('input', function(e) {
+                const v = e.target.value.replace(/\D/g, '').slice(0, 8);
+                e.target.value = v;
+                clearTimeout(t);
+                if (v.length === 8) {
+                    t = setTimeout(function() {
+                        lookup(v);
+                    }, 300);
+                }
+            });
+
+            dni.addEventListener('blur', function(e) {
+                const v = e.target.value.replace(/\D/g, '');
+                if (v.length === 8) {
+                    lookup(v);
+                }
+            });
+
+            // Si ya viene con 8 dígitos (autofill)
+            if (dni.value && dni.value.length === 8) {
+                lookup(dni.value);
+            }
+        }
+
         let currentStep = 1;
         const totalSteps = 3;
 
@@ -700,7 +758,6 @@
                 syncByRequerimiento();
             }
         });
-
 
         document.getElementById('dni').addEventListener('blur', function() {
             const dni = this.value.trim();

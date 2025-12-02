@@ -280,8 +280,8 @@
         </div>
     </div>
     <script>
-        // Ruta para consultar DNI (RENIEC simple)
-        window.ROUTE_DNI_SIMPLE = "{{ route('usuarios.dni.simple', ['dni' => 'DNI_PLACEHOLDER']) }}";
+        // Ruta para consultar DNI
+        window.ROUTE_DNI_SIMPLE = "{{ route('usuarios.dni.decolecta', ['dni' => 'DNI_PLACEHOLDER']) }}";
 
         let deleteUserId = null;
 
@@ -559,6 +559,7 @@
                             'X-Requested-With': 'XMLHttpRequest'
                         }
                     });
+
                     const j = await r.json();
                     if (j.ok) {
                         nombres.value = j.data.nombres || '';

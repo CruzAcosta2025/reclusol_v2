@@ -18,12 +18,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Response;
 use App\Models\User;
 use Illuminate\Support\Str;
 use App\Notifications\PostulanteEnListaNegra;
 use App\Notifications\NuevoPostulanteRegistrado;
-
 
 class PostulanteController extends Controller
 {
@@ -1263,6 +1263,42 @@ class PostulanteController extends Controller
         ));
     }
 
+    //Decolecta API
+    public function buscarDniDecolecta(string $dni)
+    {
+        $dni = preg_replace('/\D/', '', $dni);
+        if (strlen($dni) !== 8) {
+            return response()->json(['ok' => false, 'message' => 'DNI inválido'], 422);
+        }
+
+        $data = Cache::remember("decolecta:dni:$dni", now()->addHours(12), function () use ($dni) {
+
+            $resp = Http::withHeaders([
+                'Authorization' => 'Bearer ' . config('services.decolecta.api_key'),
+                'Accept'        => 'application/json'
+            ])->timeout(10)->get(config('services.decolecta.api_url'), [
+                'numero' => $dni
+            ]);
+
+            if (!$resp->ok()) {
+                return null;
+            }
+
+            $j = $resp->json();
+
+            return [
+                'nombres'   => $j['first_name'] ?? '',
+                'apellidos' => trim(($j['first_last_name'] ?? '') . ' ' . ($j['second_last_name'] ?? '')),
+                'completo'  => $j['full_name'] ?? '',
+            ];
+        });
+
+        if (!$data) {
+            return response()->json(['ok' => false, 'message' => 'No encontrado'], 404);
+        }
+
+        return response()->json(['ok' => true, 'data' => $data]);
+    }
 
 
     public function getCargosPorTipo($tipoCodigo)

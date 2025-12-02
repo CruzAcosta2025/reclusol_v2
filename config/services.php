@@ -40,5 +40,9 @@ return [
         'key'            => env('PERUDEVS_KEY'),
     ],
 
+    'decolecta' => [
+        'api_url' => env('DECOLECTA_API_URL'),
+        'api_key' => env('DECOLECTA_API_KEY'),
+    ],
 
 ];

@@ -21,6 +21,7 @@ Route::get('/dashboard', [HomeController::class, 'index'])
   
 // Registro externo (publico)
 Route::get('/postulantes/registro', [PostulanteController::class, 'formExterno'])->name('postulantes.formExterno');
+Route::get('/public/dni-decolecta/{dni}', [PostulanteController::class, 'buscarDniDecolecta'])->middleware(['throttle:20,1'])->name('public.dni.decolecta');
 Route::post('/postulantes/registro', [PostulanteController::class, 'storeExterno'])->name('postulantes.storeExterno');
 Route::get('/api-publico/cargos-por-tipo/{tipo}', [PostulanteController::class, 'getCargosPorTipo']);
 Route::get('/api-publico/provincias/{depa}', [PostulanteController::class, 'getProvincias']);
@@ -34,6 +35,7 @@ Route::middleware('auth')->group(function () {
   // Registro interno (solo usuarios logueados)
   Route::middleware(['auth', 'role:ADMINISTRADOR|USUARIO OPERATIVO'])->group(function () {
     Route::get('/postulantes/crear', [PostulanteController::class, 'formInterno'])->name('postulantes.formInterno');
+    Route::get('/postulantes/dni-decolecta/{dni}', [PostulanteController::class, 'buscarDniDecolecta'])->name('postulantes.dni.decolecta');
     Route::post('/postulantes', [PostulanteController::class, 'storeInterno'])->name('postulantes.storeInterno');
     Route::get('/postulantes/filtrar', [PostulanteController::class, 'filtrar'])->name('postulantes.filtrar');
     Route::get('/postulantes/ver', [PostulanteController::class, 'ver'])->name('postulantes.ver');
@@ -106,7 +108,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/usuarios/{user}/edit', [UserController::class, 'edit'])->name('usuarios.edit');
     Route::put('/usuarios/{user}',      [UserController::class, 'update'])->name('usuarios.update');
     Route::delete('/usuarios/{user}', [UserController::class, 'destroy'])->name('usuarios.destroy');
-    Route::get('/usuarios/dni-simple/{dni}', [UserController::class, 'buscarDniSimple'])->middleware(['auth', 'throttle:30,1'])->name('usuarios.dni.simple');
+    Route::get('/usuarios/dni-decolecta/{dni}', [UserController::class, 'buscarDniDecolecta'])->middleware(['auth', 'throttle:30,1'])->name('usuarios.dni.decolecta');
     Route::post('/usuarios/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('usuarios.toggleStatus');
   });
 });
