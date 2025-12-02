@@ -11,6 +11,10 @@ use App\Http\Controllers\PosterController;
 use App\Http\Controllers\EntrevistaController;
 use App\Http\Controllers\UserController;
 
+Route::get('/prueba', function () {
+  return view('prueba');
+})->name('prueba');
+
 Route::get('/', function () {
   return view('welcome');
 })->name('welcome');
@@ -18,7 +22,7 @@ Route::get('/', function () {
 Route::get('/dashboard', [HomeController::class, 'index'])
   ->middleware(['auth', 'verified'])
   ->name('dashboard');
-  
+
 // Registro externo (publico)
 Route::get('/postulantes/registro', [PostulanteController::class, 'formExterno'])->name('postulantes.formExterno');
 Route::get('/public/dni-decolecta/{dni}', [PostulanteController::class, 'buscarDniDecolecta'])->middleware(['throttle:20,1'])->name('public.dni.decolecta');
