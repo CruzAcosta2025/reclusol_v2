@@ -1,11 +1,11 @@
-@extends('layouts.prueba')
+@extends('layouts.app')
 
 @section('content')
     <div class="space-y-4">
         {{-- Botón volver --}}
         <a href="{{ route('requerimientos.filtrar') }}"
-            class="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold rounded-xl shadow-lg transition-colors flex items-center space-x-3 px-6 py-3 text-lg z-10 group">
-            <i class="fas fa-arrow-left text-2xl group-hover:-translate-x-1 transition-transform"></i>
+            class="bg-M6 hover:bg-neutral-lightest text-M2 rounded-lg border border-neutral shadow-sm p-5 font-semibold  transition-colors flex items-center space-x-3 px-6 py-3 text-sm z-10 group">
+            <i class="fas fa-arrow-left text-M2 group-hover:-translate-x-1 transition-transform"></i>
             <span class="font-bold">Volver</span>
         </a>
 
@@ -35,14 +35,14 @@
             @csrf
             <div class="grid lg:grid-cols-2 gap-8 mb-8">
                 <!-- Información General -->
-                <x-block class="flex flex-col">
+                <div class="bg-M6 rounded-lg border border-neutral shadow-sm p-5 flex flex-col items-start justify-start mx-auto w-full"> 
                     <div class="flex items-center mb-6">
-                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                        <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4">
                             <i class="fas fa-info-circle text-blue-600 text-xl"></i>
                         </div>
                         <div>
-                            <h2 class="text-2xl font-bold text-gray-800">Datos de la Solicitud</h2>
-                            <p class="text-gray-600">Datos básicos del requerimiento de personal</p>
+                            <h2 class="text-lg font-bold text-gray-800">Datos de la Solicitud</h2>
+                            <p class="text-sm text-gray-600">Datos básicos del requerimiento de personal</p>
                         </div>
                     </div>
 
@@ -54,7 +54,7 @@
                                 Fecha de Solicitud
                             </label>
                             <input type="text" value="{{ now()->format('d-m-Y') }}" disabled
-                                class="form-input w-full px-4 py-3 border border-gray-300 bg-gray-100 text-gray-600 rounded-lg focus:outline-none cursor-not-allowed">
+                                class="form-input w-full px-4 py-3 border border-gray-300 bg-gray-100 text-sm text-gray-600 rounded-lg focus:outline-none cursor-not-allowed">
                             <input type="hidden" name="fecha_solicitud" value="{{ now()->format('Y-m-d') }}">
                         </div>
 
@@ -64,7 +64,7 @@
                                 Solicitado por *
                             </label>
                             <input type="text" value="{{ Auth::user()->name ?? 'INVITADO' }}" disabled
-                                class="form-input text-xs w-full px-4 py-3 border border-gray-300 bg-gray-100 text-gray-600 rounded-lg focus:outline-none cursor-not-allowed">
+                                class="form-input w-full text-sm px-4 py-3 border border-gray-300 bg-gray-100 text-gray-600 rounded-lg focus:outline-none cursor-not-allowed">
                             <input type="hidden" name="user_id" value="{{ Auth::id() }}">
                             <input type="hidden" name="cargo_usuario"
                                 value="{{ Auth::user()->cargoInfo?->DESC_TIPO_CARG ?? 'Sin rol' }}">
@@ -77,7 +77,7 @@
                                 Sucursal *
                             </label>
                             <select id="sucursal" name="sucursal" required
-                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300">
+                                class="form-input w-full text-sm px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300">
                                 <option value="">Selecciona la sucursal</option>
                                 @foreach ($sucursales as $suc => $descripcion)
                                     <option value="{{ $suc }}">{{ $descripcion }}</option>
@@ -93,7 +93,7 @@
                                 Cliente *
                             </label>
                             <select id="cliente" name="cliente" required
-                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300">
+                                class="form-input w-full text-sm px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300">
                                 <option value="">Selecciona un cliente</option>
                                 @foreach ($clientes as $c)
                                     <option value="{{ $c->CODIGO_CLIENTE }}" @selected(old('cliente') == $c->CODIGO_CLIENTE)>
@@ -110,7 +110,7 @@
                                 Tipo de Personal *
                             </label>
                             <select name="tipo_personal" id="tipo_personal" required
-                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300">
+                                class="form-input w-full text-sm px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-neutral focus:border-transparent outline-none transition-all duration-300">
                                 <option value="">Selecciona el tipo de personal</option>
                                 @foreach ($tipoPersonal as $codigo => $desc)
                                     <option value="{{ $codigo }}" @selected(old('tipo_personal') == $codigo)>
@@ -128,7 +128,7 @@
                                 Tipo de Cargo *
                             </label>
                             <select id="tipo_cargo" name="tipo_cargo" required
-                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300">
+                                class="form-input w-full text-sm px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300">
                                 <option value="">Selecciona el cargo</option>
                             </select>
                             <span class="error-message text-red-500 text-sm hidden"></span>
@@ -141,7 +141,7 @@
                                 Cargo solicitado *
                             </label>
                             <select id="cargo_solicitado" name="cargo_solicitado" required
-                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300">
+                                class="form-input w-full text-sm px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300">
                                 <option value="">Selecciona el cargo</option>
                             </select>
                             <span class="error-message text-red-500 text-sm hidden"></span>
@@ -163,7 +163,7 @@
                                 Fecha de Inicio *
                             </label>
                             <input type="date" name="fecha_inicio" id="fecha_inicio"
-                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300"
+                                class="form-input w-full text-sm px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300"
                                 required>
                         </div>
 
@@ -173,7 +173,7 @@
                                 Fecha Fin *
                             </label>
                             <input type="date" name="fecha_fin" id="fecha_fin"
-                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300"
+                                class="form-input w-full text-sm px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300"
                                 required>
                         </div>
 
@@ -191,7 +191,7 @@
                                 Urgencia *
                             </label>
                             <select name="urgencia" id="urgencia" required
-                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300 bg-gray-200 text-gray-700"
+                                class="form-input w-full text-sm px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300 bg-gray-200 text-gray-700"
                                 readonly tabindex="-1" style="pointer-events: none;">
                                 <option value="">NO HAY URGENCIA</option>
                                 <option value="Alta">Alta (1 semana)</option>
@@ -211,7 +211,7 @@
                             </label>
                             <input type="number" id="cantidad_requerida" name="cantidad_requerida" required
                                 min="1" max="999"
-                                class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300"
+                                class="form-input w-full text-sm px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300"
                                 placeholder="Número de personas">
                             <span id="error-cantidad" class="error-message text-red-500 text-sm hidden"></span>
                         </div>
@@ -225,20 +225,20 @@
                             <div class="flex gap-2">
                                 <input type="number" id="cantidad_masculino" name="cantidad_masculino"
                                     placeholder="Masculino" min="0" max="999"
-                                    class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300"
+                                    class="form-input w-full text-sm px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300"
                                     required>
                                 <input type="number" id="cantidad_femenino" name="cantidad_femenino"
                                     placeholder="Femenino" min="0" max="999"
-                                    class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300"
+                                    class="form-input w-full text-sm px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300"
                                     required>
                             </div>
                             <span id="error-sexo" class="error-message text-red-500 text-sm hidden"></span>
                         </div>
                     </div>
-                </x-block>
+                </div>
 
                 <!-- Requisitos del Puesto -->
-                <x-block class="flex flex-col">
+                <div class="bg-M6 rounded-lg border border-neutral shadow-sm p-5 flex flex-col items-start justify-start mx-auto w-full">
                     <div class="flex items-center mb-6">
                         <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4">
                             <i class="fas fa-clipboard-list text-green-600 text-xl"></i>
@@ -249,7 +249,7 @@
                         </div>
                     </div>
 
-                    <div class="space-y-6">
+                    <div class="space-y-6 w-full">
                         <!-- Edad mínima y máxima -->
                         <div class="grid md:grid-cols-2 gap-4">
                             <div class="space-y-2">
@@ -397,11 +397,11 @@
                         </div> --}}
 
                     </div>
-                </x-block>
+                </div>
 
                 <div class="grid lg:grid-cols-1 gap-6 ">
                     <!-- Validaciones y Remuneración -->
-                    <x-block class="flex flex-col">
+                    <div class="bg-M6 rounded-lg border border-neutral shadow-sm p-5 flex flex-col items-start justify-start mx-auto w-full">
                         <div class="flex items-center mb-6">
                             <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mr-4">
                                 <i class="fas fa-dollar-sign text-purple-600 text-xl"></i>
@@ -411,7 +411,7 @@
                             </div>
                         </div>
 
-                        <div class="space-y-6">
+                        <div class="space-y-6 w-full">
                             <label for="sueldo_basico" class="block text-sm font-semibold text-gray-700">
                                 <i class="fas fa-chart-line mr-2 text-purple-500"></i>
                                 Sueldo básico (S/) *
@@ -443,11 +443,11 @@
                             </div>
                             <span class="error-message text-red-500 text-sm hidden"></span>
                         </div>
-                    </x-block>
+                    </div>
                 </div>
 
                 <!-- Estado -->
-                <x-block class="flex flex-col">
+                <div class="bg-M6 rounded-lg border border-neutral shadow-sm p-5 flex flex-col items-start justify-start mx-auto w-full">
                     <div class="flex items-center mb-6">
                         <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4">
                             <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
@@ -458,7 +458,7 @@
                         </div>
                     </div>
                     <!-- ESTADO -->
-                    <div class="space-y-2">
+                    <div class="space-y-2 w-full">
                         <label for="estado" class="block text-sm font-medium text-gray-700">Estado del
                             Requerimiento</label>
                         <select id="estado" name="estado" required
@@ -472,7 +472,7 @@
                         </select>
                         <span class="error-message text-red-500 text-sm hidden"></span>
                     </div>
-                </x-block>
+                </div>
             </div>
 
 
@@ -498,11 +498,6 @@
 
 
         <style>
-            .form-input:focus {
-                transform: translateY(-2px);
-                box-shadow: 0 10px 25px rgba(59, 130, 246, 0.15);
-            }
-
             .btn-primary:hover {
                 transform: translateY(-2px);
                 box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);

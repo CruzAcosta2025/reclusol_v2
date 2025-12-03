@@ -32,53 +32,62 @@
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <!-- Custom Styles for RECLUSOL -->
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #1d4ed8 100%);
+        }
+
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-5px);
+        }
+
+        .floating-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        .slide-in {
+            animation: slideIn 0.8s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        [x-cloak] {
+            display: none;
+        }
+    </style>
 </head>
 
-<body class="font-sans antialiased overflow-x-hidden">
-    <div x-data="{
-        sidebarOpen: window.innerWidth >= 768,
-        isMobile: window.innerWidth < 768
-    }"
-        @resize.window="isMobile = window.innerWidth < 768; if(isMobile && !sidebarOpen) sidebarOpen = false;"
-        @close-parent-sidebar.window="sidebarOpen = false" class="flex h-screen w-screen overflow-hidden">
-
-        @include('components.sidebar', [
-            'logo' => 'RECLUSOL',
-            'subtitle' => 'Sistema de Gestión',
-            'items' => [
-                ['label' => 'Dashboard', 'href' => route('dashboard'), 'icon' => 'fa-tachometer-alt'],
-                ['label' => 'Solicitudes', 'href' => route('requerimientos.filtrar'), 'icon' => 'fa-file-alt'],
-                ['label' => 'Postulantes', 'href' => route('postulantes.filtrar'), 'icon' => 'fa-users'],
-                ['label' => 'Afiches', 'href' => route('afiches.index'), 'icon' => 'fa-images'],
-                ['label' => 'Entrevistas', 'href' => route('entrevistas.index'), 'icon' => 'fa-calendar-check'],
-                ['label' => 'Usuarios', 'href' => route('usuarios.index'), 'icon' => 'fa-users-cog'],
-                ['label' => 'Configuración', 'href' => '#', 'icon' => 'fa-cog'],
-            ],
-            'logout' => [
-                'label' => 'Logout',
-                'href' => route('logout'),
-                'icon' => 'fa-sign-out-alt',
-            ],
-        ])
-
-        <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
-            <!-- Top Bar -->
-            <header class="bg-white shadow-md p-4 flex items-center flex-shrink-0">
-                <button @click="sidebarOpen = !sidebarOpen" class="p-2 rounded hover:bg-gray-200 focus:outline-none">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 6h16M4 12h16M4 18h16"></path>
-                    </svg>
-                </button>
-            </header>
-
-            <!-- Page Content -->
-            <main class="flex-1 p-7 bg-gray-50 overflow-y-auto overflow-x-hidden" style="min-width: 0;">
-                @yield('content')
-            </main>
-        </div>
-
-    </div>
+<body class="font-sans antialiased">
+    @yield('content')
 </body>
+
 
 </html>

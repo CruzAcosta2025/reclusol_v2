@@ -1,36 +1,26 @@
 @extends('layouts.app')
 
 @section('content')
+    <div class="space-y-4">
 
-    <div class="min-h-screen gradient-bg py-8 pt-24">
-        {{-- Botón volver --}}
-        <a href="{{ route('dashboard') }}"
-            class="absolute top-6 left-6 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold rounded-xl shadow-lg transition-colors flex items-center space-x-3 px-6 py-3 text-lg z-10 group">
-            <i class="fas fa-arrow-left text-2xl group-hover:-translate-x-1 transition-transform"></i>
-            <span class="font-bold">Volver al Dashboard</span>
-        </a>
-
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
-            {{-- Encabezado --}}
-            <div class="bg-white rounded-2xl shadow-lg p-6">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h1 class="text-3xl font-bold text-gray-800">Gestión de Usuarios</h1>
-                        <p class="text-gray-600 mt-1">Administra los usuarios del sistema y sus permisos</p>
-                    </div>
-                    <button onclick="openCreateModal()"
-                        class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 flex items-center space-x-2">
-                        <i class="fas fa-plus"></i>
-                        <span>Nuevo Usuario</span>
-                    </button>
+        {{-- Encabezado --}}
+        <x-block class="flex flex-col">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-xl font-bold text-M2">Gestión de Usuarios</h1>
+                    <p class="text-M3 mt-1">Administra los usuarios del sistema y sus permisos</p>
                 </div>
+                <button onclick="openCreateModal()"
+                    class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 flex items-center space-x-2">
+                    <i class="fas fa-plus"></i>
+                    <span>Nuevo Usuario</span>
+                </button>
             </div>
-        </div>
+        </x-block>
 
         {{-- Filtros --}}
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
-            <form id="filter-form" method="GET"
-                class="grid grid-cols-1 md:grid-cols-4 gap-4 bg-white p-6 rounded-2xl shadow-lg">
+        <x-block class="flex flex-col">
+            <form id="filter-form" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Buscar Usuario</label>
                     <input type="text" name="buscar" value="{{ request('buscar') }}" placeholder="Nombre..."
@@ -63,13 +53,13 @@
                     </div>
                 </div>
             </form>
-        </div>
+        </x-block>
 
         {{-- Estadísticas --}}
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+        <div class="">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {{-- Total Usuarios --}}
-                <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow card-hover">
+                <x-block class="flex flex-col">
                     <div class="flex items-center justify-between mb-4">
                         <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                             <i class="fas fa-users text-blue-600 text-xl"></i>
@@ -78,10 +68,10 @@
                     </div>
                     <h3 class="text-3xl font-bold text-gray-800 mb-1">{{ $totalUsers }}</h3>
                     <p class="text-gray-600 text-sm">Usuarios registrados</p>
-                </div>
+                </x-block>
 
                 {{-- Usuarios Habilitados --}}
-                <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow card-hover">
+                <x-block class="flex flex-col">
                     <div class="flex items-center justify-between mb-4">
                         <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
                             <i class="fas fa-user-check text-green-600 text-xl"></i>
@@ -90,10 +80,10 @@
                     </div>
                     <h3 class="text-3xl font-bold text-gray-800 mb-1">{{ $activeUsers }}</h3>
                     <p class="text-gray-600 text-sm">Usuarios Habilitados</p>
-                </div>
+                </x-block>
 
                 {{-- Usuarios Inhabilitados --}}
-                <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow card-hover">
+                <x-block class="flex flex-col">
                     <div class="flex items-center justify-between mb-4">
                         <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
                             <i class="fas fa-user-times text-red-600 text-xl"></i>
@@ -102,10 +92,10 @@
                     </div>
                     <h3 class="text-3xl font-bold text-gray-800 mb-1">{{ $inactiveUsers }}</h3>
                     <p class="text-gray-600 text-sm">Usuarios Inhabilitados</p>
-                </div>
+                </x-block>
 
                 {{-- Nuevos este mes --}}
-                <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow card-hover">
+                <x-block class="flex flex-col">
                     <div class="flex items-center justify-between mb-4">
                         <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
                             <i class="fas fa-user-plus text-purple-600 text-xl"></i>
@@ -114,12 +104,12 @@
                     </div>
                     <h3 class="text-3xl font-bold text-gray-800 mb-1">{{ $newUsersThisMonth }}</h3>
                     <p class="text-gray-600 text-sm">Este mes</p>
-                </div>
+                </x-block>
             </div>
         </div>
 
         {{-- Tabla de usuarios --}}
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+        <div>
             <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
                 {{-- Encabezado de tabla --}}
                 <div

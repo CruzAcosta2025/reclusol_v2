@@ -13,9 +13,20 @@
     ],
 ])
 
+@php
+// Helper para determinar si un item tiene subitems
+function hasSubitems($item) {
+    return !empty($item['subitems']) && is_array($item['subitems']);
+}
+@endphp
+
 <div x-data="{
     show: @js($show),
     isMobile: window.innerWidth < 768,
+    expandedItems: {},
+    toggleExpand(key) {
+        this.expandedItems[key] = !this.expandedItems[key];
+    },
     focusables() {
         let selector = 'a, button, input:not([type=\'hidden\']), textarea, select, details, [tabindex]:not([tabindex=\'-1\'])'
         return [...$el.querySelectorAll(selector)].filter(el => !el.hasAttribute('disabled'))
@@ -55,15 +66,49 @@
 
             <!-- Navigation -->
             <nav class="space-y-1 flex-1">
-                @foreach($items as $item)
-                    <a href="{{ $item['href'] }}"
-                        class="block px-3 py-3 rounded-lg transition-all duration-200 text-sm text-M6 hover:bg-M1"
-                        @click="if(isMobile){ show = false; window.dispatchEvent(new CustomEvent('close-parent-sidebar')) }">
-                        <span class="flex items-center gap-3">
-                            <i class="fas {{ $item['icon'] ?? 'fa-link' }} w-5"></i>
-                            <span>{{ $item['label'] }}</span>
-                        </span>
-                    </a>
+                @foreach($items as $index => $item)
+                    @if(hasSubitems($item))
+                        {{-- Item con subitems --}}
+                        <div x-data="{ expanded: false }" class="space-y-1">
+                            <button @click="expanded = !expanded; $dispatch('sidebar-toggle', { key: {{ $index }} })"
+                                class="w-full flex items-center justify-between px-3 py-3 rounded-lg transition-all duration-200 text-sm text-M6 hover:bg-M1 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-opacity-40">
+                                <span class="flex items-center gap-3">
+                                    <i class="fas {{ $item['icon'] ?? 'fa-folder' }} w-5"></i>
+                                    <span>{{ $item['label'] }}</span>
+                                </span>
+                                <i class="fas fa-chevron-down transition-transform duration-200" :class="{ 'rotate-180': expanded }"></i>
+                            </button>
+
+                            {{-- Subitems (colapsables) --}}
+                            <div x-show="expanded" x-transition:enter="ease-out duration-200"
+                                x-transition:enter-start="opacity-0 -translate-y-2"
+                                x-transition:enter-end="opacity-100 translate-y-0"
+                                x-transition:leave="ease-in duration-150"
+                                x-transition:leave-start="opacity-100 translate-y-0"
+                                x-transition:leave-end="opacity-0 -translate-y-2" class="space-y-1 pl-4 border-l border-M3">
+                                @foreach($item['subitems'] as $subitem)
+                                    <a href="{{ $subitem['href'] }}"
+                                        class="block px-3 py-2 rounded-lg transition-all duration-200 text-xs text-M6 hover:bg-M1"
+                                        @click="if(isMobile){ show = false; window.dispatchEvent(new CustomEvent('close-parent-sidebar')) }">
+                                        <span class="flex items-center gap-2">
+                                            <i class="fas {{ $subitem['icon'] ?? 'fa-link' }} w-4"></i>
+                                            <span>{{ $subitem['label'] }}</span>
+                                        </span>
+                                    </a>
+                                @endforeach
+                            </div>
+                        </div>
+                    @else
+                        {{-- Item simple (sin subitems) --}}
+                        <a href="{{ $item['href'] }}"
+                            class="block px-3 py-3 rounded-lg transition-all duration-200 text-sm text-M6 hover:bg-M1 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-opacity-40"
+                            @click="if(isMobile){ show = false; window.dispatchEvent(new CustomEvent('close-parent-sidebar')) }">
+                            <span class="flex items-center gap-3">
+                                <i class="fas {{ $item['icon'] ?? 'fa-link' }} w-5"></i>
+                                <span>{{ $item['label'] }}</span>
+                            </span>
+                        </a>
+                    @endif
                 @endforeach
             </nav>
         </div>

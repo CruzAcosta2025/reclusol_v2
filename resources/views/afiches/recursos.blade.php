@@ -1,48 +1,39 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="min-h-screen gradient-bg py-8 pt-24">
+    <div class="space-y-4">
+        <x-block class="flex flex-col">
+            <h1 class="text-xl font-bold text-M2 mb-1">Cargar recursos para afiches</h1>
+            <p class="text-M3 mb-4">
+                Aquí puedes subir nuevas plantillas, íconos o fuentes para usarlas en el generador de afiches.
+            </p>
 
-        <a href="{{ route('dashboard') }}"
-            class="absolute top-6 left-6 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold rounded-xl shadow-lg transition-colors flex items-center space-x-3 px-6 py-3 text-lg z-10 group">
-            <i class="fas fa-arrow-left text-2xl group-hover:-translate-x-1 transition-transform"></i>
-            <span class="font-bold">Volver al Dashboard</span>
-        </a>
+            {{-- Mensajes flash --}}
+            @if (session('success') || session('error'))
+                <div class="mb-4">
+                    <x-alerts />
+                </div>
+            @endif
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
-            <div class="bg-white rounded-2xl shadow-lg p-6">
-                <h1 class="text-3xl font-bold text-gray-800 mb-1">Cargar recursos para afiches</h1>
-                <p class="text-gray-600 mb-4">
-                    Aquí puedes subir nuevas plantillas, íconos o fuentes para usarlas en el generador de afiches.
-                </p>
-
-                {{-- Mensajes flash --}}
-                @if (session('success') || session('error'))
-                    <div class="mb-4">
-                        <x-alerts />
+            @if ($errors->any())
+                <div class="mb-4">
+                    <div class="bg-red-100 border border-red-400 text-red-800 px-4 py-2 rounded-lg">
+                        <ul class="list-disc pl-5 text-sm">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
                     </div>
-                @endif
-
-                @if ($errors->any())
-                    <div class="mb-4">
-                        <div class="bg-red-100 border border-red-400 text-red-800 px-4 py-2 rounded-lg">
-                            <ul class="list-disc pl-5 text-sm">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    </div>
-                @endif
-            </div>
-        </div>
+                </div>
+            @endif
+        </x-block>
 
         {{-- GRID: IZQUIERDA FORM / DERECHA LISTAS --}}
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div>
             <div class="grid md:grid-cols-3 gap-6 mt-4">
                 {{-- COL 1: FORMULARIO --}}
                 <div class="md:col-span-1">
-                    <div class="border border-gray-200 rounded-xl p-4 bg-gray-50">
+                    <x-block class="flex flex-col">
                         <h2 class="text-lg font-semibold text-gray-800 mb-3">Subir recurso</h2>
 
                         <form action="{{ route('afiches.assets.upload') }}" method="POST" enctype="multipart/form-data"
@@ -96,14 +87,14 @@
                                 </button>
                             </div>
                         </form>
-                    </div>
+                    </x-block>
                 </div>
 
                 {{-- COL 2–3: LISTAS CON TOGGLES --}}
                 <div class="md:col-span-2 space-y-6">
 
                     {{-- Plantillas --}}
-                    <div class="bg-white rounded-2xl shadow-lg p-6 card-hover">
+                    <x-block class="flex flex-col">
                         <div class="flex items-center justify-between">
                             <h2 class="text-lg font-semibold text-gray-800">Plantillas actuales</h2>
                             <button type="button" class="text-sm text-blue-600 hover:text-blue-800"
@@ -136,10 +127,10 @@
                                 @endforelse
                             </div>
                         </div>
-                    </div>
+                    </x-block>
 
                     {{-- Iconos principales --}}
-                    <div class="bg-white rounded-2xl shadow-lg p-6 card-hover">
+                    <x-block class="flex flex-col">
                         <div class="flex items-center justify-between">
                             <h2 class="text-lg font-semibold text-gray-800">Íconos principales (iconG)</h2>
                             <button type="button" class="text-sm text-blue-600 hover:text-blue-800"
@@ -173,10 +164,10 @@
                                 @endforelse
                             </div>
                         </div>
-                    </div>
+                    </x-block>
 
                     {{-- Iconos Check --}}
-                    <div class="bg-white rounded-2xl shadow-lg p-6 card-hover">
+                    <x-block class="flex flex-col">
                         <div class="flex items-center justify-between">
                             <h2 class="text-lg font-semibold text-gray-800">Íconos de check</h2>
                             <button type="button" class="text-sm text-blue-600 hover:text-blue-800"
@@ -208,10 +199,10 @@
                                 @endforelse
                             </div>
                         </div>
-                    </div>
+                    </x-block>
 
                     {{-- Iconos Phone --}}
-                    <div class="bg-white rounded-2xl shadow-lg p-6 card-hover">
+                    <x-block class="flex flex-col">
                         <div class="flex items-center justify-between">
                             <h2 class="text-lg font-semibold text-gray-800">Íconos de teléfono</h2>
                             <button type="button" class="text-sm text-blue-600 hover:text-blue-800"
@@ -244,10 +235,10 @@
                                 @endforelse
                             </div>
                         </div>
-                    </div>
+                    </x-block>
 
                     {{-- Iconos Email --}}
-                    <div class="bg-white rounded-2xl shadow-lg p-6 card-hover">
+                    <x-block class="flex flex-col">
                         <div class="flex items-center justify-between">
                             <h2 class="text-lg font-semibold text-gray-800">Íconos de email</h2>
                             <button type="button" class="text-sm text-blue-600 hover:text-blue-800"
@@ -279,10 +270,10 @@
                                 @endforelse
                             </div>
                         </div>
-                    </div>
+                    </x-block>
 
                     {{-- Fuentes --}}
-                    <div class="bg-white rounded-2xl shadow-lg p-6 card-hover">
+                    <x-block class="flex flex-col">
                         <div class="flex items-center justify-between">
                             <h2 class="text-lg font-semibold text-gray-800">Fuentes cargadas</h2>
                             <button type="button" class="text-sm text-blue-600 hover:text-blue-800"
@@ -313,8 +304,7 @@
                                 @endforelse
                             </div>
                         </div>
-                    </div>
-
+                    </x-block>
                 </div>
             </div>
 

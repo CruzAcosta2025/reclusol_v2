@@ -1,28 +1,32 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="min-h-screen gradient-bg py-8 pt-24">
-        {{-- Botón volver --}}
-        <a href="{{ route('dashboard') }}"
-            class="absolute top-6 left-6 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold rounded-xl shadow-lg transition-colors flex items-center space-x-3 px-6 py-3 text-lg z-10 group">
-            <i class="fas fa-arrow-left text-2xl group-hover:-translate-x-1 transition-transform"></i>
-            <span class="font-bold">Volver al Dashboard</span>
-        </a>
-
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
-            {{-- Encabezado --}}
-            <div class="bg-white rounded-2xl shadow-lg p-6">
-                <h1 class="text-3xl font-bold text-gray-800">Listado de Postulantes</h1>
-                <p class="text-gray-600 mt-1">Ver y filtrar postulantes según diferentes criterios</p>
+    <div class="space-y-4">
+        {{-- Encabezado --}}
+        <x-block>
+            <div class="flex flex-col gap-1">
+                <h1 class="text-xl font-bold text-M2">
+                    Listado de Postulantes
+                </h1>
+                <p class="text-M3 mt-1 text-base">
+                    Ver y filtrar postulantes según diferentes criterios
+                </p>
             </div>
-        </div>
+            <div class="flex flex-row items-center gap-2">
+                <a href="{{ route('postulantes.formInterno') }}">
+                    <x-primary-button-create>
+                        Crear Nuevo Postulante
+                    </x-primary-button-create>
+                </a>
+            </div>
+        </x-block>
 
         {{-- Filtro --}}
         <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+        <x-block>
             <form id="filter-form" method="GET"
-                class="grid grid-cols-1 md:grid-cols-4 gap-4 bg-white p-6 rounded-2xl shadow-lg">
+                class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">DNI</label>
                     <input type="text" name="dni" value="{{ request('dni') }}" placeholder="Ingrese DNI"
@@ -116,7 +120,7 @@
                     </button>
                 </div>
             </form>
-        </div>
+        </x-block>
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -140,7 +144,7 @@
                     <p class="text-2xl font-bold">{{ $stats['total'] ?? 0 }}</p>
                 </div>
 
-                {{--Total postulantes (OPERATIVO Y ADMINISTRATIVO)--}}
+                {{-- Total postulantes (OPERATIVO Y ADMINISTRATIVO) --}}
                 <div class="bg-blue-100 p-4 rounded-lg text-center flex flex-col items-center">
                     <i class="fa-solid fa-users fa-2x text-blue-500 mb-2"></i>
                     <p class="text-sm text-gray-600">Postulantes Administrativo</p>
@@ -169,18 +173,24 @@
                 <table class="w-full">
                     <thead class="bg-gradient-to-r from-blue-50 to-blue-100">
                         <tr class="text-left">
-                            <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Puesto al que postula</th>
-                            <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Lugar de Nacimiento</th>
-                            <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Nombres y Apellidos</th>
+                            <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Puesto al que
+                                postula</th>
+                            <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Lugar de Nacimiento
+                            </th>
+                            <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Nombres y Apellidos
+                            </th>
                             <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Edad</th>
                             <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">DNI</th>
                             <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Nacionalidad</th>
                             <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Experiencia</th>
                             <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">SUCAMEC</th>
-                            <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Grado de Instrucción</th>
+                            <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Grado de Instrucción
+                            </th>
                             <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Celular</th>
-                            <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Licencia de Arma L4</th>
-                            <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Licencia de Conducir A1</th>
+                            <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Licencia de Arma L4
+                            </th>
+                            <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Licencia de Conducir
+                                A1</th>
                             <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">CV</th>
                             <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">CUL</th>
                             <!-- <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase text-center">Estado</th> -->

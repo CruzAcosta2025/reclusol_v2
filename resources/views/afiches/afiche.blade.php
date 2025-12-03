@@ -5,39 +5,27 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="min-h-screen gradient-bg py-8 pt-24">
-        <!-- Back to Dashboard Button -->
-        <a href="{{ route('dashboard') }}"
-            class="absolute top-6 left-6 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold rounded-xl shadow-lg transition-colors flex items-center space-x-3 px-6 py-3 text-lg z-10 group">
-            <i class="fas fa-arrow-left text-2xl group-hover:-translate-x-1 transition-transform"></i>
-            <span class="font-bold">Volver al Dashboard</span>
-        </a>
-
+    <div class="space-y-4">
         <!-- Header -->
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
-            <div class="bg-white rounded-2xl shadow-lg p-6">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h1 class="text-3xl font-bold text-gray-800">Generador de Afiches</h1>
-                        <p class="text-gray-600 mt-1">Crea afiches automáticamente basados en los requerimientos activos</p>
-                    </div>
-                    <!-- <div class="flex items-center space-x-4">
-                                                                            <a href="{{ route('afiches.historial') }}" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center space-x-2 transition-all duration-300 hover:-translate-y-1">
-                                                                                <i class="fas fa-history"></i>
-                                                                                <span>Historial</span>
-                                                                            </a>
-                                                                        </div> -->
+        <x-block>
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-xl font-bold text-M2">Generador de Afiches</h1>
+                    <p class="text-M3 mt-1">Crea afiches automáticamente basados en los requerimientos activos</p>
                 </div>
+                <!-- <div class="flex items-center space-x-4">
+                                                                                        <a href="{{ route('afiches.historial') }}" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center space-x-2 transition-all duration-300 hover:-translate-y-1">
+                                                                                            <i class="fas fa-history"></i>
+                                                                                            <span>Historial</span>
+                                                                                        </a>
+                                                                                    </div> -->
             </div>
-        </div>
+        </x-block>
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div>
             <div class="grid lg:grid-cols-3 gap-8">
-                <!-- Panel de Control -->
                 <div class="lg:col-span-1 space-y-6">
-
-                    {{-- PANEL DE REQUERIMIENTOS --}}
-                    <div class="bg-white rounded-2xl shadow-lg p-6 card-hover">
+                    <x-block class="flex flex-col">
                         <div class="flex items-center mb-4">
                             <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
                                 <i class="fas fa-briefcase text-blue-600"></i>
@@ -79,7 +67,7 @@
                                 </div>
                             @endforeach
                         </div>
-                    </div>
+                    </x-block>
 
                     {{-- JS DATA --}}
                     @php
@@ -123,7 +111,7 @@
                     @endphp
 
                     {{-- CONTENEDOR DE OPCIONES (TABS) --}}
-                    <div class="bg-white rounded-2xl shadow-lg p-6 card-hover">
+                    <x-block class="flex flex-col">
                         <div class="mb-4 flex border-b border-gray-200 overflow-x-auto no-scrollbar">
                             <button
                                 class="option-tab px-4 py-2 font-semibold text-gray-700 border-b-2 border-transparent focus:outline-none focus:border-purple-600"
@@ -248,12 +236,12 @@
                                 @endforeach
                             </select>
                         </div>
-                    </div>
+                    </x-block>
                 </div>
 
                 <!-- Vista Previa del Afiche -->
                 <div class="lg:col-span-2">
-                    <div class="bg-white rounded-2xl shadow-lg p-6 card-hover">
+                    <x-block class="flex flex-col">
                         <!-- Encabezado derecha -->
                         <div class="flex justify-between items-center mb-4">
                             <div>
@@ -314,7 +302,7 @@
                                 <span>Copiar Información</span>
                             </button>
                         </div>
-                    </div>
+                    </x-block>
                 </div>
             </div>
         </div>
@@ -571,7 +559,7 @@
             selectedFont = fontUrl;
             if (selectedRequirement) updatePreview(selectedRequirement);
         }
-        
+
 
         function downloadPoster(format = 'png') {
             if (!selectedRequirement) return alert('Selecciona un requerimiento primero');

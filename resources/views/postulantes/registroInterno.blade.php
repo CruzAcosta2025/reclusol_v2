@@ -1,35 +1,37 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="min-h-screen gradient-bg py-8 pt-24">
+    <div class="space-y-4">
 
         {{-- Botón volver --}}
-        <a href="{{ route('dashboard') }}"
-            class="absolute top-6 left-6 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold rounded-xl shadow-lg transition-colors flex items-center space-x-3 px-6 py-3 text-lg z-10 group">
-            <i class="fas fa-arrow-left text-2xl group-hover:-translate-x-1 transition-transform"></i>
-            <span class="font-bold">Volver al Dashboard</span>
+        <a href="{{ route('postulantes.filtrar') }}"
+            class="bg-yellow-200 hover:bg-yellow-300 text-gray-900 font-semibold rounded-xl shadow-lg transition-colors flex items-center space-x-3 px-6 py-3 text-sm z-10 group">
+            <i class="fas fa-arrow-left text- group-hover:-translate-x-1 transition-transform"></i>
+            <span class="font-bold">Volver</span>
         </a>
 
         <!-- Header -->
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
-            <div class="text-center text-white">
-                <h1 class="text-4xl font-bold mb-2">Formulario de Postulación</h1>
-                <p class="text-base sm:text-xl text-blue-100">Complete todos los campos para registrar al postulante</p>
+        <x-block class="flex flex-col w-full">
+            <div class="mb-3">
+                <div class="text-center text-M2">
+                    <h1 class="text-xl font-bold mb-1">Formulario de Postulación</h1>
+                    <p class="text-base text-M3">Complete todos los campos para registrar al postulante</p>
+                </div>
             </div>
-        </div>
 
-        <!-- Progress Bar -->
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
-            <div class="bg-white/20 rounded-full h-2 backdrop-blur-sm">
-                <div id="progress-bar" class="bg-yellow-400 h-2 rounded-full transition-all duration-500"
-                    style="width: 33.33%"></div>
+            <!-- Progress Bar -->
+            <div class="w-full mt-4">
+                <div class="bg-neutral-lightest rounded-full h-2 backdrop-blur-sm">
+                    <div id="progress-bar" class="bg-yellow-400 h-2 rounded-full transition-all duration-500"
+                        style="width: 33.33%"></div>
+                </div>
+                <div class="flex justify-between mt-2 text-M2 text-sm">
+                    <span>Información Personal</span>
+                    <span>Información Profesional</span>
+                    <span>Documentos</span>
+                </div>
             </div>
-            <div class="flex justify-between mt-2 text-white text-sm">
-                <span>Información Personal</span>
-                <span>Información Profesional</span>
-                <span>Documentos</span>
-            </div>
-        </div>
+        </x-block>
 
         @if ($errors->any())
             <div class="bg-red-100 text-red-800 p-4 rounded mb-6">
@@ -42,18 +44,18 @@
         @endif
 
         <form method="POST" action="{{ route('postulantes.storeInterno') }}" enctype="multipart/form-data"
-            class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" id="postulanteForm">
+            class="" id="postulanteForm">
             @csrf
             <!-- Step 1: Información Personal -->
             <div id="step-1" class="form-step">
-                <div class="bg-white rounded-3xl shadow-2xl p-8 mb-8">
+                <x-block class="flex flex-col">
                     <div class="flex items-center mb-8">
-                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                        <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4">
                             <i class="fas fa-user text-blue-600 text-xl"></i>
                         </div>
                         <div>
-                            <h2 class="text-2xl font-bold text-gray-800">Información Personal</h2>
-                            <p class="text-gray-600">Ingresa tus datos personales básicos</p>
+                            <h2 class="text-lg font-bold text-gray-800">Información Personal</h2>
+                            <p class="text-sm text-gray-600">Ingresa tus datos personales básicos</p>
                         </div>
                     </div>
 
@@ -221,12 +223,12 @@
                             </button>
                         </div>
                     </div>
-                </div>
+                </x-block>
             </div>
 
             <!-- Step 2: Información Profesional -->
             <div id="step-2" class="form-step hidden">
-                <div class="bg-white rounded-3xl shadow-2xl p-8 mb-8">
+                <x-block class="flex flex-col">
                     <div class="flex items-center mb-8">
                         <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4">
                             <i class="fas fa-briefcase text-green-600 text-xl"></i>
@@ -391,12 +393,12 @@
                             <i class="fas fa-arrow-right"></i>
                         </button>
                     </div>
-                </div>
+                </x-block>
             </div>
 
             <!-- Step 3: Documentos -->
             <div id="step-3" class="form-step hidden">
-                <div class="bg-white rounded-3xl shadow-2xl p-8 mb-8">
+                <x-block class="flex flex-col">
                     <div class="flex items-center mb-8">
                         <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mr-4">
                             <i class="fas fa-file-upload text-purple-600 text-xl"></i>
@@ -478,7 +480,7 @@
                             <span>Enviar Postulación</span>
                         </button>
                     </div>
-                </div>
+                </x-block>
             </div>
         </form>
         <x-alerts /> {{-- SweetAlert success / error --}}
