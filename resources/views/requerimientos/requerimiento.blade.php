@@ -38,18 +38,18 @@
                 <div class="bg-M6 rounded-lg border border-neutral shadow-sm p-5 flex flex-col items-start justify-start mx-auto w-full"> 
                     <div class="flex items-center mb-6">
                         <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4">
-                            <i class="fas fa-info-circle text-blue-600 text-xl"></i>
+                            <i class="fas fa-info-circle text-M2 text-xl"></i>
                         </div>
                         <div>
-                            <h2 class="text-lg font-bold text-gray-800">Datos de la Solicitud</h2>
-                            <p class="text-sm text-gray-600">Datos básicos del requerimiento de personal</p>
+                            <h2 class="text-lg font-bold text-M2">Datos de la Solicitud</h2>
+                            <p class="text-sm text-M3">Datos básicos del requerimiento de personal</p>
                         </div>
                     </div>
 
-                    <div class="grid md:grid-cols-2 gap-6">
+                    <div class="grid md:grid-cols-2 gap-6 w-full">
                         <!-- Fecha Límite de Reclutamiento -->
                         <div class="space-y-2">
-                            <label class="block text-sm font-semibold text-gray-700">
+                            <label class="block text-sm font-semibold text-M3">
                                 <i class="fas fa-calendar-alt mr-2 text-blue-500"></i>
                                 Fecha de Solicitud
                             </label>
@@ -59,7 +59,7 @@
                         </div>
 
                         <div class="space-y-2">
-                            <label class="block text-sm font-semibold text-gray-700">
+                            <label class="block text-sm font-semibold text-M3">
                                 <i class="fas fa-user-alt mr-2 text-blue-500"></i>
                                 Solicitado por *
                             </label>
@@ -72,13 +72,13 @@
 
                         <!-- Sucursal -->
                         <div class="space-y-2">
-                            <label for="sucursal" class="block text-sm font-semibold text-gray-700">
+                            <label for="sucursal" class="block text-sm font-semibold text-M3">
                                 <i class="fas fa-map-marker-alt mr-2 text-blue-500"></i>
                                 Sucursal *
                             </label>
                             <select id="sucursal" name="sucursal" required
                                 class="form-input w-full text-sm px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300">
-                                <option value="">Selecciona la sucursal</option>
+                                <option class="text-neutral" value="">Selecciona la sucursal</option>
                                 @foreach ($sucursales as $suc => $descripcion)
                                     <option value="{{ $suc }}">{{ $descripcion }}</option>
                                 @endforeach
@@ -88,7 +88,7 @@
 
                         <!-- Cliente -->
                         <div class="space-y-2">
-                            <label for="cliente" class="block text-sm font-semibold text-gray-700">
+                            <label for="cliente" class="block text-sm font-semibold text-M3">
                                 <i class="fa-solid fa-user-tie mr-2 text-blue-500"></i>
                                 Cliente *
                             </label>
@@ -105,7 +105,7 @@
                         </div>
 
                         <div class="space-y-2">
-                            <label class="block text-sm font-semibold text-gray-700">
+                            <label class="block text-sm font-semibold text-M3">
                                 <i class="fas fa-user-alt mr-2 text-blue-500"></i>
                                 Tipo de Personal *
                             </label>
@@ -123,7 +123,7 @@
 
                         <!-- Tipo Cargo -->
                         <div class="space-y-2">
-                            <label for="tipo_cargo" class="block text-sm font-semibold text-gray-700">
+                            <label for="tipo_cargo" class="block text-sm font-semibold text-M3">
                                 <i class="fas fa-briefcase mr-2 text-blue-500"></i>
                                 Tipo de Cargo *
                             </label>
@@ -136,8 +136,8 @@
 
                         <!-- Cargo Especifico solicitado -->
                         <div class="space-y-2">
-                            <label for="cargo_solicitado" class="block text-sm font-semibold text-gray-700">
-                                <i class="fas fa-briefcase mr-2 text-blue-500"></i>
+                            <label for="cargo_solicitado" class="block text-sm font-semibold text-M3">
+                                <i class="fas fa-briefcase mr-2 text-M2"></i>
                                 Cargo solicitado *
                             </label>
                             <select id="cargo_solicitado" name="cargo_solicitado" required
@@ -158,8 +158,8 @@
 
                         <!-- Fechas y urgencia -->
                         <div class="space-y-2">
-                            <label for="cliente" class="block text-sm font-semibold text-gray-700">
-                                <i class="fas fa-calendar-alt mr-2 text-blue-500"></i>
+                            <label for="cliente" class="block text-sm font-semibold text-M3">
+                                <i class="fas fa-calendar-alt mr-2 text-M2"></i>
                                 Fecha de Inicio *
                             </label>
                             <input type="date" name="fecha_inicio" id="fecha_inicio"
@@ -168,8 +168,8 @@
                         </div>
 
                         <div class="space-y-2">
-                            <label for="cliente" class="block text-sm font-semibold text-gray-700">
-                                <i class="fas fa-calendar-alt mr-2 text-blue-500"></i>
+                            <label for="cliente" class="block text-sm font-semibold text-M3">
+                                <i class="fas fa-calendar-alt mr-2 text-M2"></i>
                                 Fecha Fin *
                             </label>
                             <input type="date" name="fecha_fin" id="fecha_fin"
@@ -180,14 +180,14 @@
                         <!-- Urgencia automática por fechas -->
                         <div id="urgenciaAutoBox" class="mt-2">
                             <div id="urgenciaAuto"
-                                class="rounded-lg px-4 py-3 font-semibold text-center transition-all duration-300 bg-gray-200 text-gray-700">
+                                class="text-sm rounded-lg px-4 py-3 font-semibold text-center transition-all duration-300 bg-gray-200 text-gray-700">
                                 NO SE SELECCIONÓ LA FECHA
                             </div>
                         </div>
 
                         <div class="space-y-2">
-                            <label for="urgencia" class="block text-sm font-semibold text-gray-700">
-                                <i class="fas fa-exclamation-triangle mr-2 text-blue-500"></i>
+                            <label for="urgencia" class="block text-sm font-semibold text-M3">
+                                <i class="fas fa-exclamation-triangle mr-2 text-M2"></i>
                                 Urgencia *
                             </label>
                             <select name="urgencia" id="urgencia" required
@@ -205,8 +205,8 @@
 
                         <!-- Cantidad requerida -->
                         <div class="space-y-2">
-                            <label for="cantidad_requerida" class="block text-sm font-semibold text-gray-700">
-                                <i class="fa-solid fa-users mr-2 text-blue-500"></i>
+                            <label for="cantidad_requerida" class="block text-sm font-semibold text-M3">
+                                <i class="fa-solid fa-users mr-2 text-M2"></i>
                                 Cantidad requerida *
                             </label>
                             <input type="number" id="cantidad_requerida" name="cantidad_requerida" required
@@ -218,8 +218,8 @@
 
                         <!-- Cantidad por sexo -->
                         <div class="space-y-2">
-                            <label class="block text-sm font-semibold text-gray-700">
-                                <i class="fa-solid fa-venus-mars text-blue-500"></i>
+                            <label class="block text-sm font-semibold text-M3">
+                                <i class="fa-solid fa-venus-mars text-M2"></i>
                                 Sexo requerido *
                             </label>
                             <div class="flex gap-2">
@@ -240,12 +240,12 @@
                 <!-- Requisitos del Puesto -->
                 <div class="bg-M6 rounded-lg border border-neutral shadow-sm p-5 flex flex-col items-start justify-start mx-auto w-full">
                     <div class="flex items-center mb-6">
-                        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4">
+                        <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-4">
                             <i class="fas fa-clipboard-list text-green-600 text-xl"></i>
                         </div>
                         <div>
-                            <h2 class="text-2xl font-bold text-gray-800">Perfil</h2>
-                            <p class="text-gray-600">Especificaciones y requisitos para el cargo</p>
+                            <h2 class="text-lg font-bold text-M2">Perfil</h2>
+                            <p class="text-sm text-M3">Especificaciones y requisitos para el cargo</p>
                         </div>
                     </div>
 
@@ -403,11 +403,11 @@
                     <!-- Validaciones y Remuneración -->
                     <div class="bg-M6 rounded-lg border border-neutral shadow-sm p-5 flex flex-col items-start justify-start mx-auto w-full">
                         <div class="flex items-center mb-6">
-                            <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mr-4">
+                            <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-4">
                                 <i class="fas fa-dollar-sign text-purple-600 text-xl"></i>
                             </div>
                             <div>
-                                <h2 class="text-2xl font-bold text-gray-800">Remuneración y Beneficios</h2>
+                                <h2 class="text-lg font-bold text-M2">Remuneración y Beneficios</h2>
                             </div>
                         </div>
 
@@ -449,12 +449,12 @@
                 <!-- Estado -->
                 <div class="bg-M6 rounded-lg border border-neutral shadow-sm p-5 flex flex-col items-start justify-start mx-auto w-full">
                     <div class="flex items-center mb-6">
-                        <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4">
+                        <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-4">
                             <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
                         </div>
                         <div>
-                            <h2 class="text-2xl font-bold text-gray-800">Estado</h2>
-                            <p class="text-gray-600">Define el estado actual de la solicitud</p>
+                            <h2 class="text-lg font-bold text-M2">Estado</h2>
+                            <p class="text-sm text-M3">Define el estado actual de la solicitud</p>
                         </div>
                     </div>
                     <!-- ESTADO -->

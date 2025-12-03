@@ -10,11 +10,9 @@
                     <h1 class="text-xl font-bold text-M2">Gestión de Usuarios</h1>
                     <p class="text-M3 mt-1">Administra los usuarios del sistema y sus permisos</p>
                 </div>
-                <button onclick="openCreateModal()"
-                    class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 flex items-center space-x-2">
-                    <i class="fas fa-plus"></i>
+                <x-primary-button-create onclick="openCreateModal()">
                     <span>Nuevo Usuario</span>
-                </button>
+                </x-primary-button-create>
             </div>
         </x-block>
 

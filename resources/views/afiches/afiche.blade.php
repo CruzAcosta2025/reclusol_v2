@@ -14,11 +14,11 @@
                     <p class="text-M3 mt-1">Crea afiches automáticamente basados en los requerimientos activos</p>
                 </div>
                 <!-- <div class="flex items-center space-x-4">
-                                                                                        <a href="{{ route('afiches.historial') }}" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center space-x-2 transition-all duration-300 hover:-translate-y-1">
-                                                                                            <i class="fas fa-history"></i>
-                                                                                            <span>Historial</span>
-                                                                                        </a>
-                                                                                    </div> -->
+                                                                                                <a href="{{ route('afiches.historial') }}" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center space-x-2 transition-all duration-300 hover:-translate-y-1">
+                                                                                                    <i class="fas fa-history"></i>
+                                                                                                    <span>Historial</span>
+                                                                                                </a>
+                                                                                            </div> -->
             </div>
         </x-block>
 
@@ -28,34 +28,35 @@
                     <x-block class="flex flex-col">
                         <div class="flex items-center mb-4">
                             <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                                <i class="fas fa-briefcase text-blue-600"></i>
+                                <i class="fas fa-briefcase text-M2"></i>
                             </div>
-                            <h3 class="text-xl font-bold text-gray-800">Requerimientos Activos</h3>
+                            <h3 class="text-lg font-bold text-M2">Requerimientos Activos</h3>
                         </div>
                         <div class="space-y-3 max-h-80 overflow-y-auto">
                             @foreach ($requerimientos as $req)
                                 @php
                                     $color = match (strtolower($req->urgencia)) {
-                                        'alta' => 'bg-red-600 text-white',
-                                        'media' => 'bg-yellow-600 text-white',
-                                        'baja' => 'bg-green-600 text-white',
-                                        default => 'bg-gray-600 text-white',
+                                        'alta' => 'bg-error-light text-error-dark',
+                                        'media' => 'bg-warning-light text-warning-dark',
+                                        'baja' => 'bg-success-light text-success-dark',
+                                        default
+                                            => 'bg-neutral-lightest text-neutral-darkest border border-neutral-dark', //eliminar el default
                                     };
 
                                 @endphp
                                 <div class="requirement-item p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all duration-300"
                                     onclick="selectRequirement({{ $req->id }}, this)">
                                     <div class="flex justify-between items-start mb-2">
-                                        <h4 class="font-semibold text-xs text-gray-800">{{ $req->cargo_nombre }}</h4>
+                                        <h4 class="font-semibold text-xs text-M2">{{ $req->cargo_nombre }}</h4>
                                         <span
                                             class="{{ $color }} text-sm font-semibold tracking-widest px-3 py-1 rounded-full uppercase shadow-sm border border-opacity-40 border-current">
                                             {{ strtoupper($req->urgencia) }}
                                         </span>
                                     </div>
-                                    <p class="text-xs text-gray-600 mb-2">
+                                    <p class="text-xs text-M3 mb-2">
                                         Sucursal: {{ $req->sucursal_nombre }}
                                     </p>
-                                    <div class="flex justify-between text-xs text-gray-600">
+                                    <div class="flex justify-between text-xs text-M3">
                                         <span>
                                             Cantidad Requerida: {{ $req->cantidad_requerida }}
                                             {{ str('persona')->plural($req->cantidad_requerida) }}
@@ -81,7 +82,7 @@
                                 };
                                 return [
                                     $req->id => [
-                                        'title' => strtoupper($req->cargo_nombre), // 👈 Cambiado
+                                        'title' => strtoupper($req->cargo_nombre),
                                         'location' => trim(
                                             $req->sucursal_nombre . ' - ' . ($req->cliente_nombre ?? ''),
                                             ' -',
@@ -114,22 +115,22 @@
                     <x-block class="flex flex-col">
                         <div class="mb-4 flex border-b border-gray-200 overflow-x-auto no-scrollbar">
                             <button
-                                class="option-tab px-4 py-2 font-semibold text-gray-700 border-b-2 border-transparent focus:outline-none focus:border-purple-600"
+                                class="option-tab px-4 py-2 text-sm font-semibold text-M2 border-b-2 border-transparent focus:outline-none"
                                 onclick="showTab('tab-plantillas', this)">Plantillas</button>
                             <button
-                                class="option-tab px-4 py-2 font-semibold text-gray-700 border-b-2 border-transparent focus:outline-none"
+                                class="option-tab px-4 py-2 text-sm font-semibold text-M2 border-b-2 border-transparent focus:outline-none"
                                 onclick="showTab('tab-iconG', this)">Ícono Principal</button>
                             <button
-                                class="option-tab px-4 py-2 font-semibold text-gray-700 border-b-2 border-transparent focus:outline-none"
+                                class="option-tab px-4 py-2 text-sm font-semibold text-M2 border-b-2 border-transparent focus:outline-none"
                                 onclick="showTab('tab-iconCheck', this)">Ícono Check</button>
                             <button
-                                class="option-tab px-4 py-2 font-semibold text-gray-700 border-b-2 border-transparent focus:outline-none"
+                                class="option-tab px-4 py-2 text-sm font-semibold text-M2 border-b-2 border-transparent focus:outline-none"
                                 onclick="showTab('tab-iconPhone', this)">Ícono Celular</button>
                             <button
-                                class="option-tab px-4 py-2 font-semibold text-gray-700 border-b-2 border-transparent focus:outline-none"
+                                class="option-tab px-4 py-2 text-sm font-semibold text-M2 border-b-2 border-transparent focus:outline-none"
                                 onclick="showTab('tab-iconEmail', this)">Ícono Email</button>
                             <button
-                                class="option-tab px-4 py-2 font-semibold text-gray-700 border-b-2 border-transparent focus:outline-none"
+                                class="option-tab px-4 py-2 text-sm font-semibold text-M2 border-b-2 border-transparent focus:outline-none"
                                 onclick="showTab('tab-font', this)">Fuente</button>
                         </div>
 
@@ -141,7 +142,7 @@
                                         $tplKey = Str::beforeLast($tpl->filename, '.'); // ej: modern, classic, etc.
                                     @endphp
 
-                                    <div class="template-option p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 transition-all duration-300 text-center"
+                                    <div class="template-option p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all duration-300 text-center"
                                         onclick="selectTemplate('{{ $tplKey }}', this)">
                                         <div
                                             class="w-full h-20 rounded-lg mb-2 flex items-center justify-center overflow-hidden">
@@ -164,7 +165,7 @@
                         <div id="tab-iconG" class="option-tab-content hidden">
                             <div class="grid grid-cols-3 gap-3">
                                 @forelse($iconosG ?? [] as $icon)
-                                    <div class="iconG-option p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 text-center"
+                                    <div class="iconG-option p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-50 text-center"
                                         onclick="selectIconG('{{ $icon->path }}', this)">
                                         <img src="{{ asset($icon->path) }}" alt="{{ $icon->name }}"
                                             class="w-full h-16 object-contain mx-auto">
@@ -181,7 +182,7 @@
                         <div id="tab-iconCheck" class="option-tab-content hidden">
                             <div class="grid grid-cols-3 gap-3">
                                 @forelse($iconosCheck ?? [] as $icon)
-                                    <div class="iconCheck-option p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 text-center"
+                                    <div class="iconCheck-option p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-50text-center"
                                         onclick="selectIconCheck('{{ $icon->path }}', this)">
                                         <img src="{{ asset($icon->path) }}" alt="{{ $icon->name }}"
                                             class="w-full h-12 object-contain mx-auto">
@@ -197,7 +198,7 @@
                         <div id="tab-iconPhone" class="option-tab-content hidden">
                             <div class="grid grid-cols-3 gap-3">
                                 @forelse($iconosPhone ?? [] as $icon)
-                                    <div class="iconPhone-option p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 text-center"
+                                    <div class="iconPhone-option p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-50 text-center"
                                         onclick="selectIconPhone('{{ $icon->path }}', this)">
                                         <img src="{{ asset($icon->path) }}" alt="{{ $icon->name }}"
                                             class="w-full h-12 object-contain mx-auto">
@@ -213,7 +214,7 @@
                         <div id="tab-iconEmail" class="option-tab-content hidden">
                             <div class="grid grid-cols-3 gap-3">
                                 @forelse($iconosEmail ?? [] as $icon)
-                                    <div class="iconEmail-option p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 text-center"
+                                    <div class="iconEmail-option p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-50 text-center"
                                         onclick="selectIconEmail('{{ $icon->path }}', this)">
                                         <img src="{{ asset($icon->path) }}" alt="{{ $icon->name }}"
                                             class="w-full h-12 object-contain mx-auto">
@@ -245,8 +246,8 @@
                         <!-- Encabezado derecha -->
                         <div class="flex justify-between items-center mb-4">
                             <div>
-                                <h2 class="text-xl font-bold text-gray-800">Vista previa del afiche</h2>
-                                <p class="text-sm text-gray-500">
+                                <h2 class="text-lg font-bold text-M2">Vista previa del afiche</h2>
+                                <p class="text-sm text-M3">
                                     Selecciona un requerimiento y una plantilla para generar el afiche.
                                 </p>
                             </div>
@@ -323,21 +324,21 @@
         }
 
         .template-option.selected {
-            border-color: #8b5cf6;
-            background-color: #f3e8ff;
+            border-color: #3b82f6;
+            background-color: #eff6ff;
         }
 
         .icon-option.selected {
-            border-color: #8b5cf6;
-            background-color: #f3e8ff;
+            border-color: #3b82f6;
+            background-color: #eff6ff;
         }
 
         .iconG-option.selected,
         .iconCheck-option.selected,
         .iconPhone-option.selected,
         .iconEmail-option.selected {
-            border-color: #8b5cf6 !important;
-            background-color: #f3e8ff !important;
+            border-color: #3b82f6 !important;
+            background-color: #eff6ff !important;
         }
     </style>
 
@@ -377,8 +378,8 @@
             document.querySelectorAll('.option-tab-content').forEach(el => el.classList.add('hidden'));
             document.getElementById(tabId).classList.remove('hidden');
             document.querySelectorAll('.option-tab').forEach(b => b.classList.remove('border-purple-600',
-                'text-purple-600'));
-            btn.classList.add('border-purple-600', 'text-purple-600');
+                'text-accent-dark'));
+            btn.classList.add('text-accent-dark');
         }
 
 

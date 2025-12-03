@@ -34,18 +34,17 @@
                 {{-- COL 1: FORMULARIO --}}
                 <div class="md:col-span-1">
                     <x-block class="flex flex-col">
-                        <h2 class="text-lg font-semibold text-gray-800 mb-3">Subir recurso</h2>
+                        <h2 class="text-lg font-semibold text-M2 mb-3">Subir recurso</h2>
 
                         <form action="{{ route('afiches.assets.upload') }}" method="POST" enctype="multipart/form-data"
                             class="space-y-4">
                             @csrf
 
                             <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-1">
+                                <label class="block text-sm font-semibold text-M2 mb-1">
                                     Tipo de recurso
                                 </label>
-                                <select name="tipo"
-                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                                <x-select name="tipo" class="text-sm">
                                     <option value="">-- Selecciona --</option>
                                     <option value="plantilla" {{ old('tipo') === 'plantilla' ? 'selected' : '' }}>
                                         Plantilla de afiche
@@ -65,16 +64,16 @@
                                     <option value="font" {{ old('tipo') === 'font' ? 'selected' : '' }}>
                                         Fuente (TTF/OTF)
                                     </option>
-                                </select>
+                                </x-select>
                             </div>
 
                             <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-1">
+                                <label class="block text-sm font-semibold text-M2 mb-1">
                                     Archivo
                                 </label>
                                 <input type="file" name="archivo"
                                     class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white text-sm">
-                                <p class="text-xs text-gray-500 mt-1">
+                                <p class="text-xs text-M3 mt-1">
                                     Imágenes: PNG/JPG. Fuentes: TTF/OTF. Tamaño máximo: 4 MB.
                                 </p>
                             </div>

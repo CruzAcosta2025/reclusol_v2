@@ -9,16 +9,12 @@ class Postulante extends Model
 {
     use HasFactory;
 
-    // Nombre de la tabla si no sigue el plural por defecto
     protected $table = 'postulantes';
 
-    // Clave primaria (Laravel asume 'id' por defecto, así que no es necesario declararla si usas 'id')
     protected $primaryKey = 'id';
 
-    // Si no usas created_at/updated_at, pon false
     public $timestamps = true;
 
-    // Campos que se pueden llenar con asignación masiva
     protected $fillable = [
         'nombres',
         'apellidos',

@@ -163,113 +163,64 @@
         {{-- Tabla --}}
         <div class="w-full">
             <div class="bg-white rounded-2xl shadow-sm border">
+                @php
+                    // Define table columns for the component
+                    $columns = [
+                        ['key' => 'tipo_personal_nombre', 'label' => 'Tipo de Personal', 'sortable' => true, 'align' => 'text-center'],
+                        ['key' => 'cargo_nombre', 'label' => 'Cargo Solicitado', 'sortable' => true, 'align' => 'text-center'],
+                        ['key' => 'sucursal_nombre', 'label' => 'Sucursal', 'sortable' => true, 'align' => 'text-center'],
+                        ['key' => 'cliente_nombre', 'label' => 'Cliente', 'sortable' => true, 'align' => 'text-center'],
+                        ['key' => 'urgencia_label', 'label' => 'Urgencia', 'sortable' => true, 'align' => 'text-center'],
+                        ['key' => 'estado_label', 'label' => 'Estado', 'sortable' => true, 'align' => 'text-center'],
+                        ['key' => 'fecha_inicio', 'label' => 'Fecha Inicio', 'sortable' => true, 'align' => 'text-center'],
+                        ['key' => 'fecha_fin', 'label' => 'Fecha Final', 'sortable' => true, 'align' => 'text-center'],
+                        ['key' => 'actions', 'label' => 'Acciones', 'sortable' => false, 'align' => 'text-center'],
+                    ];
+
+                    // Prepare rows as plain arrays that include HTML for actions and labels
+                    $rows = $requerimientos->map(function($r){
+                        $urg = strtolower($r->urgencia ?? '');
+                        $priorityColors = [
+                            'mayor' => 'bg-neutral-lightest text-neutral-darkest border border-neutral-dark',
+                            'alta' => 'bg-error-light text-error-dark',
+                            'media' => 'bg-warning-light text-warning-dark',
+                            'baja' => 'bg-success-light text-success-dark',
+                        ];
+                        $priorityClass = $priorityColors[$urg] ?? 'bg-neutral-lightest text-neutral-darkest border border-neutral-dark';
+                        $urgHtml = '<span class="inline-flex items-center px-3 py-1 rounded-full text-xs '. $priorityClass . '">' . ucfirst($r->urgencia ?? 'N/A') . '</span>';
+
+                        $estadoNombre = $r->estado_nombre;
+                        $statusColors = [
+                            'en proceso' => 'bg-yellow-100 text-yellow-800',
+                            'cubierto' => 'bg-green-100 text-green-800',
+                            'cancelado' => 'bg-red-100 text-red-800',
+                            'vencido' => 'bg-gray-200 text-gray-700',
+                        ];
+                        $statusClass = $statusColors[strtolower($estadoNombre ?? '')] ?? 'bg-gray-100 text-gray-600';
+                        $estadoHtml = '<span class="inline-flex items-center px-3 py-1 rounded-full text-xs '. $statusClass . '">' . ($estadoNombre ?? 'N/A') . '</span>';
+
+                        $actions = '';
+                        $actions .= '<a href="#" class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 hover:bg-blue-100 text-blue-600 transition" title="Ver"><i class="fas fa-eye"></i></a>';
+                        $actions .= ' <button data-id="'. $r->id .'" class="btn-edit inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-50 hover:bg-green-100 text-green-600 transition" title="Editar"><i class="fas fa-edit"></i></button>';
+                        $actions .= ' <button onclick="eliminarRequerimiento('. $r->id .')" class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-50 hover:bg-red-100 text-red-600 transition" title="Eliminar"><i class="fas fa-trash"></i></button>';
+
+                        return [
+                            'id' => $r->id,
+                            'tipo_personal_nombre' => $r->tipo_personal_nombre,
+                            'cargo_nombre' => $r->cargo_nombre,
+                            'sucursal_nombre' => ucfirst($r->sucursal_nombre),
+                            'cliente_nombre' => ucfirst($r->cliente_nombre),
+                            'urgencia_label' => $urgHtml,
+                            'estado_label' => $estadoHtml,
+                            'fecha_inicio' => $r->fecha_inicio ? $r->fecha_inicio->format('d/m/Y') : '—',
+                            'fecha_fin' => $r->fecha_fin ? $r->fecha_fin->format('d/m/Y') : '—',
+                            'actions' => $actions,
+                        ];
+                    })->toArray();
+                @endphp
+
                 <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead class="bg-neutral-lightest rounded-t-2xl border border-neutral">
-                            <tr class="text-left text-sm">
-                                <th class="px-4 py-2 font-bold text-M2 uppercase text-center">Tipo de
-                                    Personal</th>
-                                <th class="px-4 py-2 font-bold text-M2 uppercase text-center">Cargo
-                                    Solicitado</th>
-                                <th class="px-4 py-2 font-bold text-M2 uppercase text-center">Sucursal
-                                </th>
-                                <th class="px-4 py-2 font-bold text-M2 uppercase text-center">Cliente
-                                </th>
-                                <th class="px-4 py-2 font-bold text-M2 uppercase text-center">Urgencia
-                                </th>
-                                <th class="px-4 py-2 font-bold text-M2 uppercase text-center">Estado</th>
-                                <th class="px-4 py-2 font-bold text-M2 uppercase text-center">Fecha
-                                    Inicio
-                                </th>
-                                <th class="px-4 py-2 font-bold text-M2 uppercase text-center">Fecha Final
-                                </th>
-                                <th class="px-4 py-2 font-bold text-M2 uppercase text-center">Acciones
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-neutral">
-                            @forelse($requerimientos as $requerimiento)
-                                <tr class="hover:bg-blue-50 transition">
-                                    <td class="px-4 py-2 text-M2 text-sm text-center">
-                                        {{ $requerimiento->tipo_personal_nombre }}
-                                    </td>
-                                    <td class="px-4 py-2 text-M2 text-sm text-center">{{ $requerimiento->cargo_nombre }}
-                                    </td>
-                                    <td class="px-4 py-2 text-M2 text-sm text-center">
-                                        {{ ucfirst($requerimiento->sucursal_nombre) }}</td>
-                                    <td class="px-4 py-2 text-M2 text-sm text-center">
-                                        {{ ucfirst($requerimiento->cliente_nombre) }}</td>
-                                    <td class="px-4 py-2 text-M2 text-sm text-center">
-                                        @php
-                                            $urg = strtolower($requerimiento->urgencia ?? '');
-                                            $priorityColors = [
-                                                'alta' => 'bg-red-100 text-xs text-red-800',
-                                                'media' => 'bg-yellow-100 text-xs text-yellow-800',
-                                                'baja' => 'bg-green-100 text-xs text-green-800',
-                                            ];
-                                            $priorityClass = $priorityColors[$urg] ?? 'bg-gray-100 text-gray-600';
-                                        @endphp
-                                        <span
-                                            class="inline-flex items-center px-3 py-1 rounded-full text-xs {{ $priorityClass }}">
-                                            {{ ucfirst($requerimiento->urgencia ?? 'N/A') }}
-                                        </span>
-
-                                    </td>
-                                    <td class="px-4 py-2 text-M2 text-sm text-center">
-                                        @php
-                                            $estadoNombre = $requerimiento->estado_nombre; // ya viene del controller
-                                            $statusColors = [
-                                                'en proceso' => 'bg-yellow-100 text-xs text-yellow-800',
-                                                'cubierto' => 'bg-green-100 text-xs text-green-800',
-                                                'cancelado' => 'bg-red-100 text-xs text-red-800',
-                                                'vencido' => 'bg-gray-200 text-xs text-gray-700',
-                                            ];
-                                            $statusClass =
-                                                $statusColors[strtolower($estadoNombre ?? '')] ??
-                                                'bg-gray-100 text-xs text-gray-600';
-                                        @endphp
-                                        <span
-                                            class="inline-flex items-center px-3 py-1 rounded-full text-xs {{ $statusClass }}">
-                                            {{ $estadoNombre ?? 'N/A' }}
-                                        </span>
-
-                                    </td>
-
-                                    <td class="px-4 py-2 text-M2 text-sm text-center">
-                                        {{ $requerimiento->fecha_inicio ? $requerimiento->fecha_inicio->format('d/m/Y') : '—' }}
-                                    </td>
-
-                                    <td class="px-4 py-2 text-M2 text-sm text-center">
-                                        {{ $requerimiento->fecha_fin ? $requerimiento->fecha_fin->format('d/m/Y') : '—' }}
-                                    </td>
-
-
-                                    <td class="px-4 py-3 flex space-x-2">
-                                        <a href="#"
-                                            class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 hover:bg-blue-100 text-blue-600 transition"
-                                            title="Ver">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        <button data-id="{{ $requerimiento->id }}"
-                                            class="btn-edit inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-50 hover:bg-green-100 text-green-600 transition"
-                                            title="Editar">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button onclick="eliminarRequerimiento({{ $requerimiento->id }})"
-                                            class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-50 hover:bg-red-100 text-red-600 transition"
-                                            title="Eliminar">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="9" class="text-center py-6 text-M2 text-sm">No hay requerimientos.
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                    <x-data-table :columns="$columns" :rows="$rows" :initial-per-page="25" empty-message="No hay requerimientos." />
                 </div>
 
                 {{-- Modal de Edición --}}

@@ -30,19 +30,18 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">DNI</label>
                     <input type="text" name="dni" value="{{ request('dni') }}" placeholder="Ingrese DNI"
-                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-0 bg-white/80 transition-colors">
+                        class="w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent focus:ring-opacity-60 focus:border-accent bg-white/80">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
                     <input type="text" name="nombre" value="{{ request('nombre') }}" placeholder="Nombre o Apellido"
-                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-0 bg-white/80 transition-colors">
+                        class="w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-accent focus:ring-opacity-60 focus:border-accent bg-white/80 transition-colors">
                 </div>
 
                 <!-- Tipo de Cargo -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Cargo</label>
-                    <select name="tipo_cargo" id="tipo_cargo"
-                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 bg-white/80">
+                    <x-select name="tipo_cargo" id="tipo_cargo">
                         <option value="">Todos</option>
                         @foreach ($tipoCargos as $codigo => $desc)
                             <option value="{{ $codigo }}"
@@ -50,27 +49,25 @@
                                 {{ $desc }}
                             </option>
                         @endforeach
-                    </select>
+                    </x-select>
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Cargo Solicitado</label>
-                    <select name="cargo" id="cargo"
-                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 bg-white/80">
+                    <x-select name="cargo" id="cargo">
                         <option value="">Todos</option>
                         @foreach ($cargos as $codigo => $cargo)
                             <option value="{{ $codigo }}" {{ request('cargo') == $codigo ? 'selected' : '' }}>
                                 {{ $cargo->DESC_CARGO }}
                             </option>
                         @endforeach
-                    </select>
+                    </x-select>
                 </div>
 
                 {{-- Departamento --}}
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Departamento</label>
-                    <select name="departamento" id="departamento"
-                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 bg-white/80">
+                    <x-select name="departamento" id="departamento">
                         <option value="">Todos</option>
                         @foreach ($departamentos as $codigo => $desc)
                             {{-- $desc es STRING --}}
@@ -78,36 +75,34 @@
                                 {{ $desc }}
                             </option>
                         @endforeach
-                    </select>
+                    </x-select>
                 </div>
 
 
                 {{-- Provincia --}}
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Provincia</label>
-                    <select name="provincia" id="provincia"
-                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 bg-white/80">
+                    <x-select name="provincia" id="provincia">
                         <option value="">Todas</option>
                         @foreach ($provincias as $codigo => $provincia)
                             <option value="{{ $codigo }}" {{ request('provincia') == $codigo ? 'selected' : '' }}>
                                 {{ $provincia->PROVI_DESCRIPCION }}
                             </option>
                         @endforeach
-                    </select>
+                    </x-select>
                 </div>
 
                 {{-- Distrito --}}
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Distrito</label>
-                    <select name="distrito" id="distrito"
-                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 bg-white/80">
+                    <x-select name="distrito" id="distrito">
                         <option value="">Todos</option>
                         @foreach ($distritos as $codigo => $distrito)
                             <option value="{{ $codigo }}" {{ request('distrito') == $codigo ? 'selected' : '' }}>
                                 {{ $distrito->DIST_DESCRIPCION }}
                             </option>
                         @endforeach
-                    </select>
+                    </x-select>
                 </div>
 
                 <div class="md:col-span-4 flex flex-wrap gap-2 mt-4">
@@ -122,7 +117,7 @@
             </form>
         </x-block>
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+        <div>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {{-- Aptos --}}
                 <div class="bg-green-100 p-4 rounded-lg text-center flex flex-col items-center">
@@ -156,7 +151,7 @@
 
 
         {{-- Resultados --}}
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+        <div>
             {{-- Encabezado --}}
             <div
                 class="flex items-center justify-between bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-4 py-3 rounded-t-xl shadow-md">

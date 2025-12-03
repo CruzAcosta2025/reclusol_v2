@@ -1,7 +1,7 @@
 <div class="p-6">
     <div class="flex items-center justify-between mb-6">
-        <h3 class="text-xl font-semibold text-gray-800 flex items-center">
-            <i class="fas fa-user-plus text-blue-600 mr-2"></i>
+        <h3 class="text-lg font-semibold text-M2 flex items-center">
+            <i class="fas fa-user-plus text-M2 mr-2"></i>
             Crear Nuevo Usuario
         </h3>
         <button onclick="closeCreateModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
@@ -32,8 +32,7 @@
                 </label>
                 <input type="text" id="nombres" name="nombres"
                     class="form-input w-full px-4 py-3 border border-gray-300 bg-gray-100 text-gray-600 rounded-lg focus:outline-none cursor-not-allowed"
-                    readonly
-                    placeholder="Nombres">
+                    readonly placeholder="Nombres">
                 <span class="error-message text-red-500 text-sm hidden"></span>
             </div>
 
@@ -45,8 +44,7 @@
                 </label>
                 <input type="text" id="apellidos" name="apellidos"
                     class="form-input w-full px-4 py-3 border border-gray-300 bg-gray-100 text-gray-600 rounded-lg focus:outline-none cursor-not-allowed"
-                    readonly
-                    placeholder="Apellidos">
+                    readonly placeholder="Apellidos">
                 <span class="error-message text-red-500 text-sm hidden"></span>
             </div>
             {{-- Sucursal 
@@ -131,16 +129,12 @@
 
         {{-- Botones --}}
         <div class="flex space-x-3 pt-4 border-t border-gray-200">
-            <button type="button" onclick="closeCreateModal()"
-                class="flex-1 px-4 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-xl transition-colors">
-                <i class="fas fa-times mr-2"></i>
+            <x-cancel-button type="button" onclick="closeCreateModal()">
                 Cancelar
-            </button>
-            <button type="submit"
-                class="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl transition-all">
-                <i class="fas fa-save mr-2"></i>
+            </x-cancel-button>
+            <x-confirm-button type="submit">
                 Crear Usuario
-            </button>
+            </x-confirm-button>
         </div>
     </form>
 </div>

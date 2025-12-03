@@ -554,34 +554,33 @@ class RequerimientoController extends Controller
 
 
 
-    /*
-    public function edit(Requerimiento $requerimiento)
+  /*   public function edit(Requerimiento $requerimiento)
     {
         $estados = EstadoRequerimiento::all();
 
-        $sucursales = DB::connection('si_solmar')
+        $sucursales = DB::connection('reclusol')
             ->table('SISO_SUCURSAL')
             ->select('SUCU_CODIGO', 'SUCU_DESCRIPCION')
             ->where('SUCU_VIGENCIA', 'SI')
             ->get();
 
-        $tipoCargos = DB::connection('si_solmar')
+        $tipoCargos = DB::connection('reclusol')
             ->table('TIPO_CARGO')
             ->select('CODI_TIPO_CARG', 'DESC_TIPO_CARG')
             ->get();
 
-        $cargos = DB::connection('si_solmar')
+        $cargos = DB::connection('reclusol')
             ->table('CARGOS')
             ->select('CODI_CARG', 'DESC_CARGO', 'TIPO_CARG')
             ->where('CARG_VIGENCIA', 'SI')
             ->get();
 
-        $nivelEducativo = DB::connection('si_solmar')
+        $nivelEducativo = DB::connection('reclusol')
             ->table('SUNAT_NIVEL_EDUCATIVO')
             ->select('NIED_CODIGO', 'NIED_DESCRIPCION')
             ->get();
 
-        $departamentos = DB::connection('si_solmar')
+        $departamentos = DB::connection('reclusol')
             ->table('ADMI_DEPARTAMENTO')
             ->select('DEPA_CODIGO', 'DEPA_DESCRIPCION')
             ->where('DEPA_VIGENCIA', 'SI')
@@ -590,7 +589,7 @@ class RequerimientoController extends Controller
             ->keyBy('DEPA_CODIGO');
 
 
-        $provincias = DB::connection('si_solmar')
+        $provincias = DB::connection('reclusol')
             ->table('ADMI_PROVINCIA')
             ->select('PROVI_CODIGO', 'PROVI_DESCRIPCION', 'DEPA_CODIGO')
             ->where('PROVI_VIGENCIA', 'SI')
@@ -598,7 +597,7 @@ class RequerimientoController extends Controller
             ->get()
             ->keyBy('PROVI_CODIGO');
 
-        $distritos = DB::connection('si_solmar')
+        $distritos = DB::connection('reclusol')
             ->table('ADMI_DISTRITO')
             ->select('DIST_CODIGO', 'DIST_DESCRIPCION', 'PROVI_CODIGO')
             ->where('DIST_VIGENCIA', 'SI')
@@ -617,8 +616,8 @@ class RequerimientoController extends Controller
             'provincias',
             'distritos'
         ));
-    }
-    */
+    } */
+    
 
     /**
      * Valida y actualiza el postulante.
