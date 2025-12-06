@@ -1,135 +1,266 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="min-h-screen gradient-bg">
-        <!-- Header -->
-        <header class="bg-white/10 border-b border-white/20 z-40">
-            <div class="px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between items-center h-16">
-                    <!-- User Info - Moved to extreme left -->
-                    <div class="flex items-center space-x-3 relative">
-                        <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                            <i class="fas fa-user text-white text-sm"></i>
-                        </div>
-                        <div class="text-white cursor-pointer" onclick="toggleUserDropdown()">
-                            <h2 class="font-semibold text-sm"> {{ Auth::user()->name ?? 'INVITADO' }} </h2>
-                            <p class="text-xs text-blue-100"> {{ Auth::user()->rol ?? 'Sin rol' }}
-                            </p>
-                        </div>
+    <style>
+        [x-cloak] {
+            display: none !important;
+        }
 
-                        <!-- User Dropdown -->
-                        <div id="user-dropdown"
-                            class="absolute top-full left-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 hidden z-50">
-                            <!-- Dropdown Header -->
-                            <div class="p-4 border-b border-gray-200 bg-blue-50">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                                        <i class="fas fa-user text-blue-600 text-lg"></i>
-                                    </div>
-                                    <div>
-                                        <h3 class="font-semibold text-gray-800">{{ Auth::user()->name ?? 'INVITADO' }}</h3>
-                                        <p class="text-sm text-gray-600">
-                                            {{ Auth::user()->rol ?? 'Sin rol' }} </p>
-                                    </div>
+        /* Fondo y “glass” profesional (sin tocar tu lógica) */
+        .reclusol-bg {
+            background:
+                radial-gradient(1200px circle at 10% 10%, rgba(56, 189, 248, .18), transparent 45%),
+                radial-gradient(900px circle at 90% 20%, rgba(99, 102, 241, .16), transparent 42%),
+                radial-gradient(1100px circle at 50% 95%, rgba(34, 197, 94, .12), transparent 40%),
+                linear-gradient(180deg, #0b1220 0%, #0a1020 55%, #070b14 100%);
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, .08);
+            border: 1px solid rgba(255, 255, 255, .12);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .glass-strong {
+            background: rgba(255, 255, 255, .10);
+            border: 1px solid rgba(255, 255, 255, .16);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+        }
+
+        .shadow-soft {
+            box-shadow: 0 10px 35px rgba(0, 0, 0, .35);
+        }
+
+        .card {
+            border-radius: 1.25rem;
+        }
+
+        .btn-primary{
+            display:inline-flex;align-items:center;gap:.5rem;
+            border-radius: .9rem;
+            padding:.55rem 1rem;
+            font-size:.875rem;line-height:1.25rem;
+            font-weight:700;
+            color:#fff;
+            transition:filter .15s ease, transform .15s ease, box-shadow .15s ease;
+            background: linear-gradient(135deg, rgba(56, 189, 248, .95), rgba(99, 102, 241, .95));
+            box-shadow: 0 10px 25px rgba(56,189,248,.18);
+            text-decoration:none;
+        }
+        .btn-primary:hover{filter:brightness(1.05);transform:translateY(-1px)}
+        .btn-primary:active{transform:translateY(0)}
+        .nav-item{
+            display:flex;align-items:center;gap:.75rem;
+            width:100%;
+            border-radius: .9rem;
+            padding:.75rem 1rem;
+            font-size:.9rem;
+            font-weight:700;
+            line-height:1.25rem;
+            transition:background-color .15s ease, color .15s ease, border-color .15s ease, transform .15s ease;
+            text-decoration:none;
+        }
+        .nav-item:hover{background: rgba(255, 255, 255, .08)}
+        .nav-item-active{
+            background: linear-gradient(135deg, rgba(56, 189, 248, .28), rgba(99, 102, 241, .22));
+            border: 1px solid rgba(255, 255, 255, .10);
+        box-shadow: 0 10px 25px rgba(0,0,0,.18);
+            }
+
+        .pill {
+            border: 1px solid rgba(255, 255, 255, .14);
+            background: rgba(255, 255, 255, .08);
+        }
+    </style>
+
+    @php
+        // ====== Datos para gráficos (sin inventar números nuevos) ======
+        $labelsSede = collect($porSede ?? [])->map(function ($s) {
+            return ucwords(strtolower($s->nombre_departamento ?? 'Sin sede'));
+        })->values();
+
+        $totalesSede = collect($porSede ?? [])->map(function ($s) {
+            return (int) ($s->total ?? 0);
+        })->values();
+
+        // Si luego lo pasas desde el controller, reemplazas $estadoPostulantes.
+        $estadoPostulantes = $estadoPostulantes ?? [
+            'Apto' => 140,
+            'Pendiente' => 40,
+            'En entrevista' => 53,
+            'No Apto' => 15,
+        ];
+
+        $estadoLabels = array_keys($estadoPostulantes);
+        $estadoValues = array_values($estadoPostulantes);
+
+        $notiCount = ($notificaciones ?? collect())->count();
+    @endphp
+
+    <div class="min-h-screen reclusol-bg text-white" x-data x-cloak>
+        <!-- Topbar -->
+        <header class="sticky top-0 z-40">
+            <div class="glass-strong border-b border-white/10">
+                <div class="px-4 sm:px-6 lg:px-8">
+                    <div class="flex h-16 items-center justify-between gap-4">
+                        <!-- Left: toggle + brand -->
+                        <div class="flex items-center gap-3">
+                            <button type="button"
+                                class="h-10 w-10 rounded-xl pill grid place-items-center hover:bg-white/10 transition"
+                                @click="$store.ui.toggleSidebar()" title="Ocultar/Mostrar menú">
+                                <i class="fas fa-bars"></i>
+                            </button>
+
+                            <div class="hidden sm:flex items-center gap-3">
+                                <div
+                                    class="h-10 w-10 rounded-2xl grid place-items-center shadow-soft"
+                                    style="background: linear-gradient(135deg, rgba(56,189,248,.9), rgba(99,102,241,.9));">
+                                    <i class="fas fa-shield-halved"></i>
+                                </div>
+                                <div class="leading-tight">
+                                    <div class="font-semibold tracking-wide">RECLUSOL</div>
+                                    <div class="text-xs text-white/70">Recruiting Dashboard</div>
                                 </div>
                             </div>
+                        </div>
 
-                            <!-- Notifications Section -->
-                            <div class="p-4">
-                                <div class="flex items-center justify-between mb-3">
-                                    <h4 class="font-semibold text-gray-800 flex items-center">
-                                        <i class="fas fa-bell text-yellow-500 mr-2"></i>
-                                        Notificaciones
-                                    </h4>
-                                    <span class="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
-                                        {{ $notificaciones->count() }}
-                                    </span>
-                                </div>
+                        <!-- Center: dynamic title -->
+                        <div class="hidden md:block flex-1 text-center">
+                            <h1 class="text-sm sm:text-base font-semibold tracking-wide text-white"
+                                x-text="({
+                                    dashboard: 'Resumen general del sistema de reclutamiento',
+                                    solicitudes: 'Módulo: Solicitudes',
+                                    postulantes: 'Módulo: Postulantes',
+                                    afiches: 'Módulo: Afiches',
+                                    entrevistas: 'Módulo: Entrevistas',
+                                    usuarios: 'Módulo: Usuarios',
+                                    configuracion: 'Módulo: Configuración'
+                                }[$store.ui.currentModule] || 'Resumen general del sistema de reclutamiento')">
+                            </h1>
+                        </div>
 
-                                <div class="space-y-3 max-h-60 overflow-y-auto">
-                                    @forelse ($notificaciones as $noti)
-                                        <div
-                                            class="flex items-start space-x-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer">
-                                            {{-- Ícono y color según tipo de notificación --}}
-                                            <div
-                                                class="w-8 h-8
-@if ($noti->type == 'App\Notifications\PostulanteEnListaNegra') bg-red-100
-@elseif($noti->type == 'App\Notifications\NuevoRequerimientoCreado')
-    bg-green-100
-@elseif(str_contains($noti->data['mensaje'] ?? '', 'reprogramada'))
-    bg-orange-100
-@elseif(str_contains($noti->data['mensaje'] ?? '', 'urgente'))
-    bg-blue-100
-@else
-    bg-yellow-100 @endif
-rounded-full flex items-center justify-center flex-shrink-0">
+                        <!-- Right: date + user -->
+                        <div class="flex items-center gap-3">
+                            <div class="hidden lg:flex items-center gap-2 text-white/80 pill rounded-xl px-3 py-1.5">
+                                <i class="fas fa-calendar-alt text-white/80"></i>
+                                <span class="text-sm">{{ now()->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}</span>
+                            </div>
 
-                                                @if ($noti->type == 'App\Notifications\PostulanteEnListaNegra')
-                                                    <i class="fas fa-user-slash text-red-600 text-xs"></i>
-                                                @elseif($noti->type == 'App\Notifications\NuevoRequerimientoCreado')
-                                                    <i class="fas fa-users text-green-600 text-xs"></i>
-                                                @elseif(str_contains($noti->data['mensaje'] ?? '', 'reprogramada'))
-                                                    <i class="fas fa-clock text-orange-600 text-xs"></i>
-                                                @elseif(str_contains($noti->data['mensaje'] ?? '', 'urgente'))
-                                                    <i class="fas fa-info-circle text-blue-600 text-xs"></i>
-                                                @else
-                                                    <i class="fas fa-exclamation-triangle text-yellow-600 text-xs"></i>
-                                                @endif
+                            <!-- User dropdown (Alpine, sin onclick) -->
+                            <div class="relative" x-data="{ open:false }">
+                                <button @click="open=!open"
+                                    class="flex items-center gap-3 rounded-2xl px-3 py-2 pill hover:bg-white/10 transition">
+                                    <div class="h-9 w-9 rounded-xl grid place-items-center bg-white/10">
+                                        <i class="fas fa-user text-sm"></i>
+                                    </div>
+                                    <div class="hidden sm:block text-left leading-tight">
+                                        <div class="text-sm font-semibold">{{ Auth::user()->name ?? 'INVITADO' }}</div>
+                                        <div class="text-xs text-white/70">{{ Auth::user()->rol ?? 'Sin rol' }}</div>
+                                    </div>
+                                    <div class="hidden sm:grid place-items-center h-7 w-7 rounded-lg bg-white/10">
+                                        <i class="fas fa-chevron-down text-xs"></i>
+                                    </div>
+                                </button>
+
+                                <div x-show="open" x-cloak @click.away="open=false" x-transition
+                                    class="absolute right-0 mt-3 w-[22rem] sm:w-96 overflow-hidden rounded-2xl bg-white text-gray-800 shadow-soft border border-gray-200 z-50">
+                                    <!-- Header -->
+                                    <div class="p-4 bg-gradient-to-r from-sky-50 to-indigo-50 border-b border-gray-200">
+                                        <div class="flex items-center gap-3">
+                                            <div class="h-12 w-12 rounded-2xl grid place-items-center bg-white shadow">
+                                                <i class="fas fa-user text-indigo-600 text-lg"></i>
                                             </div>
-
-                                            <div class="flex-1">
-                                                <p class="text-sm font-medium text-gray-800">
-                                                    {{ $noti->data['mensaje'] ?? 'Tienes una nueva notificación.' }}
-                                                    @if (!empty($noti->data['nombre']))
-                                                        <br>
-                                                        <span class="text-xs text-gray-500">
-                                                            {{ $noti->data['nombre'] }}
-                                                        </span>
-                                                    @endif
-                                                </p>
-                                                <p class="text-xs text-gray-500">{{ $noti->created_at->diffForHumans() }}
-                                                </p>
+                                            <div>
+                                                <div class="font-semibold">{{ Auth::user()->name ?? 'INVITADO' }}</div>
+                                                <div class="text-sm text-gray-600">{{ Auth::user()->rol ?? 'Sin rol' }}</div>
                                             </div>
                                         </div>
-                                    @empty
-                                        <div class="text-center text-gray-400 text-sm py-4">
-                                            No tienes notificaciones nuevas.
+                                    </div>
+
+                                    <!-- Notifications -->
+                                    <div class="p-4">
+                                        <div class="flex items-center justify-between mb-3">
+                                            <div class="flex items-center gap-2">
+                                                <i class="fas fa-bell text-amber-500"></i>
+                                                <div class="font-semibold">Notificaciones</div>
+                                            </div>
+                                            <span class="text-xs font-semibold text-white px-2 py-1 rounded-full"
+                                                style="background: linear-gradient(135deg,#ef4444,#f97316);">
+                                                {{ $notiCount }}
+                                            </span>
                                         </div>
-                                    @endforelse
-                                </div>
 
-                                <div class="mt-3 pt-3 border-t border-gray-200">
-                                    <a href="#" class="text-sm text-blue-600 hover:text-blue-800 font-medium">Ver
-                                        todas las notificaciones</a>
+                                        <div class="space-y-2 max-h-60 overflow-y-auto">
+                                            @forelse (($notificaciones ?? collect()) as $noti)
+                                                <div class="flex items-start gap-3 p-2 rounded-xl hover:bg-gray-50 transition cursor-pointer">
+                                                    <div class="h-9 w-9 rounded-xl grid place-items-center flex-shrink-0
+                                                        @if ($noti->type == 'App\Notifications\PostulanteEnListaNegra') bg-red-100
+                                                        @elseif($noti->type == 'App\Notifications\NuevoRequerimientoCreado') bg-green-100
+                                                        @elseif(str_contains($noti->data['mensaje'] ?? '', 'reprogramada')) bg-orange-100
+                                                        @elseif(str_contains($noti->data['mensaje'] ?? '', 'urgente')) bg-blue-100
+                                                        @else bg-amber-100 @endif">
+                                                        @if ($noti->type == 'App\Notifications\PostulanteEnListaNegra')
+                                                            <i class="fas fa-user-slash text-red-600 text-xs"></i>
+                                                        @elseif($noti->type == 'App\Notifications\NuevoRequerimientoCreado')
+                                                            <i class="fas fa-users text-green-600 text-xs"></i>
+                                                        @elseif(str_contains($noti->data['mensaje'] ?? '', 'reprogramada'))
+                                                            <i class="fas fa-clock text-orange-600 text-xs"></i>
+                                                        @elseif(str_contains($noti->data['mensaje'] ?? '', 'urgente'))
+                                                            <i class="fas fa-info-circle text-blue-600 text-xs"></i>
+                                                        @else
+                                                            <i class="fas fa-exclamation-triangle text-amber-600 text-xs"></i>
+                                                        @endif
+                                                    </div>
+
+                                                    <div class="min-w-0">
+                                                        <div class="text-sm font-medium text-gray-900 break-words">
+                                                            {{ $noti->data['mensaje'] ?? 'Tienes una nueva notificación.' }}
+                                                            @if (!empty($noti->data['nombre']))
+                                                                <div class="text-xs text-gray-500">{{ $noti->data['nombre'] }}</div>
+                                                            @endif
+                                                        </div>
+                                                        <div class="text-xs text-gray-500 mt-1">
+                                                            {{ $noti->created_at->diffForHumans() }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @empty
+                                                <div class="text-center text-gray-400 text-sm py-6">
+                                                    No tienes notificaciones nuevas.
+                                                </div>
+                                            @endforelse
+                                        </div>
+
+                                        <div class="mt-3 pt-3 border-t border-gray-200">
+                                            <a href="#" class="text-sm text-indigo-600 hover:text-indigo-800 font-semibold">
+                                                Ver todas las notificaciones
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                    <!-- Footer -->
+                                    <div class="p-4 bg-gray-50 border-t border-gray-200">
+                                        <form method="POST" action="{{ route('logout') }}">
+                                            @csrf
+                                            <button type="submit"
+                                                class="w-full inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-white transition"
+                                                style="background: linear-gradient(135deg,#ef4444,#dc2626);">
+                                                <i class="fas fa-sign-out-alt"></i>
+                                                <span>Cerrar Sesión</span>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
 
-                            <!-- Dropdown Footer -->
-                            <div class="p-4 border-t border-gray-200 bg-gray-50">
-                                <form method="POST" action="{{ route('logout') }}">
-                                    @csrf
-                                    <button type="submit"
-                                        class="w-full flex items-center justify-center space-x-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">
-                                        <i class="fas fa-sign-out-alt"></i>
-                                        <span>Cerrar Sesión</span>
-                                    </button>
-                                </form>
-                            </div>
+                            <!-- Mobile menu button (opcional) -->
+                            <button type="button" class="sm:hidden h-10 w-10 rounded-xl pill grid place-items-center hover:bg-white/10 transition"
+                                @click="$store.ui.mobileMenuOpen = !$store.ui.mobileMenuOpen" title="Menú">
+                                <i class="fas" :class="$store.ui.mobileMenuOpen ? 'fa-xmark' : 'fa-ellipsis-vertical'"></i>
+                            </button>
                         </div>
-                    </div>
-
-                    <!-- Center Title -->
-                    <div class="hidden md:block text-center text-white flex-1">
-                        <h1 class="text-lg font-semibold">Resumen general del sistema de reclutamiento</h1>
-                    </div>
-
-                    <!-- Right Section -->
-                    <div class="flex items-center space-x-4 text-white">
-                        <div class="hidden sm:flex items-center space-x-2">
-                            <i class="fas fa-calendar-alt text-yellow-300"></i>
-                            <span class="text-sm">{{ now()->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}</span>
-                        </div>
-                        <!-- Removed the logout button from here since it's now in the dropdown -->
                     </div>
                 </div>
             </div>
@@ -137,392 +268,775 @@ rounded-full flex items-center justify-center flex-shrink-0">
 
         <div class="flex">
             <!-- Sidebar -->
-            <aside class="w-64 bg-white/10 backdrop-blur-md min-h-screen border-r border-white/20">
-                <nav class="p-4 space-y-2">
-                    <a href="{{ route('dashboard') }}"
-                        class="flex items-center space-x-3 bg-blue-600 text-white px-4 py-3 rounded-lg font-medium">
-                        <i class="fas fa-tachometer-alt"></i>
-                        <span>DASHBOARD</span>
+            <aside class="hidden sm:flex flex-col glass border-r border-white/10 min-h-[calc(100vh-4rem)] transition-all duration-300"
+                :class="$store.ui.sidebarOpen ? 'w-72' : 'w-20'">
+                <nav class="p-4 space-y-1">
+                    <!-- DASHBOARD -->
+                    <a href="#" @click.prevent="$store.ui.setModule('dashboard')"
+                        class="nav-item text-white"
+                        :class="$store.ui.currentModule === 'dashboard' ? 'nav-item-active' : 'text-white/80'">
+                        <i class="fas fa-gauge-high text-white/90"></i>
+                        <span x-show="$store.ui.sidebarOpen" x-transition>Dashboard</span>
                     </a>
 
-                    <!-- Sidebar menú: SOLICITUDES -->
+                    <div class="my-3 border-t border-white/10"></div>
+
+                    <!-- SOLICITUDES -->
                     <div x-data="{ open: false }" class="relative">
-                        <button @click="open = !open"
-                            class="flex items-center justify-between w-full space-x-3 text-white/80 hover:text-white hover:bg-white/10 px-4 py-3 rounded-lg transition-colors">
-                            <div class="flex items-center space-x-3">
-                                <i class="fas fa-file-alt"></i>
-                                <span>SOLICITUDES</span>
-                            </div>
-                            <i :class="open ? 'fa-chevron-up' : 'fa-chevron-down'" class="fas"></i>
+                        <button @click="open = !open; $store.ui.setModule('solicitudes')"
+                            class="nav-item w-full justify-between"
+                            :class="$store.ui.currentModule === 'solicitudes' ? 'nav-item-active text-white' : 'text-white/80'">
+                            <span class="flex items-center gap-3">
+                                <i class="fas fa-file-lines"></i>
+                                <span x-show="$store.ui.sidebarOpen" x-transition>Solicitudes</span>
+                            </span>
+                            <i x-show="$store.ui.sidebarOpen" class="fas text-xs"
+                                :class="open ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
                         </button>
-                        <div x-show="open" @click.away="open = false" x-transition x-cloak
-                            class="absolute left-0 mt-1 w-48 bg-white rounded-lg shadow-lg z-20">
+
+                        <div x-show="open && $store.ui.sidebarOpen" x-cloak x-transition @click.away="open=false"
+                            class="mt-2 ml-2 space-y-1">
                             <a href="{{ route('requerimientos.requerimiento') }}"
-                                class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors">
-                                <i class="fas fa-plus mr-2"></i> Crear Solicitud
+                                class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-white/85 hover:text-white hover:bg-white/10 transition">
+                                <i class="fas fa-plus text-xs"></i> Crear Solicitud
                             </a>
                             <a href="{{ route('requerimientos.filtrar') }}"
-                                class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors">
-                                <i class="fas fa-users mr-2"></i> Ver Solicitudes
+                                class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-white/85 hover:text-white hover:bg-white/10 transition">
+                                <i class="fas fa-list text-xs"></i> Ver Solicitudes
                             </a>
                         </div>
                     </div>
 
-                    <!-- Sidebar menú: POSTULANTES -->
+                    <!-- POSTULANTES -->
                     <div x-data="{ open: false }" class="relative">
-                        <button @click="open = !open"
-                            class="flex items-center justify-between w-full space-x-3 text-white/80 hover:text-white hover:bg-white/10 px-4 py-3 rounded-lg transition-colors">
-                            <div class="flex items-center space-x-3">
+                        <button @click="open = !open; $store.ui.setModule('postulantes')"
+                            class="nav-item w-full justify-between"
+                            :class="$store.ui.currentModule === 'postulantes' ? 'nav-item-active text-white' : 'text-white/80'">
+                            <span class="flex items-center gap-3">
                                 <i class="fas fa-users"></i>
-                                <span>POSTULANTES</span>
-                            </div>
-                            <i :class="open ? 'fa-chevron-up' : 'fa-chevron-down'" class="fas"></i>
+                                <span x-show="$store.ui.sidebarOpen" x-transition>Postulantes</span>
+                            </span>
+                            <i x-show="$store.ui.sidebarOpen" class="fas text-xs"
+                                :class="open ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
                         </button>
-                        <div x-show="open" @click.away="open = false" x-transition x-cloak
-                            class="absolute left-0 mt-1 w-48 bg-white rounded-lg shadow-lg z-20">
+
+                        <div x-show="open && $store.ui.sidebarOpen" x-cloak x-transition @click.away="open=false"
+                            class="mt-2 ml-2 space-y-1">
                             <a href="{{ route('postulantes.formInterno') }}"
-                                class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors">
-                                <i class="fas fa-plus mr-2"></i> Crear Postulante
+                                class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-white/85 hover:text-white hover:bg-white/10 transition">
+                                <i class="fas fa-plus text-xs"></i> Crear Postulante
                             </a>
                             <a href="{{ route('postulantes.filtrar') }}"
-                                class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors">
-                                <i class="fas fa-users mr-2"></i> Ver Postulantes
+                                class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-white/85 hover:text-white hover:bg-white/10 transition">
+                                <i class="fas fa-list text-xs"></i> Ver Postulantes
                             </a>
                         </div>
                     </div>
 
-                    {{--
-                    <a href="{{ route('afiches.index') }}"
-                        class="flex items-center space-x-3 text-white/80 hover:text-white hover:bg-white/10 px-4 py-3 rounded-lg transition-colors">
-                        <i class="fas fa-image"></i>
-                        <span>AFICHES</span>
-                    </a>
-                    --}}
-
+                    <!-- AFICHES -->
                     <div x-data="{ open: false }" class="relative">
-                        <button @click="open = !open"
-                            class="flex items-center justify-between w-full space-x-3 text-white/80 hover:text-white hover:bg-white/10 px-4 py-3 rounded-lg transition-colors">
-                            <div class="flex items-center space-x-3">
+                        <button @click="open = !open; $store.ui.setModule('afiches')"
+                            class="nav-item w-full justify-between"
+                            :class="$store.ui.currentModule === 'afiches' ? 'nav-item-active text-white' : 'text-white/80'">
+                            <span class="flex items-center gap-3">
                                 <i class="fa-regular fa-images"></i>
-                                <span>AFICHES</span>
-                            </div>
-                            <i :class="open ? 'fa-chevron-up' : 'fa-chevron-down'" class="fas"></i>
+                                <span x-show="$store.ui.sidebarOpen" x-transition>Afiches</span>
+                            </span>
+                            <i x-show="$store.ui.sidebarOpen" class="fas text-xs"
+                                :class="open ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
                         </button>
-                        <div x-show="open" @click.away="open = false" x-transition x-cloak
-                            class="absolute left-0 mt-1 w-48 bg-white rounded-lg shadow-lg z-20">
+
+                        <div x-show="open && $store.ui.sidebarOpen" x-cloak x-transition @click.away="open=false"
+                            class="mt-2 ml-2 space-y-1">
                             <a href="{{ route('afiches.index') }}"
-                                class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors">
-                                <i class="fas fa-image mr-2"></i> Generar Afiche
+                                class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-white/85 hover:text-white hover:bg-white/10 transition">
+                                <i class="fas fa-image text-xs"></i> Generar Afiche
                             </a>
                             <a href="{{ route('afiches.assets.upload') }}"
-                                class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors">
-                                <i class="fas fa-plus mr-2"></i> Añadir recursos
+                                class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-white/85 hover:text-white hover:bg-white/10 transition">
+                                <i class="fas fa-plus text-xs"></i> Añadir recursos
                             </a>
                         </div>
                     </div>
 
-
-                    <a href="{{ route('entrevistas.index') }}"
-                        class="flex items-center space-x-3 text-white/80 hover:text-white hover:bg-white/10 px-4 py-3 rounded-lg transition-colors">
+                    <!-- ENTREVISTAS -->
+                    <a href="#" @click.prevent="$store.ui.setModule('entrevistas')"
+                        class="nav-item"
+                        :class="$store.ui.currentModule === 'entrevistas' ? 'nav-item-active text-white' : 'text-white/80'">
                         <i class="fas fa-calendar-check"></i>
-                        <span>ENTREVISTAS</span>
+                        <span x-show="$store.ui.sidebarOpen" x-transition>Entrevistas</span>
                     </a>
 
-
-
+                    <!-- USUARIOS -->
                     @role('ADMINISTRADOR')
-                        <a href="{{ route('usuarios.index') }}"
-                            class="flex items-center space-x-3 text-white/80 hover:text-white hover:bg-white/10 px-4 py-3 rounded-lg transition-colors">
-                            <i class="fas fa-users-cog"></i>
-                            <span>USUARIOS</span>
+                        <a href="#" @click.prevent="$store.ui.setModule('usuarios')"
+                            class="nav-item"
+                            :class="$store.ui.currentModule === 'usuarios' ? 'nav-item-active text-white' : 'text-white/80'">
+                            <i class="fas fa-users-gear"></i>
+                            <span x-show="$store.ui.sidebarOpen" x-transition>Usuarios</span>
                         </a>
                     @endrole
 
-                    <a href="#"
-                        class="flex items-center space-x-3 text-white/80 hover:text-white hover:bg-white/10 px-4 py-3 rounded-lg transition-colors">
-                        <i class="fas fa-cog"></i>
-                        <span>CONFIGURACIÓN</span>
+                    <!-- CONFIG -->
+                    <a href="#" @click.prevent="$store.ui.setModule('configuracion')"
+                        class="nav-item"
+                        :class="$store.ui.currentModule === 'configuracion' ? 'nav-item-active text-white' : 'text-white/80'">
+                        <i class="fas fa-gear"></i>
+                        <span x-show="$store.ui.sidebarOpen" x-transition>Configuración</span>
                     </a>
+
+                    <div class="mt-6 px-2" x-show="$store.ui.sidebarOpen" x-transition>
+                        <div class="rounded-2xl p-4 glass-strong">
+                            <div class="text-xs text-white/70">Consejo rápido</div>
+                            <div class="mt-1 text-sm font-semibold">Usa el panel para monitorear tu funnel</div>
+                            <div class="mt-3 flex gap-2">
+                                <a href="{{ route('postulantes.filtrar') }}"
+                                    class="text-xs font-semibold rounded-xl px-3 py-2 bg-white/10 hover:bg-white/15 transition">
+                                    Ver postulantes
+                                </a>
+                                <a href="{{ route('requerimientos.filtrar') }}"
+                                    class="text-xs font-semibold rounded-xl px-3 py-2 bg-white/10 hover:bg-white/15 transition">
+                                    Ver solicitudes
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
                 </nav>
             </aside>
 
-            <!-- Main Content -->
-            <main class="flex-1 p-6">
-                <!-- KPI Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-                    <!-- Total Postulantes -->
-                    <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow card-hover">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-users text-blue-600 text-xl"></i>
-                            </div>
+            <!-- Mobile drawer -->
+            <div class="sm:hidden" x-show="$store.ui.mobileMenuOpen" x-cloak>
+                <div class="fixed inset-0 bg-black/50 z-40" @click="$store.ui.mobileMenuOpen=false"></div>
+                <div class="fixed left-0 top-16 bottom-0 w-80 glass z-50 border-r border-white/10 overflow-y-auto">
+                    <nav class="p-4 space-y-1">
+                        <a href="#" @click.prevent="$store.ui.setModule('dashboard'); $store.ui.mobileMenuOpen=false"
+                            class="nav-item text-white"
+                            :class="$store.ui.currentModule === 'dashboard' ? 'nav-item-active' : 'text-white/80'">
+                            <i class="fas fa-gauge-high"></i> Dashboard
+                        </a>
 
-                            {{-- porcentaje de cambio --}}
-                            <span class="text-green-500 text-sm font-medium">
-                                {{ $variacionPostulantes > 0 ? '+' : '' }}{{ $variacionPostulantes }}%
-                            </span>
-                        </div>
-                        {{-- total real de postulantes --}}
-                        <h3 class="text-3xl font-bold text-gray-800 mb-1">{{ $totalPostulantes }}</h3>
-                        <p class="text-gray-600 text-sm">Total de postulantes registrados</p>
-                    </div>
+                        <div class="my-3 border-t border-white/10"></div>
 
-                    <!-- Requerimientos Activos -->
-                    <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow card-hover">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-briefcase text-orange-600 text-xl"></i>
-                            </div>
-                            <span
-                                class="text-green-500 text-sm font-medium">{{ $variacionRequerimientos > 0 ? '+' : '' }}{{ $variacionRequerimientos }}%</span>
-                        </div>
-                        <h3 class="text-3xl font-bold text-gray-800 mb-1">{{ $totalRequerimientos }}</h3>
-                        <p class="text-gray-600 text-sm">Requerimientos activos</p>
-                        <p class="text-xs text-gray-500 mt-1">Vacantes abiertas</p>
-                    </div>
-
-                    <!-- Entrevistas Programadas -->
-                    <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow card-hover">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-calendar-alt text-green-600 text-xl"></i>
-                            </div>
-                            <span class="text-blue-500 text-sm font-medium">Hoy</span>
-                        </div>
-                        <h3 class="text-3xl font-bold text-gray-800 mb-1">6</h3>
-                        <p class="text-gray-600 text-sm">Entrevistas programadas hoy</p>
-                        <p class="text-xs text-gray-500 mt-1">entrevistas</p>
-                    </div>
-
-                    <!-- Contrataciones -->
-                    <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow card-hover">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                                <i class="fa-solid fa-user-shield text-purple-600 text-x1"></i>
-                            </div>
-                            <span class="text-green-500 text-sm font-medium">+5</span>
-                        </div>
-                        <h3 class="text-3xl font-bold text-gray-800 mb-1">18</h3>
-                        <p class="text-gray-600 text-sm">Personal Operativo</p>
-                    </div>
-
-                    <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow card-hover">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                                <i class="fa-solid fa-user-tie text-purple-600 text-x1"></i>
-                            </div>
-                            <span class="text-green-500 text-sm font-medium">+5</span>
-                        </div>
-                        <h3 class="text-3xl font-bold text-gray-800 mb-1">18</h3>
-                        <p class="text-gray-600 text-sm">Personal Administrativo</p>
-                    </div>
+                        <a href="{{ route('requerimientos.requerimiento') }}"
+                            class="nav-item text-white/80 hover:text-white">
+                            <i class="fas fa-plus"></i> Crear Solicitud
+                        </a>
+                        <a href="{{ route('requerimientos.filtrar') }}"
+                            class="nav-item text-white/80 hover:text-white">
+                            <i class="fas fa-list"></i> Ver Solicitudes
+                        </a>
+                        <a href="{{ route('postulantes.formInterno') }}"
+                            class="nav-item text-white/80 hover:text-white">
+                            <i class="fas fa-plus"></i> Crear Postulante
+                        </a>
+                        <a href="{{ route('postulantes.filtrar') }}"
+                            class="nav-item text-white/80 hover:text-white">
+                            <i class="fas fa-list"></i> Ver Postulantes
+                        </a>
+                        <a href="{{ route('afiches.index') }}"
+                            class="nav-item text-white/80 hover:text-white">
+                            <i class="fas fa-image"></i> Generar Afiche
+                        </a>
+                        <a href="{{ route('afiches.assets.upload') }}"
+                            class="nav-item text-white/80 hover:text-white">
+                            <i class="fas fa-plus"></i> Añadir recursos
+                        </a>
+                        <a href="{{ route('entrevistas.index') }}"
+                            class="nav-item text-white/80 hover:text-white">
+                            <i class="fas fa-calendar-check"></i> Entrevistas
+                        </a>
+                        @role('ADMINISTRADOR')
+                            <a href="{{ route('usuarios.index') }}"
+                                class="nav-item text-white/80 hover:text-white">
+                                <i class="fas fa-users-gear"></i> Usuarios
+                            </a>
+                        @endrole
+                    </nav>
                 </div>
+            </div>
 
-                <!-- Charts Section -->
-                <div class="grid lg:grid-cols-2 gap-6 mb-8">
-                    <!-- Postulaciones por Sede -->
-                    <div class="bg-white rounded-2xl p-6 shadow-lg">
-                        <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-xl font-bold text-gray-800">Postulaciones por Sede</h3>
-                            <i class="fas fa-chart-bar text-blue-500"></i>
+            <!-- Main -->
+            <main class="flex-1 p-4 sm:p-6 lg:p-8">
+                <!-- Dashboard -->
+                <div x-show="$store.ui.currentModule === 'dashboard'" x-cloak>
+                    <!-- KPI Cards -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4 lg:gap-6 mb-6">
+                        <!-- Total Postulantes -->
+                        <div class="card bg-white text-gray-900 p-6 shadow-soft">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <div class="text-xs font-semibold text-gray-500">Postulantes</div>
+                                    <div class="mt-1 text-3xl font-extrabold">{{ $totalPostulantes }}</div>
+                                    <div class="mt-1 text-sm text-gray-600">Total registrados</div>
+                                </div>
+                                <div class="h-12 w-12 rounded-2xl grid place-items-center bg-sky-50">
+                                    <i class="fas fa-users text-sky-600 text-lg"></i>
+                                </div>
+                            </div>
+                            <div class="mt-5 flex items-center justify-between">
+                                <span class="text-xs text-gray-500">Variación</span>
+                                <span class="text-sm font-semibold {{ $variacionPostulantes >= 0 ? 'text-emerald-600' : 'text-red-600' }}">
+                                    {{ $variacionPostulantes > 0 ? '+' : '' }}{{ $variacionPostulantes }}%
+                                </span>
+                            </div>
+                            <div class="mt-2 h-2 rounded-full bg-gray-100 overflow-hidden">
+                                <div class="h-2 rounded-full" style="width: {{ min(100, max(0, (int)abs($variacionPostulantes))) }}%; background: linear-gradient(135deg,#38bdf8,#6366f1);">
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="space-y-4">
-                            @php
-                                /* Colores tailwind para las barras (cicla si hay más sedes) */
-                                $colores = [
-                                    'blue-500',
-                                    'green-500',
-                                    'yellow-500',
-                                    'red-500',
-                                    'purple-500',
-                                    'orange-500',
-                                ];
-                            @endphp
+                        <!-- Requerimientos Activos -->
+                        <div class="card bg-white text-gray-900 p-6 shadow-soft">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <div class="text-xs font-semibold text-gray-500">Requerimientos</div>
+                                    <div class="mt-1 text-3xl font-extrabold">{{ $totalRequerimientos }}</div>
+                                    <div class="mt-1 text-sm text-gray-600">Vacantes abiertas</div>
+                                </div>
+                                <div class="h-12 w-12 rounded-2xl grid place-items-center bg-orange-50">
+                                    <i class="fas fa-briefcase text-orange-600 text-lg"></i>
+                                </div>
+                            </div>
+                            <div class="mt-5 flex items-center justify-between">
+                                <span class="text-xs text-gray-500">Variación</span>
+                                <span class="text-sm font-semibold {{ $variacionRequerimientos >= 0 ? 'text-emerald-600' : 'text-red-600' }}">
+                                    {{ $variacionRequerimientos > 0 ? '+' : '' }}{{ $variacionRequerimientos }}%
+                                </span>
+                            </div>
+                            <div class="mt-2 h-2 rounded-full bg-gray-100 overflow-hidden">
+                                <div class="h-2 rounded-full" style="width: {{ min(100, max(0, (int)abs($variacionRequerimientos))) }}%; background: linear-gradient(135deg,#fb923c,#f97316);">
+                                </div>
+                            </div>
+                        </div>
 
-                            @foreach ($porSede as $idx => $sede)
+                        <!-- Entrevistas Hoy (placeholder como estaba) -->
+                        <div class="card bg-white text-gray-900 p-6 shadow-soft">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <div class="text-xs font-semibold text-gray-500">Entrevistas</div>
+                                    <div class="mt-1 text-3xl font-extrabold">6</div>
+                                    <div class="mt-1 text-sm text-gray-600">Programadas hoy</div>
+                                </div>
+                                <div class="h-12 w-12 rounded-2xl grid place-items-center bg-emerald-50">
+                                    <i class="fas fa-calendar-day text-emerald-600 text-lg"></i>
+                                </div>
+                            </div>
+                            <div class="mt-5 text-xs text-gray-500">Indicador diario</div>
+                            <div class="mt-2 h-2 rounded-full bg-gray-100 overflow-hidden">
+                                <div class="h-2 rounded-full" style="width: 60%; background: linear-gradient(135deg,#22c55e,#10b981);"></div>
+                            </div>
+                        </div>
+
+                        <!-- Operativo (placeholder como estaba) -->
+                        <div class="card bg-white text-gray-900 p-6 shadow-soft">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <div class="text-xs font-semibold text-gray-500">Personal Operativo</div>
+                                    <div class="mt-1 text-3xl font-extrabold">18</div>
+                                    <div class="mt-1 text-sm text-gray-600">Contrataciones</div>
+                                </div>
+                                <div class="h-12 w-12 rounded-2xl grid place-items-center bg-indigo-50">
+                                    <i class="fa-solid fa-user-shield text-indigo-600 text-lg"></i>
+                                </div>
+                            </div>
+                            <div class="mt-5 flex items-center justify-between">
+                                <span class="text-xs text-gray-500">Nuevos</span>
+                                <span class="text-sm font-semibold text-emerald-600">+5</span>
+                            </div>
+                            <div class="mt-2 h-2 rounded-full bg-gray-100 overflow-hidden">
+                                <div class="h-2 rounded-full" style="width: 55%; background: linear-gradient(135deg,#6366f1,#38bdf8);"></div>
+                            </div>
+                        </div>
+
+                        <!-- Administrativo (placeholder como estaba) -->
+                        <div class="card bg-white text-gray-900 p-6 shadow-soft">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <div class="text-xs font-semibold text-gray-500">Personal Administrativo</div>
+                                    <div class="mt-1 text-3xl font-extrabold">18</div>
+                                    <div class="mt-1 text-sm text-gray-600">Contrataciones</div>
+                                </div>
+                                <div class="h-12 w-12 rounded-2xl grid place-items-center bg-purple-50">
+                                    <i class="fa-solid fa-user-tie text-purple-600 text-lg"></i>
+                                </div>
+                            </div>
+                            <div class="mt-5 flex items-center justify-between">
+                                <span class="text-xs text-gray-500">Nuevos</span>
+                                <span class="text-sm font-semibold text-emerald-600">+5</span>
+                            </div>
+                            <div class="mt-2 h-2 rounded-full bg-gray-100 overflow-hidden">
+                                <div class="h-2 rounded-full" style="width: 55%; background: linear-gradient(135deg,#a855f7,#6366f1);"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts -->
+                    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
+                        <!-- Bar chart: Postulaciones por Sede -->
+                        <div class="card glass-strong p-6 shadow-soft">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <div class="text-sm font-semibold">Postulaciones por Sede</div>
+                                    <div class="text-xs text-white/70">Distribución de postulantes según sede</div>
+                                </div>
+                                <div class="pill rounded-xl px-3 py-1.5 text-xs text-white/80">
+                                    <i class="fas fa-chart-column mr-2"></i>Interactivo
+                                </div>
+                            </div>
+                            <div class="bg-white rounded-2xl p-4">
+                                <canvas id="chartSede" height="140"></canvas>
+                            </div>
+
+                            <!-- mini resumen visual (manteniendo tus datos) -->
+                            <div class="mt-4 space-y-3">
                                 @php
-                                    $porcentaje = $maxTotalSede ? round(($sede->total / $maxTotalSede) * 100) : 0;
-                                    $color = $colores[$idx % count($colores)];
+                                    $hex = ['#3b82f6','#22c55e','#f59e0b','#ef4444','#8b5cf6','#f97316'];
                                 @endphp
+                                @foreach (($porSede ?? []) as $idx => $sede)
+                                    @php
+                                        $porcentaje = $maxTotalSede ? round(($sede->total / $maxTotalSede) * 100) : 0;
+                                        $colorHex = $hex[$idx % count($hex)];
+                                    @endphp
 
-                                <div class="flex items-center justify-between">
-                                    <span class="text-gray-600 capitalize">
-                                        {{ strtolower($sede->nombre_departamento) }}
-                                    </span>
-
-                                    <div class="flex items-center space-x-3 flex-1 mx-4">
-                                        <div class="flex-1 bg-gray-200 rounded-full h-3 overflow-hidden">
-                                            <div class="bg-{{ $color }} h-3" style="width: {{ $porcentaje }}%">
+                                    <div class="flex items-center gap-3">
+                                        <div class="h-2.5 w-2.5 rounded-full" style="background: {{ $colorHex }}"></div>
+                                        <div class="flex-1">
+                                            <div class="flex items-center justify-between">
+                                                <div class="text-sm text-white/85 capitalize">{{ strtolower($sede->nombre_departamento) }}</div>
+                                                <div class="text-sm font-semibold text-white">{{ $sede->total }}</div>
+                                            </div>
+                                            <div class="mt-1 h-2 rounded-full bg-white/10 overflow-hidden">
+                                                <div class="h-2 rounded-full" style="width: {{ $porcentaje }}%; background: {{ $colorHex }}"></div>
                                             </div>
                                         </div>
-                                        <span class="text-sm font-semibold text-gray-800 w-8">
-                                            {{ $sede->total }}
-                                        </span>
+                                    </div>
+                                @endforeach
+                                @if (empty($porSede) || (is_countable($porSede) && count($porSede) === 0))
+                                    <div class="text-sm text-white/70">No hay datos por sede para mostrar.</div>
+                                @endif
+                            </div>
+                        </div>
+
+                        <!-- Donut chart: Estado de Postulantes -->
+                        <div class="card glass-strong p-6 shadow-soft">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <div class="text-sm font-semibold">Estado de Postulantes</div>
+                                    <div class="text-xs text-white/70">Funnel / pipeline de postulaciones</div>
+                                </div>
+                                <div class="pill rounded-xl px-3 py-1.5 text-xs text-white/80">
+                                    <i class="fas fa-chart-pie mr-2"></i>Interactivo
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
+                                <div class="md:col-span-2 bg-white rounded-2xl p-4">
+                                    <canvas id="chartEstado" height="160"></canvas>
+                                </div>
+
+                                <div class="md:col-span-3 space-y-3">
+                                    <template x-data="{ labels: @json($estadoLabels), values: @json($estadoValues) }"></template>
+
+                                    @php
+                                        $estadoPills = [
+                                            'Apto' => ['bg' => 'bg-emerald-500', 'soft' => 'bg-emerald-50', 'text' => 'text-emerald-700'],
+                                            'Pendiente' => ['bg' => 'bg-amber-500', 'soft' => 'bg-amber-50', 'text' => 'text-amber-700'],
+                                            'En entrevista' => ['bg' => 'bg-sky-500', 'soft' => 'bg-sky-50', 'text' => 'text-sky-700'],
+                                            'No Apto' => ['bg' => 'bg-rose-500', 'soft' => 'bg-rose-50', 'text' => 'text-rose-700'],
+                                        ];
+                                    @endphp
+
+                                    @foreach ($estadoPostulantes as $k => $v)
+                                        @php
+                                            $pill = $estadoPills[$k] ?? ['bg'=>'bg-indigo-500','soft'=>'bg-indigo-50','text'=>'text-indigo-700'];
+                                        @endphp
+                                        <div class="bg-white rounded-2xl p-4 flex items-center justify-between">
+                                            <div class="flex items-center gap-3">
+                                                <div class="h-3 w-3 rounded-full {{ $pill['bg'] }}"></div>
+                                                <div class="text-sm font-semibold text-gray-800">{{ $k }}</div>
+                                            </div>
+                                            <div class="text-sm font-extrabold {{ $pill['text'] }}">{{ $v }}</div>
+                                        </div>
+                                    @endforeach
+
+                                    <div class="bg-white rounded-2xl p-4">
+                                        <div class="text-xs text-gray-500">Tip</div>
+                                        <div class="text-sm font-semibold text-gray-800">Convierte “Pendiente” a “Entrevista” con recordatorios automáticos.</div>
                                     </div>
                                 </div>
-                            @endforeach
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Estado de Postulantes -->
-                    <div class="bg-white rounded-2xl p-6 shadow-lg">
-                        <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-xl font-bold text-gray-800">Estado de Postulantes</h3>
-                            <i class="fas fa-user-check text-green-500"></i>
+                    <!-- Bottom section -->
+                    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                        <!-- Próximas Entrevistas -->
+                        <div class="card glass-strong p-6 shadow-soft" x-data="{ q: '' }">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <div class="text-sm font-semibold">Próximas Entrevistas Programadas</div>
+                                    <div class="text-xs text-white/70">Vista rápida de agenda</div>
+                                </div>
+                                <div class="pill rounded-xl px-3 py-1.5 text-xs text-white/80">
+                                    <i class="fas fa-calendar-check mr-2"></i>Agenda
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-2 mb-4">
+                                <div class="flex-1 relative">
+                                    <i class="fas fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                    <input type="text" x-model="q" placeholder="Buscar por postulante o cargo..."
+                                        class="w-full pl-9 pr-3 py-2 rounded-xl bg-white text-gray-800 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-200">
+                                </div>
+                                <button class="btn-primary" type="button" @click="q=''">
+                                    <i class="fas fa-broom"></i> Limpiar
+                                </button>
+                            </div>
+
+                            <div class="bg-white rounded-2xl overflow-hidden">
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-sm text-gray-700">
+                                        <thead class="bg-gray-50 text-xs uppercase text-gray-500">
+                                            <tr>
+                                                <th class="text-left px-4 py-3">Fecha</th>
+                                                <th class="text-left px-4 py-3">Hora</th>
+                                                <th class="text-left px-4 py-3">Postulante</th>
+                                                <th class="text-left px-4 py-3">Cargo</th>
+                                                <th class="text-left px-4 py-3">Estado</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @php
+                                                // Si luego lo pasas desde el controller, reemplazas $proximasEntrevistas.
+                                                $proximasEntrevistas = $proximasEntrevistas ?? [
+                                                    ['fecha'=>'2024-01-15','hora'=>'09:00 am','postulante'=>'Ruben Cruz','cargo'=>'Analista de datos','estado'=>'Completo'],
+                                                    ['fecha'=>'2025-01-22','hora'=>'10:00 am','postulante'=>'Emma Acosta','cargo'=>'Secretaria','estado'=>'Pendiente'],
+                                                    ['fecha'=>'2025-06-22','hora'=>'10:30 am','postulante'=>'Bryan Arteaga','cargo'=>'Analista Programador','estado'=>'Completo'],
+                                                ];
+                                            @endphp
+
+                                            @foreach ($proximasEntrevistas as $row)
+                                                <tr class="border-t border-gray-100 hover:bg-gray-50 transition"
+                                                    x-show="(q.trim()==='' || ('{{ strtolower($row['postulante']) }} {{ strtolower($row['cargo']) }}').includes(q.toLowerCase()))">
+                                                    <td class="px-4 py-3 whitespace-nowrap">{{ $row['fecha'] }}</td>
+                                                    <td class="px-4 py-3 whitespace-nowrap">{{ $row['hora'] }}</td>
+                                                    <td class="px-4 py-3 font-semibold text-gray-900">{{ $row['postulante'] }}</td>
+                                                    <td class="px-4 py-3">{{ $row['cargo'] }}</td>
+                                                    <td class="px-4 py-3">
+                                                        @php
+                                                            $isPending = strtolower($row['estado']) === 'pendiente';
+                                                        @endphp
+                                                        <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold
+                                                            {{ $isPending ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800' }}">
+                                                            {{ $row['estado'] }}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
-                        <div class="space-y-4">
-                            <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-3 h-3 bg-green-500 rounded-full"></div>
-                                    <span class="text-gray-700">Apto</span>
+
+                        <!-- Alertas -->
+                        <div class="card glass-strong p-6 shadow-soft">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <div class="text-sm font-semibold">Alertas Recientes</div>
+                                    <div class="text-xs text-white/70">Eventos que requieren atención</div>
                                 </div>
-                                <span class="font-bold text-green-600">140</span>
+                                <div class="pill rounded-xl px-3 py-1.5 text-xs text-white/80">
+                                    <i class="fas fa-bell mr-2"></i>Alertas
+                                </div>
                             </div>
-                            <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                                    <span class="text-gray-700">Pendiente</span>
+
+                            <div class="space-y-3">
+                                <div class="bg-white rounded-2xl p-4 border-l-4 border-amber-400">
+                                    <div class="flex items-start gap-3">
+                                        <div class="h-10 w-10 rounded-2xl grid place-items-center bg-amber-50">
+                                            <i class="fas fa-triangle-exclamation text-amber-500"></i>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <div class="text-sm font-semibold text-gray-900">Faltan validar 5 postulantes</div>
+                                            <div class="text-xs text-gray-500 mt-1">Hace 2 horas</div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <span class="font-bold text-yellow-600">40</span>
+
+                                <div class="bg-white rounded-2xl p-4 border-l-4 border-sky-400">
+                                    <div class="flex items-start gap-3">
+                                        <div class="h-10 w-10 rounded-2xl grid place-items-center bg-sky-50">
+                                            <i class="fas fa-circle-info text-sky-500"></i>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <div class="text-sm font-semibold text-gray-900">Requerimiento urgente sin oficina</div>
+                                            <div class="text-xs text-gray-500 mt-1">Hace 4 horas</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="bg-white rounded-2xl p-4 border-l-4 border-orange-400">
+                                    <div class="flex items-start gap-3">
+                                        <div class="h-10 w-10 rounded-2xl grid place-items-center bg-orange-50">
+                                            <i class="fas fa-clock text-orange-500"></i>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <div class="text-sm font-semibold text-gray-900">Postulante con entrevista reprogramada</div>
+                                            <div class="text-xs text-gray-500 mt-1">Hace 6 horas</div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
-                                    <span class="text-gray-700">En entrevista</span>
-                                </div>
-                                <span class="font-bold text-blue-600">53</span>
-                            </div>
-                            <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-3 h-3 bg-red-500 rounded-full"></div>
-                                    <span class="text-gray-700">No Apto</span>
-                                </div>
-                                <span class="font-bold text-red-600">15</span>
+
+                            <div class="mt-4">
+                                <a href="#" class="inline-flex items-center gap-2 text-sm font-semibold text-white/85 hover:text-white transition">
+                                    Ver historial de alertas <i class="fas fa-arrow-right text-xs"></i>
+                                </a>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Bottom Section -->
-                <div class="grid lg:grid-cols-2 gap-6">
-                    <!-- Próximas Entrevistas -->
-                    <div class="bg-white rounded-2xl p-6 shadow-lg">
-                        <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-xl font-bold text-gray-800">Próximas Entrevistas Programadas</h3>
-                            <i class="fas fa-calendar-check text-blue-500"></i>
+                <!-- Module panels inside home -->
+                <div x-show="$store.ui.currentModule !== 'dashboard'" x-cloak class="space-y-6">
+                    <div class="card glass-strong p-6 shadow-soft flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div>
+                            <div class="text-sm font-semibold">Acciones del módulo</div>
+                            <div class="text-xs text-white/70 mt-1">Estás viendo el módulo dentro del Inicio (Dashboard).</div>
                         </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-sm">
-                                <thead>
-                                    <tr class="border-b border-gray-200">
-                                        <th class="text-left py-3 text-gray-600">Fecha</th>
-                                        <th class="text-left py-3 text-gray-600">Hora</th>
-                                        <th class="text-left py-3 text-gray-600">Postulante</th>
-                                        <th class="text-left py-3 text-gray-600">Cargo</th>
-                                        <th class="text-left py-3 text-gray-600">Estado</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="space-y-2">
-                                    <tr class="border-b border-gray-100">
-                                        <td class="py-3">2024-01-15</td>
-                                        <td class="py-3">09:00 am</td>
-                                        <td class="py-3 font-medium">Ruben Cruz</td>
-                                        <td class="py-3">Analista de datos</td>
-                                        <td class="py-3">
-                                            <span
-                                                class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Completo</span>
-                                        </td>
-                                    </tr>
-                                    <tr class="border-b border-gray-100">
-                                        <td class="py-3">2025-01-22</td>
-                                        <td class="py-3">10:00 am</td>
-                                        <td class="py-3 font-medium">Emma Acosta</td>
-                                        <td class="py-3">Secretaria</td>
-                                        <td class="py-3">
-                                            <span
-                                                class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">Pendiente</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="py-3">2025-06-22</td>
-                                        <td class="py-3">10:30 am</td>
-                                        <td class="py-3 font-medium">Bryan Arteaga</td>
-                                        <td class="py-3">Analista Programador</td>
-                                        <td class="py-3">
-                                            <span
-                                                class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Completo</span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        <button class="btn-primary" @click="$store.ui.setModule('dashboard')">
+                            <i class="fas fa-arrow-left"></i> Volver al Dashboard
+                        </button>
+                    </div>
+
+                    <!-- SOLICITUDES -->
+                    <div x-show="$store.ui.currentModule === 'solicitudes'" class="card glass-strong p-6 shadow-soft">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="text-sm font-semibold">Solicitudes</div>
+                                <div class="text-xs text-white/70 mt-1">Gestiona requerimientos y vacantes.</div>
+                            </div>
+                            <div class="pill rounded-xl px-3 py-1.5 text-xs text-white/80">
+                                <i class="fas fa-file-lines mr-2"></i>Módulo
+                            </div>
+                        </div>
+                        <div class="mt-5 flex flex-wrap gap-3">
+                            <a href="{{ route('requerimientos.requerimiento') }}"
+                                class="btn-primary">
+                                <i class="fas fa-plus"></i> Crear Solicitud
+                            </a>
+                            <a href="{{ route('requerimientos.filtrar') }}"
+                                class="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold bg-white/10 hover:bg-white/15 transition text-white">
+                                <i class="fas fa-list"></i> Ver Solicitudes
+                            </a>
                         </div>
                     </div>
 
-                    <!-- Alertas Recientes -->
-                    <div class="bg-white rounded-2xl p-6 shadow-lg">
-                        <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-xl font-bold text-gray-800">Alertas Recientes</h3>
-                            <i class="fas fa-bell text-yellow-500"></i>
-                        </div>
-                        <div class="space-y-4">
-                            <div
-                                class="flex items-start space-x-3 p-3 bg-yellow-50 rounded-lg border-l-4 border-yellow-400">
-                                <i class="fas fa-exclamation-triangle text-yellow-500 mt-1"></i>
-                                <div>
-                                    <p class="text-sm font-medium text-gray-800">Faltan validar 5 postulantes</p>
-                                    <p class="text-xs text-gray-600">Hace 2 horas</p>
-                                </div>
+                    <!-- POSTULANTES -->
+                    <div x-show="$store.ui.currentModule === 'postulantes'" class="card glass-strong p-6 shadow-soft">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="text-sm font-semibold">Postulantes</div>
+                                <div class="text-xs text-white/70 mt-1">Registro, validación y seguimiento.</div>
                             </div>
-                            <div class="flex items-start space-x-3 p-3 bg-blue-50 rounded-lg border-l-4 border-blue-400">
-                                <i class="fas fa-info-circle text-blue-500 mt-1"></i>
-                                <div>
-                                    <p class="text-sm font-medium text-gray-800">Requerimiento urgente sin oficina</p>
-                                    <p class="text-xs text-gray-600">Hace 4 horas</p>
-                                </div>
-                            </div>
-                            <div
-                                class="flex items-start space-x-3 p-3 bg-orange-50 rounded-lg border-l-4 border-orange-400">
-                                <i class="fas fa-clock text-orange-500 mt-1"></i>
-                                <div>
-                                    <p class="text-sm font-medium text-gray-800">Postulante con entrevista reprogramada</p>
-                                    <p class="text-xs text-gray-600">Hace 6 horas</p>
-                                </div>
+                            <div class="pill rounded-xl px-3 py-1.5 text-xs text-white/80">
+                                <i class="fas fa-users mr-2"></i>Módulo
                             </div>
                         </div>
+                        <div class="mt-5 flex flex-wrap gap-3">
+                            <a href="{{ route('postulantes.formInterno') }}" class="btn-primary">
+                                <i class="fas fa-plus"></i> Crear Postulante
+                            </a>
+                            <a href="{{ route('postulantes.filtrar') }}"
+                                class="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold bg-white/10 hover:bg-white/15 transition text-white">
+                                <i class="fas fa-list"></i> Ver Postulantes
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- AFICHES -->
+                    <div x-show="$store.ui.currentModule === 'afiches'" class="card glass-strong p-6 shadow-soft">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="text-sm font-semibold">Afiches</div>
+                                <div class="text-xs text-white/70 mt-1">Generación y recursos del módulo.</div>
+                            </div>
+                            <div class="pill rounded-xl px-3 py-1.5 text-xs text-white/80">
+                                <i class="fa-regular fa-images mr-2"></i>Módulo
+                            </div>
+                        </div>
+                        <div class="mt-5 flex flex-wrap gap-3">
+                            <a href="{{ route('afiches.index') }}"
+                                class="btn-primary">
+                                <i class="fas fa-image"></i> Generar Afiche
+                            </a>
+                            <a href="{{ route('afiches.assets.upload') }}"
+                                class="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold bg-white/10 hover:bg-white/15 transition text-white">
+                                <i class="fas fa-plus"></i> Añadir recursos
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- ENTREVISTAS -->
+                    <div x-show="$store.ui.currentModule === 'entrevistas'" class="card glass-strong p-6 shadow-soft">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="text-sm font-semibold">Entrevistas</div>
+                                <div class="text-xs text-white/70 mt-1">Agenda y gestión de entrevistas.</div>
+                            </div>
+                            <div class="pill rounded-xl px-3 py-1.5 text-xs text-white/80">
+                                <i class="fas fa-calendar-check mr-2"></i>Módulo
+                            </div>
+                        </div>
+                        <div class="mt-5">
+                            <a href="{{ route('entrevistas.index') }}"
+                                class="btn-primary">
+                                <i class="fas fa-calendar-check"></i> Ver Entrevistas
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- USUARIOS -->
+                    @role('ADMINISTRADOR')
+                        <div x-show="$store.ui.currentModule === 'usuarios'" class="card glass-strong p-6 shadow-soft">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <div class="text-sm font-semibold">Usuarios</div>
+                                    <div class="text-xs text-white/70 mt-1">Administración de accesos.</div>
+                                </div>
+                                <div class="pill rounded-xl px-3 py-1.5 text-xs text-white/80">
+                                    <i class="fas fa-users-gear mr-2"></i>Módulo
+                                </div>
+                            </div>
+                            <div class="mt-5">
+                                <a href="{{ route('usuarios.index') }}"
+                                    class="btn-primary">
+                                    <i class="fas fa-users-cog"></i> Gestionar Usuarios
+                                </a>
+                            </div>
+                        </div>
+                    @endrole
+
+                    <!-- CONFIG -->
+                    <div x-show="$store.ui.currentModule === 'configuracion'" class="card glass-strong p-6 shadow-soft">
+                        <div class="text-sm font-semibold">Configuración</div>
+                        <div class="text-xs text-white/70 mt-1">Aquí puedes mostrar accesos/configs cuando lo tengas listo.</div>
                     </div>
                 </div>
             </main>
         </div>
     </div>
 
+    <!-- Chart.js (CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
     <script>
-        function toggleUserDropdown() {
-            const dropdown = document.getElementById('user-dropdown');
-            dropdown.classList.toggle('hidden');
-        }
-
-        document.addEventListener('click', function(event) {
-            const dropdown = document.getElementById('user-dropdown');
-            if (!dropdown) return;
-            if (!dropdown.classList.contains('hidden')) {
-                const userInfo = event.target.closest('[onclick="toggleUserDropdown()"]');
-                if (!userInfo && !dropdown.contains(event.target)) {
-                    dropdown.classList.add('hidden');
+        // Alpine store: Sidebar + módulo actual (MISMA LÓGICA, mejorada y persistiendo estado)
+        document.addEventListener('alpine:init', () => {
+            Alpine.store('ui', {
+                sidebarOpen: JSON.parse(localStorage.getItem('sidebarOpen') ?? 'true'),
+                mobileMenuOpen: false,
+                currentModule: localStorage.getItem('currentModule') ?? 'dashboard',
+                toggleSidebar() {
+                    this.sidebarOpen = !this.sidebarOpen;
+                    localStorage.setItem('sidebarOpen', JSON.stringify(this.sidebarOpen));
+                },
+                setModule(m) {
+                    this.currentModule = m;
+                    localStorage.setItem('currentModule', m);
                 }
-            }
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const progressBars = document.querySelectorAll('[style*="width:"]');
-            progressBars.forEach(bar => {
-                const width = bar.style.width;
-                bar.style.width = '0%';
-                setTimeout(() => {
-                    bar.style.transition = 'width 1s ease-in-out';
-                    bar.style.width = width;
-                }, 500);
             });
         });
+
+        // Charts (solo se basan en tus datos existentes)
+        document.addEventListener('DOMContentLoaded', function() {
+            const labelsSede = @json($labelsSede);
+            const totalsSede = @json($totalesSede);
+            const estadoLabels = @json($estadoLabels);
+            const estadoValues = @json($estadoValues);
+
+            // Paletas (hex) - evita problemas de Tailwind JIT con clases dinámicas
+            const colors = ['#3b82f6','#22c55e','#f59e0b','#ef4444','#8b5cf6','#f97316','#06b6d4','#a855f7'];
+
+            // Chart: Sedes (bar)
+            const ctxSede = document.getElementById('chartSede');
+            if (ctxSede && labelsSede.length) {
+                new Chart(ctxSede, {
+                    type: 'bar',
+                    data: {
+                        labels: labelsSede,
+                        datasets: [{
+                            label: 'Postulantes',
+                            data: totalsSede,
+                            borderWidth: 0,
+                            backgroundColor: labelsSede.map((_, i) => colors[i % colors.length]),
+                            borderRadius: 10,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: (ctx) => ` ${ctx.raw} postulantes`
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false },
+                                ticks: { color: '#334155', font: { weight: '600' } }
+                            },
+                            y: {
+                                grid: { color: 'rgba(15, 23, 42, .08)' },
+                                ticks: { color: '#334155' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Chart: Estado (donut)
+            const ctxEstado = document.getElementById('chartEstado');
+            if (ctxEstado && estadoLabels.length) {
+                new Chart(ctxEstado, {
+                    type: 'doughnut',
+                    data: {
+                        labels: estadoLabels,
+                        datasets: [{
+                            data: estadoValues,
+                            borderWidth: 0,
+                            backgroundColor: ['#10b981', '#f59e0b', '#0ea5e9', '#f43f5e'],
+                            hoverOffset: 6,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: (ctx) => ` ${ctx.label}: ${ctx.raw}`
+                                }
+                            }
+                        },
+                        cutout: '70%'
+                    }
+                });
+            }
+        });
     </script>
+
+    {{-- NOTA IMPORTANTE (para que la barra izquierda aparezca en OTRAS VISTAS):
+        Este archivo deja el sidebar dentro de esta vista (como lo tenías).
+        Si quieres que el sidebar se mantenga en TODAS LAS VISTAS (crear solicitud, ver postulantes, etc.),
+        copia el bloque <header> y <aside> al archivo layouts.app (layout global) o a un componente Blade,
+        y deja aquí solo el contenido del <main>.
+        El estado de la barra ya se guarda en localStorage (sidebarOpen), así se respeta entre páginas.
+    --}}
 @endsection
