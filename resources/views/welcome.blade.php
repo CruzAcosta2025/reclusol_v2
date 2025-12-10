@@ -53,7 +53,6 @@
                         <p class="text-xs text-gray-500">Plataforma de Reclutamiento</p>
                     </div>
                 </div>
-                <!-- Navigation con Alpine.js -->
                 <div x-data="{ open: false }" class="relative">
                     <button @click="open = !open" class="md:hidden text-gray-600 text-2xl focus:outline-none">
                         <i class="fas fa-bars"></i>
@@ -239,8 +238,6 @@
             });
         });
     </script>
-    <!-- Alpine.js por CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js" defer></script>
 </body>
 
 </html>

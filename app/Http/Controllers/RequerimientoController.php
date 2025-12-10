@@ -13,18 +13,77 @@ use App\Models\PrioridadRequerimiento;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\Departamento;
-//use Illuminate\Support\Carbon;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Notifications\NuevoRequerimientoCreado;
+use App\Services\RequerimientoService;
 
 
 class RequerimientoController extends Controller
 {
-    /*-------------------------------------------------
-    |  Mostrar formulario
-    *------------------------------------------------*/
+
+    protected $service;
+
+    public function __construct(RequerimientoService $service)
+    {
+        $this->service = $service;
+    }
+
     public function mostrar()
+    {
+        $data = $this->service->getFormData();
+        return view('requerimientos.requerimiento', $data);
+    }
+
+    public function clientesPorSucursalSP(Request $request)
+    {
+        $sucursal = trim((string) $request->query('codigo_sucursal', ''));
+        $buscar   = $request->query('q');
+
+        try {
+            $data = $this->service->clientesPorSucursal($sucursal, $buscar);
+            return response()->json($data, 200);
+        } catch (\Throwable $e) {
+            Log::error('SP clientesPorSucursal error', [
+                'sucursal' => $sucursal,
+                'error'    => $e->getMessage()
+            ]);
+            return response()->json([], 200);
+        }
+    }
+
+    public function sedesPorCliente(Request $request)
+    {
+        $codigo = $request->input('codigo_cliente');
+        $sedes = $this->service->sedesPorCliente($codigo);
+        return response()->json($sedes);
+    }
+
+    public function tiposPorTipoPersonal(Request $request)
+    {
+        $tipoPersonal = $request->query('tipo_personal');
+        $data = $this->service->tiposPorTipoPersonal($tipoPersonal);
+        return response()->json($data);
+    }
+
+    public function cargosPorTipo(Request $request)
+    {
+        $tipoPersonal = $request->query('tipo_personal');
+        $tipoCargo    = $request->query('tipo_cargo');
+        $data = $this->service->cargosPorTipo($tipoPersonal, $tipoCargo);
+        return response()->json($data);
+    }
+
+    public function cargoTipo($codiCarg)
+    {
+        $tipo = $this->service->cargoTipo($codiCarg);
+        return response()->json([
+            'cargo_tipo' => $tipo
+        ]);
+    }
+
+    /* public function mostrar()
     {
         $estados = EstadoRequerimiento::all();
         $prioridades = PrioridadRequerimiento::all();
@@ -33,10 +92,8 @@ class RequerimientoController extends Controller
         $cargos = Cargo::forSelect();
         $tipoPersonal = TipoPersonal::forSelect();
 
-
         // Clientes (base CONTROLCLIENTES2018)
         $clientes = collect(DB::connection('sqlsrv')->select('EXEC dbo.SP_LISTAR_CLIENTES'));
-
 
         return view('requerimientos.requerimiento', compact(
             'estados',
@@ -45,9 +102,9 @@ class RequerimientoController extends Controller
             'sucursales',
             'tipoPersonal',
         ));
-    }
+    } */
 
-    public function clientesPorSucursalSP(Request $r)
+    /* public function clientesPorSucursalSP(Request $r)
     {
         $sucursal = trim((string) $r->query('codigo_sucursal', ''));
         $buscar   = $r->query('q'); // opcional para autocompletar
@@ -108,7 +165,6 @@ class RequerimientoController extends Controller
             'EXEC dbo.REC_TIPOS_CARGO_POR_TIPO_PERSONAL ?',
             [$tipoPersonal]
         );
-
         return response()->json($rows);
     }
 
@@ -135,96 +191,172 @@ class RequerimientoController extends Controller
         return response()->json([
             'cargo_tipo' => $tipo ? str_pad($tipo, 2, '0', STR_PAD_LEFT) : null
         ]);
-    }
-
+    } */
 
     public function index()
     {
         return view('requerimientos.filtrar');
     }
 
-    /*-------------------------------------------------
-    |  Guardar requerimiento
-    *------------------------------------------------*/
+    public function probarRepositorio()
+    {
+        $requerimiento = $this->service->getById(2);
+
+        if (!$requerimiento) {
+            return response()->json(['error' => 'No encontrado'], 404);
+        }
+
+        return response()->json($requerimiento);
+    }
+
+    public function detalle($id)
+    {
+        $detalle = $this->service->getDetalleCompleto($id);
+
+        if (!$detalle) {
+            return response()->json(['error' => 'No encontrado'], 404);
+        }
+
+        return response()->json($detalle);
+    }
+
     public function store(Request $request)
     {
         /* ---------- 1. VALIDACIÓN ---------- */
-        $validated = $request->validate([
-            // DATOS AUTOMÁTICOS (se agregan luego, no validar)
-            // 'user_id' => ...,
-            // 'cargo_usuario' => ...,
-            // 'fecha_solicitud' => ...,
-
-            'area_solicitante'     => 'nullable|string|max:50',
-            'departamento'         => 'nullable|string|max:50',
-            'provincia'            => 'nullable|string|max:50',
-            'distrito'             => 'nullable|string|max:50',
-            'sucursal'             => 'required|string|max:50',
-            'cliente'              => 'required|string|max:50',
-            'sede'                 => 'nullable|string|max:50',
-            'tipo_personal'        => 'required|string|max:50',
-            'tipo_cargo'           => 'required|string|max:50',
-            'cargo_solicitado'     => 'required|string|max:50',
-            'ubicacion_servicio'   => 'nullable|string|max:50',
-            'fecha_inicio'         => 'required|date',
-            'fecha_fin'            => 'required|date|after_or_equal:fecha_inicio',
-            'urgencia'             => 'required|string|max:50',
-            'cantidad_requerida'   => 'required|integer|min:1|max:255',
-            'cantidad_masculino'   => 'required|integer|min:0|max:255',
-            'cantidad_femenino'    => 'required|integer|min:0|max:255',
-            'edad_minima'          => 'required|integer|min:18|max:65',
-            'edad_maxima'          => 'required|integer|min:18|max:70',
-            'experiencia_minima'   => 'required|string|max:50',
-            'curso_sucamec_operativo'   => 'nullable|string|max:50',
-            'carne_sucamec_operativo'   => 'nullable|string|max:50',
-            'licencia_armas'            => 'nullable|string|max:50',
-            'servicio_acuartelado'      => 'nullable|string|max:50',
-            'grado_academico'           => 'required|string|max:50',
-            'formacion_adicional'       => 'nullable|string|max:50',
-            'requiere_licencia_conducir' => 'nullable|string|max:50',
-            'validado_rrhh'             => 'boolean',
-            'sueldo_basico'             => 'required|string|max:50',
-            'beneficios'                => 'required|string|max:50',
-
-            //'prioridad'                 => 'nullable|exists:prioridad_requerimiento,id',
-            'estado'                    => 'required|exists:estado_requerimiento,id',
-            //'fecha_limite'              => 'nullable|date|after_or_equal:today',
-
-            //'requiere_sucamec'          => 'boolean',
-            //'requisitos_adicionales'    => 'nullable|string',
-        ]);
-
-
-        /* ---------- 2. CAMPOS AUTOMÁTICOS ---------- */
-        $validated['user_id'] = Auth::id();
-        $validated['fecha_solicitud'] = now();
-        $validated['cargo_usuario'] = Auth::user()->cargo ?? null;
-
-        /* ---------- 3. TRANSFORMAR CHECKBOX ---------- */
-        $validated['requiere_sucamec'] = $request->boolean('requiere_sucamec');
-        $validated['validado_rrhh'] = $request->boolean('validado_rrhh');
-
+        Log::info('=== INICIANDO STORE DE REQUERIMIENTO ===');
+        Log::info('Datos recibidos:', $request->all());
+        
         try {
-            $requerimiento = DB::transaction(
-                fn() =>
-                Requerimiento::create($validated)
-            );
-            // Notificar a todos los usuarios (puedes filtrar si quieres solo admins/reclutadores)
-            $usuarios = User::all(); // O un filtro si prefieres
-            foreach ($usuarios as $usuario) {
-                $usuario->notify(new NuevoRequerimientoCreado($requerimiento));
+            $validated = $request->validate([
+                // DATOS AUTOMÁTICOS (se agregan luego, no validar)
+                // 'user_id' => ...,
+                // 'cargo_usuario' => ...,
+                // 'fecha_solicitud' => ...,
+
+                'area_solicitante'     => 'nullable|string|max:50',
+                'departamento'         => 'nullable|string|max:50',
+                'provincia'            => 'nullable|string|max:50',
+                'distrito'             => 'nullable|string|max:50',
+                'sucursal'             => 'required|string|max:50',
+                'cliente'              => 'required|string|max:50',
+                'sede'                 => 'nullable|string|max:50',
+                'tipo_personal'        => 'required|string|max:50',
+                'tipo_cargo'           => 'required|string|max:50',
+                'cargo_solicitado'     => 'required|string|max:50',
+                'ubicacion_servicio'   => 'nullable|string|max:50',
+                'fecha_inicio'         => 'required|date',
+                'fecha_fin'            => 'required|date|after_or_equal:fecha_inicio',
+                'urgencia'             => 'required|string|max:50',
+                'cantidad_requerida'   => 'required|integer|min:1|max:255',
+                'cantidad_masculino'   => 'required|integer|min:0|max:255',
+                'cantidad_femenino'    => 'required|integer|min:0|max:255',
+                'edad_minima'          => 'required|integer|min:18|max:65',
+                'edad_maxima'          => 'required|integer|min:18|max:70',
+                'experiencia_minima'   => 'required|string|max:50',
+                'curso_sucamec_operativo'   => 'nullable|string|max:50',
+                'carne_sucamec_operativo'   => 'nullable|string|max:50',
+                'licencia_armas'            => 'nullable|string|max:50',
+                'servicio_acuartelado'      => 'nullable|string|max:50',
+                'grado_academico'           => 'required|string|max:50',
+                'formacion_adicional'       => 'nullable|string|max:50',
+                'requiere_licencia_conducir' => 'nullable|string|max:50',
+                'validado_rrhh'             => 'boolean',
+                'sueldo_basico'             => 'required|string|max:50',
+                'beneficios'                => 'required|string|max:50',
+
+                //'prioridad'                 => 'nullable|exists:prioridad_requerimiento,id',
+                'estado'                    => 'required|exists:estado_requerimiento,id',
+                //'fecha_limite'              => 'nullable|date|after_or_equal:today',
+
+                //'requiere_sucamec'          => 'boolean',
+                //'requisitos_adicionales'    => 'nullable|string',
+            ]);
+            
+            Log::info('Validación exitosa');
+
+            /* ---------- 2. CAMPOS AUTOMÁTICOS ---------- */
+            $validated['user_id'] = Auth::id();
+            $validated['fecha_solicitud'] = now();
+            $validated['cargo_usuario'] = Auth::user()->cargo ?? 'Sin especificar';
+
+            /* ---------- 3. TRANSFORMAR CHECKBOX ---------- */
+            $validated['requiere_sucamec'] = $request->boolean('requiere_sucamec');
+            $validated['validado_rrhh'] = $request->boolean('validado_rrhh');
+
+            Log::info('Datos validados y procesados:', $validated);
+
+            /* ---------- 4. CREAR EN TRANSACCIÓN ---------- */
+            $requerimiento = DB::transaction(function () use ($validated) {
+                Log::info('Iniciando transacción...');
+                $req = Requerimiento::create($validated);
+                Log::info('Requerimiento creado con ID:', ['id' => $req->id]);
+                return $req;
+            });
+
+            Log::info('Transacción completada. ID generado:', ['id' => $requerimiento->id]);
+
+            /* ---------- 5. NOTIFICACIONES ---------- */
+            try {
+                $usuarios = User::all();
+                foreach ($usuarios as $usuario) {
+                    $usuario->notify(new NuevoRequerimientoCreado($requerimiento));
+                }
+                Log::info('Notificaciones enviadas');
+            } catch (\Throwable $notifError) {
+                Log::warning('Error al enviar notificaciones (pero se guardó el registro):', [
+                    'message' => $notifError->getMessage()
+                ]);
             }
 
-            Log::info('Requerimiento guardado', $requerimiento->toArray());
+            Log::info('=== STORE COMPLETADO EXITOSAMENTE ===');
+            
+            // Devolver JSON para AJAX
+            if ($request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
+                return response()->json([
+                    'success' => true,
+                    'message' => '¡Requerimiento creado con éxito!',
+                    'requerimiento' => $requerimiento
+                ], 201);
+            }
+            
             return back()->with('success', '¡Requerimiento creado con éxito!');
+            
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::warning('Error de validación:', $e->errors());
+            
+            if ($request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Errores de validación',
+                    'errors' => $e->errors()
+                ], 422);
+            }
+
+            return back()
+                ->withInput()
+                ->withErrors($e->errors());
+                
         } catch (\Throwable $e) {
-            Log::error('Error al guardar requerimiento', ['message' => $e->getMessage()]);
+            Log::error('=== ERROR CRÍTICO AL GUARDAR REQUERIMIENTO ===', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            if ($request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error al guardar: ' . $e->getMessage()
+                ], 500);
+            }
 
             return back()
                 ->withInput()
                 ->withErrors(['general' => 'Error al guardar. Inténtalo de nuevo.']);
         }
     }
+
 
 
     //REVIEW FILTRAR
@@ -353,8 +485,6 @@ class RequerimientoController extends Controller
             $r->provincia_nombre = $provincias->get($codigoProvincia)?->PROVI_DESCRIPCION ?? $r->provincia;
             $r->distrito_nombre = $distritos->get($codigoDistrito)?->DIST_DESCRIPCION ?? $r->distrito;
         }
-
-        
 
         // Contar total general
         $requerimientosProcesos = Requerimiento::where('estado', 1)->count();
@@ -519,11 +649,9 @@ class RequerimientoController extends Controller
             $r->estado_nombre = $estadoMap[(int)$r->estado] ?? null;
         }
 
-
         // Para la vista/JS seguimos exponiendo $provincias y $distritos
         $provincias = $provinciasStr;
         $distritos  = $distritosStr;
-
 
         // Contar total general
         $requerimientosProcesos = Requerimiento::where('estado', 1)->count();
@@ -538,6 +666,14 @@ class RequerimientoController extends Controller
         $requerimientosVencidos = Requerimiento::where('estado', 4)->count(); // estado 4 = Vencido
 
 
+        // Exponer catálogos que usan los partials del modal
+        $estados = EstadoRequerimiento::all();
+        
+        $nivelEducativo = DB::connection('sqlsrv')
+            ->table('SUNAT_NIVEL_EDUCATIVO')
+            ->select('NIED_CODIGO', 'NIED_DESCRIPCION')
+            ->get();
+
         return view('requerimientos.filtrar', compact(
             'requerimientos',
             'tipoCargos',
@@ -547,40 +683,44 @@ class RequerimientoController extends Controller
             'distritos',
             'sucursales',
             'clientes',
-            'stats'
-
-        ));
+            'stats',
+            'nivelEducativo'
+        ))->with([
+            'tipoPersonal' => $tiposPersonal,
+            'estados' => $estados,
+        ]);
     }
 
-
-
-  /*   public function edit(Requerimiento $requerimiento)
+    public function edit(Requerimiento $requerimiento)
     {
         $estados = EstadoRequerimiento::all();
-
-        $sucursales = DB::connection('reclusol')
+        $sucursales =  Sucursal::forSelect();
+        $tipoCargos = TipoCargo::forSelect();
+        $cargos = Cargo::forSelect();
+        /*
+        $sucursales = DB::connection('si_solmar')
             ->table('SISO_SUCURSAL')
             ->select('SUCU_CODIGO', 'SUCU_DESCRIPCION')
             ->where('SUCU_VIGENCIA', 'SI')
             ->get();
 
-        $tipoCargos = DB::connection('reclusol')
+        $tipoCargos = DB::connection('si_solmar')
             ->table('TIPO_CARGO')
             ->select('CODI_TIPO_CARG', 'DESC_TIPO_CARG')
             ->get();
 
-        $cargos = DB::connection('reclusol')
+        $cargos = DB::connection('si_solmar')
             ->table('CARGOS')
             ->select('CODI_CARG', 'DESC_CARGO', 'TIPO_CARG')
             ->where('CARG_VIGENCIA', 'SI')
             ->get();
 
-        $nivelEducativo = DB::connection('reclusol')
+        $nivelEducativo = DB::connection('si_solmar')
             ->table('SUNAT_NIVEL_EDUCATIVO')
             ->select('NIED_CODIGO', 'NIED_DESCRIPCION')
             ->get();
 
-        $departamentos = DB::connection('reclusol')
+        $departamentos = DB::connection('si_solmar')
             ->table('ADMI_DEPARTAMENTO')
             ->select('DEPA_CODIGO', 'DEPA_DESCRIPCION')
             ->where('DEPA_VIGENCIA', 'SI')
@@ -589,7 +729,7 @@ class RequerimientoController extends Controller
             ->keyBy('DEPA_CODIGO');
 
 
-        $provincias = DB::connection('reclusol')
+        $provincias = DB::connection('si_solmar')
             ->table('ADMI_PROVINCIA')
             ->select('PROVI_CODIGO', 'PROVI_DESCRIPCION', 'DEPA_CODIGO')
             ->where('PROVI_VIGENCIA', 'SI')
@@ -597,13 +737,14 @@ class RequerimientoController extends Controller
             ->get()
             ->keyBy('PROVI_CODIGO');
 
-        $distritos = DB::connection('reclusol')
+        $distritos = DB::connection('si_solmar')
             ->table('ADMI_DISTRITO')
             ->select('DIST_CODIGO', 'DIST_DESCRIPCION', 'PROVI_CODIGO')
             ->where('DIST_VIGENCIA', 'SI')
             ->orderBy('DIST_DESCRIPCION')
             ->get()
-            ->keyBy('DIST_CODIGO');
+            ->keyBy('DIST_CODIGO'); */
+
 
         return view('requerimientos.partials.form-edit', compact(
             'requerimiento',
@@ -616,8 +757,7 @@ class RequerimientoController extends Controller
             'provincias',
             'distritos'
         ));
-    } */
-    
+    }
 
     /**
      * Valida y actualiza el postulante.

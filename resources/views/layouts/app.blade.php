@@ -2,7 +2,6 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
-
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -60,7 +59,7 @@
                 ],
                 ['label' => 'Entrevistas', 'href' => route('entrevistas.index'), 'icon' => 'fa-calendar-check'],
                 ['label' => 'Usuarios', 'href' => route('usuarios.index'), 'icon' => 'fa-users-cog'],
-                ['label' => 'Configuración', 'href' => '#', 'icon' => 'fa-cog'],
+                ['label' => 'Configuración', 'href' => route('configuracion.index'), 'icon' => 'fa-cog'],
             ],
             'logout' => [
                 'label' => 'Logout',
@@ -91,7 +90,7 @@
 
                         <!-- Center Title -->
                         <div class="hidden lg:block text-center flex-1">
-                            <h1 class="text-lg text-M2 font-semibold">Sistema de reclutamiento - RECLUSOL </h1>
+                            <h1 class="text-base text-M2 font-semibold">Sistema de reclutamiento - RECLUSOL </h1>
                         </div>
 
                         <!-- Right: User Info -->

@@ -4,7 +4,7 @@
     <div class="space-y-4">
         <x-block class="flex flex-col">
             <h1 class="text-xl font-bold text-M2 mb-1">Cargar recursos para afiches</h1>
-            <p class="text-M3 mb-4">
+            <p class="text-M3 text-sm mb-4">
                 Aquí puedes subir nuevas plantillas, íconos o fuentes para usarlas en el generador de afiches.
             </p>
 

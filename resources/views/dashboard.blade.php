@@ -75,13 +75,14 @@
         <!-- Charts Section -->
         <div class="grid lg:grid-cols-2 gap-6 mb-8">
             <!-- Postulaciones por Sede -->
-            <x-block class="flex flex-col">
-                <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-xl font-bold text-gray-800">Postulaciones por Sede</h3>
-                    <i class="fas fa-chart-bar text-blue-500"></i>
+            <div
+                class="bg-M6 rounded-lg border border-neutral shadow-sm p-5 flex flex-col items-start justify-start mx-auto w-full">
+                <div class="flex items-center justify-between mb-6 w-full">
+                    <h3 class="text-lg font-bold text-M2">Postulaciones por Sede</h3>
+                    <i class="fas fa-chart-bar text-M2"></i>
                 </div>
 
-                <div class="space-y-4">
+                <div class="space-y-4 w-full">
                     @php
                         /* Colores tailwind para las barras (cicla si hay más sedes) */
                         $colores = ['blue-500', 'green-500', 'yellow-500', 'red-500', 'purple-500', 'orange-500'];
@@ -110,15 +111,16 @@
                         </div>
                     @endforeach
                 </div>
-            </x-block>
+            </div>
 
             <!-- Estado de Postulantes -->
-            <x-block class="flex flex-col">
-                <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-xl font-bold text-gray-800">Estado de Postulantes</h3>
-                    <i class="fas fa-user-check text-green-500"></i>
+            <div
+                class="bg-M6 rounded-lg border border-neutral shadow-sm p-5 flex flex-col items-start justify-start mx-auto w-full">
+                <div class="flex items-center justify-between mb-6 w-full">
+                    <h3 class="text-lg font-bold text-M2">Estado de Postulantes</h3>
+                    <i class="fas fa-user-check text-M2"></i>
                 </div>
-                <div class="space-y-4">
+                <div class="space-y-4 w-full">
                     <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
                         <div class="flex items-center space-x-3">
                             <div class="w-3 h-3 bg-green-500 rounded-full"></div>
@@ -148,18 +150,19 @@
                         <span class="font-bold text-red-600">15</span>
                     </div>
                 </div>
-            </x-block>
+            </div>
         </div>
 
         <!-- Bottom Section -->
         <div class="grid lg:grid-cols-2 gap-6">
             <!-- Próximas Entrevistas -->
-            <x-block class="flex flex-col">
-                <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-xl font-bold text-gray-800">Próximas Entrevistas Programadas</h3>
-                    <i class="fas fa-calendar-check text-blue-500"></i>
+            <div
+                class="bg-M6 rounded-lg border border-neutral shadow-sm p-5 flex flex-col items-start justify-start mx-auto w-full">
+                <div class="flex items-center justify-between mb-6 w-full">
+                    <h3 class="text-lg font-bold text-M2">Próximas Entrevistas Programadas</h3>
+                    <i class="fas fa-calendar-check text-M2"></i>
                 </div>
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto w-full">
                     <table class="w-full text-sm">
                         <thead>
                             <tr class="border-b border-gray-200">
@@ -203,38 +206,65 @@
                         </tbody>
                     </table>
                 </div>
-            </x-block>
+            </div>
 
             <!-- Alertas Recientes -->
-            <x-block class="flex flex-col">
-                <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-xl font-bold text-gray-800">Alertas Recientes</h3>
-                    <i class="fas fa-bell text-yellow-500"></i>
+            <div
+                class="bg-M6 rounded-lg border border-neutral shadow-sm p-5 flex flex-col items-start justify-start mx-auto w-full">
+                <div class="flex items-center justify-between mb-6 w-full">
+                    <h3 class="text-lg font-bold text-M2">Alertas Recientes</h3>
+                    <i class="fas fa-bell text-M2"></i>
                 </div>
-                <div class="space-y-4">
-                    <div class="flex items-start space-x-3 p-3 bg-yellow-50 rounded-lg border-l-4 border-yellow-400">
-                        <i class="fas fa-exclamation-triangle text-yellow-500 mt-1"></i>
-                        <div>
-                            <p class="text-sm font-medium text-gray-800">Faltan validar 5 postulantes</p>
-                            <p class="text-xs text-gray-600">Hace 2 horas</p>
+                <div class="space-y-3 w-full">
+                    <!-- Alert row (yellow) -->
+                    <div class="flex items-center justify-between bg-white rounded-lg shadow-sm">
+                        <div class="flex items-center">
+                            <div class="h-12 w-1 rounded-l-full bg-yellow-400"></div>
+                            <div class="flex items-center space-x-3 px-4 py-3">
+                                <div class="w-10 h-10 bg-yellow-50 rounded-md flex items-center justify-center">
+                                    <i class="fas fa-exclamation-triangle text-yellow-500"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">Faltan validar 5 postulantes</p>
+                                    <p class="text-xs text-gray-600">Hace 2 horas</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="flex items-start space-x-3 p-3 bg-blue-50 rounded-lg border-l-4 border-blue-400">
-                        <i class="fas fa-info-circle text-blue-500 mt-1"></i>
-                        <div>
-                            <p class="text-sm font-medium text-gray-800">Requerimiento urgente sin oficina</p>
-                            <p class="text-xs text-gray-600">Hace 4 horas</p>
+
+                    <!-- Alert row (blue) -->
+                    <div class="flex items-center justify-between bg-white rounded-lg shadow-sm">
+                        <div class="flex items-center">
+                            <div class="h-12 w-1 rounded-l-full bg-blue-400"></div>
+                            <div class="flex items-center space-x-3 px-4 py-3">
+                                <div class="w-10 h-10 bg-blue-50 rounded-md flex items-center justify-center">
+                                    <i class="fas fa-info-circle text-blue-500"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">Requerimiento urgente sin oficina</p>
+                                    <p class="text-xs text-gray-600">Hace 4 horas</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="flex items-start space-x-3 p-3 bg-orange-50 rounded-lg border-l-4 border-orange-400">
-                        <i class="fas fa-clock text-orange-500 mt-1"></i>
-                        <div>
-                            <p class="text-sm font-medium text-gray-800">Postulante con entrevista reprogramada</p>
-                            <p class="text-xs text-gray-600">Hace 6 horas</p>
+
+                    <!-- Alert row (orange) -->
+                    <div class="flex items-center justify-between bg-white rounded-lg shadow-sm">
+                        <div class="flex items-center">
+                            <div class="h-12 w-1 rounded-l-full bg-orange-400"></div>
+                            <div class="flex items-center space-x-3 px-4 py-3">
+                                <div class="w-10 h-10 bg-orange-50 rounded-md flex items-center justify-center">
+                                    <i class="fas fa-clock text-orange-500"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">Postulante con entrevista reprogramada</p>
+                                    <p class="text-xs text-gray-600">Hace 6 horas</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </x-block>
+            </div>
         </div>
     </div>
     </div>

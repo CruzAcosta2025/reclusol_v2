@@ -60,7 +60,7 @@
     <div class="overflow-x-auto">
         <table class="w-full bg-white">
             <thead class="bg-neutral-lightest rounded-t-2xl border border-neutral">
-                <tr class="text-left text-sm">
+                <tr class="text-left text-xs">
                     @foreach ($columns as $col)
                         @php $align = $col['align'] ?? 'text-center'; @endphp
                         <th class="px-4 py-3 font-bold text-M2 uppercase {{ $align }}">
@@ -83,11 +83,13 @@
                             $dataAttrs .= ' ' . $dataKey . '="' . e((string) $val) . '"';
                         }
                         $searchValue = strtolower(implode(' ', $searchParts));
+                        $trClass = $r['_tr_class'] ?? '';
+                        $rawAttrs = $r['_raw_attrs'] ?? '';
                     @endphp
-                    <tr data-search="{{ $searchValue }}" {!! $dataAttrs !!}>
+                    <tr class="{{ $trClass }}" {!! $rawAttrs !!} data-search="{{ $searchValue }}" {!! $dataAttrs !!}>
                         @foreach($columns as $col)
                             @php $k = $col['key']; $align = $col['align'] ?? 'text-center'; @endphp
-                            <td class="px-4 py-3 text-M2 text-sm {{ $align }}">
+                            <td class="px-4 py-3 text-M2 text-xs {{ $align }}">
                                 {!! data_get($r, $k, '—') !!}
                             </td>
                         @endforeach
@@ -101,26 +103,6 @@
         </table>
     </div>
 
-    <!-- Mobile cards -->
-    <div class="hidden" x-ref="cards">
-        @forelse($rows as $r)
-            @php
-                $searchParts = [];
-                foreach($columns as $col){ $searchParts[] = strip_tags((string) data_get($r, $col['key'], '')); }
-                $searchValue = strtolower(implode(' ', $searchParts));
-            @endphp
-            <div data-id="{{ data_get($r,'id', Str::random(6)) }}" data-search="{{ $searchValue }}" class="bg-white rounded-lg border p-3 shadow-sm">
-                @foreach($columns as $col)
-                    <div class="flex justify-between py-1">
-                        <div class="text-xs text-gray-500">{{ $col['label'] }}</div>
-                        <div class="text-sm text-M2">{!! data_get($r, $col['key'], '—') !!}</div>
-                    </div>
-                @endforeach
-            </div>
-        @empty
-            <div class="text-center py-6 text-M2 text-sm">{{ $emptyMessage }}</div>
-        @endforelse
-    </div>
 
     <script>
         // Ensure initial pagination/filter run after Alpine initializes

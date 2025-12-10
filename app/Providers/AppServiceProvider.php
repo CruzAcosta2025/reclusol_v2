@@ -5,8 +5,9 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use App\Models\Catalogo;
 use Illuminate\Support\Facades\View;
-
-
+use App\Http\View\Composers\SidebarComposer;
+use App\Repositories\RequerimientosRepository;
+use App\Repositories\Interfaces\RequerimientosRepositoryInterface;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -15,7 +16,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-
+        $this->app->bind(RequerimientosRepositoryInterface::class, RequerimientosRepository::class);
     }
 
     /**
@@ -23,6 +24,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Register sidebar composer to dynamically build sidebar items
+        View::composer('components.sidebar', SidebarComposer::class);
         /*
         View::composer('postulantes.registroPrimario', function ($view) {
             $departamentos = Catalogo::obtenerDepartamentos();

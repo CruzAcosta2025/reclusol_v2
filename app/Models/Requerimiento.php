@@ -7,9 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Requerimiento extends Model
 {
     protected $table = 'requerimientos';
-
     protected $primaryKey = 'id';
-
     public $timestamps = true;
 
     protected $fillable = [
@@ -73,17 +71,14 @@ class Requerimiento extends Model
 
     public function estado()
     {
-        return $this->belongsTo(EstadoRequerimiento::class, 'estado'); // 'estado' es la FK en tu tabla requerimientos
+        return $this->belongsTo(EstadoRequerimiento::class, 'estado');
     }
-
 
     public function getEstadoAttribute($value)
     {
-        // Si la relación ya se cargó, úsala
         if ($this->relationLoaded('estado') && $this->getRelation('estado')) {
             return $this->getRelation('estado');
         }
-        // Si no, devuelve el valor crudo de la columna
         return $value;
     }
 }

@@ -8,9 +8,9 @@
             <div class="flex justify-between items-center">
                 <div>
                     <h1 class="text-xl font-bold text-M2">Gestión de Usuarios</h1>
-                    <p class="text-M3 mt-1">Administra los usuarios del sistema y sus permisos</p>
+                    <p class="text-M3 text-sm">Administra los usuarios del sistema y sus permisos</p>
                 </div>
-                <x-primary-button-create onclick="openCreateModal()">
+                <x-primary-button-create x-on:click="$dispatch('open-modal', 'crearUsuario')">
                     <span>Nuevo Usuario</span>
                 </x-primary-button-create>
             </div>
@@ -109,18 +109,7 @@
         {{-- Tabla de usuarios --}}
         <div>
             <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-                {{-- Encabezado de tabla --}}
-                <div
-                    class="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-6 py-4 flex justify-between items-center">
-                    <h2 class="flex items-center text-lg font-semibold">
-                        <i class="fas fa-list mr-2"></i>
-                        Lista de Usuarios
-                    </h2>
-                    <span class="text-sm opacity-80">
-                        {{ $users->total() }} usuarios encontrados
-                    </span>
-                </div>
-
+                {{-- {{ $users->total() }} usuarios encontrados --}}
                 <div class="overflow-x-auto">
                     <table class="w-full">
                         <thead class="bg-gradient-to-r from-blue-50 to-blue-100">
@@ -186,8 +175,7 @@
                                             <button onclick="toggleUserStatus({{ $user->id }})"
                                                 class="inline-flex items-center justify-center w-8 h-8 rounded-full {{ $user->habilitado ? 'bg-green-50 hover:bg-green-100 text-green-600' : 'bg-orange-50 hover:bg-orange-100 text-orange-600' }} transition"
                                                 title="{{ $user->habilitado ? 'Desactivar' : 'Activar' }}">
-                                                <i
-                                                    class="fas fa-{{ $user->habilitado ? 'toggle-on' : 'toggle-off' }}"></i>
+                                                <i class="fas fa-{{ $user->habilitado ? 'toggle-on' : 'toggle-off' }}"></i>
                                             </button>
 
                                             <button onclick="deleteUser({{ $user->id }})"
@@ -223,22 +211,25 @@
         </div>
 
         {{-- Modal de Creación --}}
-        <div id="create-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4" id="create-modal-content">
-                {{-- Contenido del modal se carga aquí --}}
+        <x-modal name="crearUsuario" :show="false" maxWidth="xl" id="create-modal">
+            <x-slot name="title">Crear Nuevo Usuario</x-slot>
+            <div class="space-y-4" id="create-modal-content">
+                @include('usuarios.create')
             </div>
-        </div>
+            <x-slot name="footer">
+                <x-cancel-button x-on:click="$dispatch('close-modal', 'crearUsuario')">
+                    Cancelar
+                </x-cancel-button>
+                <x-confirm-button type="submit" id="create-user-submit"
+                    onclick="document.getElementById('create-user-form').submit();">
+                    Crear Usuario
+                </x-confirm-button>
+            </x-slot>
+        </x-modal>
 
         {{-- Modal de Edición --}}
         <div id="edit-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
             <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4" id="edit-modal-content">
-                {{-- Contenido del modal se carga aquí --}}
-            </div>
-        </div>
-
-        {{-- Modal de Visualización --}}
-        <div id="view-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4" id="view-modal-content">
                 {{-- Contenido del modal se carga aquí --}}
             </div>
         </div>
@@ -289,14 +280,21 @@
                 })
                 .then(response => response.text())
                 .then(html => {
-                    document.getElementById('create-modal-content').innerHTML = html;
-                    document.getElementById('create-modal').classList.remove('hidden');
-                    inicializarEventosCreateModal();
+                    const target = document.getElementById('create-modal-content');
+                    if (target) {
+                        target.innerHTML = html;
+                        inicializarEventosCreateModal();
+                        document.dispatchEvent(new CustomEvent('open-modal', {
+                            detail: 'crearUsuario'
+                        }));
+                    }
                 });
         }
 
         function closeCreateModal() {
-            document.getElementById('create-modal').classList.add('hidden');
+            document.dispatchEvent(new CustomEvent('close-modal', {
+                detail: 'crearUsuario'
+            }));
         }
 
         function inicializarEventosCreateModal() {
@@ -432,6 +430,13 @@
                 }
             }
         }
+
+        // Inicializa eventos del modal de creación al cargar la vista (contenido ya está incluido en el x-modal)
+        document.addEventListener('DOMContentLoaded', function() {
+            if (document.getElementById('create-modal-content')) {
+                inicializarEventosCreateModal();
+            }
+        });
 
         // ------ MODAL: EDITAR USUARIO ------
         function openEditModal(id) {
@@ -635,9 +640,9 @@
                 .catch(() => alert('Error al eliminar usuario'));
         }
 
-        // ------ Cerrar modales al hacer clic fuera ------
         document.addEventListener('click', function(event) {
-            const modals = ['create-modal', 'edit-modal', 'view-modal', 'delete-modal'];
+            // Para modales legacy (edit/view/delete) se mantiene la lógica de backdrop clic
+            const modals = ['edit-modal', 'view-modal', 'delete-modal'];
             modals.forEach(function(modalId) {
                 const modal = document.getElementById(modalId);
                 if (modal && event.target === modal) {

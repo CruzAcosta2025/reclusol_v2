@@ -9,7 +9,6 @@
             <i class="fas fa-arrow-left text- group-hover:-translate-x-1 transition-transform"></i>
             <span class="font-bold">Volver</span>
         </a>
-
         <!-- Header -->
         <x-block class="flex flex-col w-full">
             <div class="mb-3">
@@ -18,7 +17,6 @@
                     <p class="text-base text-M3">Complete todos los campos para registrar al postulante</p>
                 </div>
             </div>
-
             <!-- Progress Bar -->
             <div class="w-full mt-4">
                 <div class="bg-neutral-lightest rounded-full h-2 backdrop-blur-sm">

@@ -10,6 +10,7 @@ use App\Http\Controllers\HistorialController;
 use App\Http\Controllers\PosterController;
 use App\Http\Controllers\EntrevistaController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ConfiguracionController;
 
 Route::get('/prueba', function () {
   return view('prueba');
@@ -38,6 +39,10 @@ Route::middleware('auth')->group(function () {
   Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
   // Registro interno (solo usuarios logueados)
   Route::middleware(['auth', 'role:ADMINISTRADOR|USUARIO OPERATIVO'])->group(function () {
+    Route::redirect('/postulantes', '/postulantes/filtrar');
+    Route::get('/postulantes', function () {
+      return redirect()->route('postulantes.filtrar');
+    });
     Route::get('/postulantes/crear', [PostulanteController::class, 'formInterno'])->name('postulantes.formInterno');
     Route::get('/postulantes/dni-decolecta/{dni}', [PostulanteController::class, 'buscarDniDecolecta'])->name('postulantes.dni.decolecta');
     Route::post('/postulantes', [PostulanteController::class, 'storeInterno'])->name('postulantes.storeInterno');
@@ -60,7 +65,9 @@ Route::middleware('auth')->group(function () {
 
   // RUTAS PARA REQUERIMIENTOS
   Route::middleware(['auth', 'role:ADMINISTRADOR|USUARIO OPERATIVO'])->group(function () {
+    Route::redirect('/requerimientos', '/requerimientos/filtrar');
     Route::get('/requerimientos/registro', [RequerimientoController::class, 'mostrar'])->name('requerimientos.requerimiento');
+    Route::get('/requerimientos/{id}/detalle', [RequerimientoController::class, 'detalle'])->name('requerimientos.detalle');
     Route::post('/requerimientos', [RequerimientoController::class, 'store'])->name('requerimientos.store');
     Route::get('/requerimientos/filtrar', [RequerimientoController::class, 'filtrar'])->name('requerimientos.filtrar');
     Route::delete('/requerimientos/{requerimiento}', [RequerimientoController::class, 'destroy'])->name('requerimientos.destroy');
@@ -72,9 +79,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/cargos/{id}', [CargoController::class, 'show']);
     Route::get('/api/tipos-cargo', [RequerimientoController::class, 'tiposPorTipoPersonal'])->name('api.tipos_cargo');
     Route::get('/api/cargos', [RequerimientoController::class, 'cargosPorTipo'])->name('api.cargos');
+    Route::get('/requerimientos/probar', [RequerimientoController::class, 'probarRepositorio'])->name('requerimientos.probar');
   });
 
-  // RUTAS PARA AFICHES 
+  // RUTAS PARA AFICHES
   Route::middleware('role:ADMINISTRADOR|USUARIO OPERATIVO')->group(function () {
     Route::get('/afiches', [PosterController::class, 'index'])->name('afiches.index');
     //Route::get('/afiches/agregarRecursos', [PosterController::class, 'mostrarFormularioRecursos'])->name('afiches.recursos');
@@ -114,6 +122,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/usuarios/{user}', [UserController::class, 'destroy'])->name('usuarios.destroy');
     Route::get('/usuarios/dni-decolecta/{dni}', [UserController::class, 'buscarDniDecolecta'])->middleware(['auth', 'throttle:30,1'])->name('usuarios.dni.decolecta');
     Route::post('/usuarios/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('usuarios.toggleStatus');
+  });
+
+  Route::middleware('role:ADMINISTRADOR')->group(function () {
+    Route::get('/configuracion/index', [ConfiguracionController::class, 'index'])->name('configuracion.index');
   });
 });
 

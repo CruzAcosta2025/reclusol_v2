@@ -13,7 +13,6 @@ class Cargo extends Model
 
     protected $fillable = ['CODI_CARG', 'DESC_CARGO', 'TIPO_CARG', 'CARG_VIGENCIA'];
 
-    // Relación con TipoCargo
     public function tipo()
     {
         return $this->belongsTo(TipoCargo::class, 'TIPO_CARG', 'CODI_TIPO_CARG');

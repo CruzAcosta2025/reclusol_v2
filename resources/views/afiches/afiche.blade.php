@@ -11,7 +11,7 @@
             <div class="flex justify-between items-center">
                 <div>
                     <h1 class="text-xl font-bold text-M2">Generador de Afiches</h1>
-                    <p class="text-M3 mt-1">Crea afiches automáticamente basados en los requerimientos activos</p>
+                    <p class="text-M3 text-sm">Crea afiches automáticamente basados en los requerimientos activos</p>
                 </div>
                 <!-- <div class="flex items-center space-x-4">
                                                                                                 <a href="{{ route('afiches.historial') }}" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center space-x-2 transition-all duration-300 hover:-translate-y-1">

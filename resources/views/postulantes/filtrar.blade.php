@@ -8,7 +8,7 @@
                 <h1 class="text-xl font-bold text-M2">
                     Listado de Postulantes
                 </h1>
-                <p class="text-M3 mt-1 text-base">
+                <p class="text-M3 text-sm">
                     Ver y filtrar postulantes según diferentes criterios
                 </p>
             </div>
@@ -120,28 +120,26 @@
         <div>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {{-- Aptos --}}
-                <div class="bg-green-100 p-4 rounded-lg text-center flex flex-col items-center">
-                    <i class="fas fa-check-circle fa-2x text-green-500 mb-2"></i>
+                <div class="bg-green-100 border border-green-200 p-4 rounded-lg text-center flex flex-col items-center">
+                    <i class="fas fa-check-circle fa-2x text-green-500"></i>
                     <p class="text-sm text-gray-600">Postulantes Aptos</p>
                     <p class="text-2xl font-bold">{{ $stats['aptos'] ?? 0 }}</p>
                 </div>
                 {{-- No Aptos --}}
-                <div class="bg-red-100 p-4 rounded-lg text-center flex flex-col items-center">
-                    <i class="fas fa-times-circle fa-2x text-red-500 mb-2"></i>
+                <div class="bg-red-100 border border-red-200 p-4 rounded-lg text-center flex flex-col items-center">
+                    <i class="fas fa-times-circle fa-2x text-red-500"></i>
                     <p class="text-sm text-gray-600">Postulantes No Aptos</p>
                     <p class="text-2xl font-bold">{{ $stats['no_aptos'] ?? 0 }}</p>
                 </div>
-
                 {{-- Total --}}
-                <div class="bg-blue-100 p-4 rounded-lg text-center flex flex-col items-center">
-                    <i class="fa-solid fa-users fa-2x text-blue-500 mb-2"></i>
+                <div class="bg-blue-100 border border-blue-200 p-4 rounded-lg text-center flex flex-col items-center">
+                    <i class="fa-solid fa-users fa-2x text-blue-500"></i>
                     <p class="text-sm text-gray-600">Total Postulantes</p>
                     <p class="text-2xl font-bold">{{ $stats['total'] ?? 0 }}</p>
                 </div>
-
                 {{-- Total postulantes (OPERATIVO Y ADMINISTRATIVO) --}}
-                <div class="bg-blue-100 p-4 rounded-lg text-center flex flex-col items-center">
-                    <i class="fa-solid fa-users fa-2x text-blue-500 mb-2"></i>
+                <div class="bg-blue-100 border border-blue-200 p-4 rounded-lg text-center flex flex-col items-center">
+                    <i class="fa-solid fa-users fa-2x text-blue-500"></i>
                     <p class="text-sm text-gray-600">Postulantes Administrativo</p>
                     <p class="text-sm text-gray-600">Postulantes Operativo</p>
                     <p class="text-2xl font-bold">{{ $stats['total'] ?? 0 }}</p>
@@ -149,174 +147,68 @@
             </div>
         </div>
 
-
-        {{-- Resultados --}}
+        {{-- Tabla de Resultados --}}
         <div>
-            {{-- Encabezado --}}
-            <div
-                class="flex items-center justify-between bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-4 py-3 rounded-t-xl shadow-md">
-                <h2 class="flex items-center text-lg font-semibold">
-                    <i class="fas fa-search mr-2"></i>
-                    Listado de Postulantes
-                </h2>
-                <span class="text-sm opacity-80">
-                    {{-- {{ $postulantes->total() }} resultados --}}
-                </span>
-            </div>
+            @php
+                $columns = [
+                    ['key' => 'puesto_postula', 'label' => 'Puesto al que postula', 'align' => 'text-center'],
+                    ['key' => 'distrito_nombre', 'label' => 'Lugar de Nacimiento', 'align' => 'text-center'],
+                    ['key' => 'nombres_apellidos', 'label' => 'Nombres y Apellidos', 'align' => 'text-center'],
+                    ['key' => 'edad_label', 'label' => 'Edad', 'align' => 'text-center'],
+                    ['key' => 'dni', 'label' => 'DNI', 'align' => 'text-center'],
+                    ['key' => 'nacionalidad', 'label' => 'Nacionalidad', 'align' => 'text-center'],
+                    ['key' => 'experiencia_rubro', 'label' => 'Experiencia', 'align' => 'text-center'],
+                    ['key' => 'sucamec', 'label' => 'SUCAMEC', 'align' => 'text-center'],
+                    ['key' => 'grado_instruccion', 'label' => 'Grado de Instrucción', 'align' => 'text-center'],
+                    ['key' => 'celular', 'label' => 'Celular', 'align' => 'text-center'],
+                    ['key' => 'licencia_arma', 'label' => 'Lic. Arma L4', 'align' => 'text-center'],
+                    ['key' => 'licencia_conducir', 'label' => 'Lic. Conducir A1', 'align' => 'text-center'],
+                    ['key' => 'cv', 'label' => 'CV', 'align' => 'text-center'],
+                    ['key' => 'cul', 'label' => 'CUL', 'align' => 'text-center'],
+                    ['key' => 'actions', 'label' => 'Acciones', 'align' => 'text-center'],
+                ];
+
+                $rows = $postulantes->map(function ($postulante) {
+                    // Row class depending on decision
+                    $trClass = trim(($postulante->decision === 'apto' ? 'bg-green-100' : ($postulante->decision === 'no_apto' ? 'bg-red-100' : '')));
+
+                    $cv = $postulante->cv ? '<a href="' . route('postulantes.ver-envuelto', ['postulante' => $postulante->id, 'tipo' => 'cv']) . '" target="_blank" class="flex items-center justify-center w-24 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-600 transition" title="Ver CV"><i class="fa-solid fa-file-pdf mr-2"></i> Ver CV</a>' : '<span class="text-gray-400">-</span>';
+
+                    $cul = $postulante->cul ? '<a href="' . route('postulantes.ver-envuelto', ['postulante' => $postulante->id, 'tipo' => 'cul']) . '" target="_blank" class="flex items-center justify-center w-24 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-600 transition" title="Ver CUL"><i class="fa-solid fa-file-pdf mr-2"></i> Ver CUL</a>' : '<span class="text-gray-400">-</span>';
+
+                    $actions = '<div class="flex flex-col justify-center items-center gap-2 h-full">';
+                    $actions .= '<button data-id="' . $postulante->id . '" data-nombre="' . $postulante->nombres . ' ' . $postulante->apellidos . '" class="btn-validar flex items-center justify-center w-24 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-600 transition" title="Validar documentos"><i class="fa-solid fa-clipboard-check mr-2"></i> Validar</button>';
+                    $actions .= '<button data-id="' . $postulante->id . '" class="btn-edit flex items-center justify-center w-24 py-1 rounded-lg bg-green-50 hover:bg-green-100 text-green-600 transition" title="Editar"><i class="fas fa-edit mr-2"></i> Editar</button>';
+                    $actions .= '<button onclick="eliminarPostulante(' . $postulante->id . ')" class="flex items-center justify-center w-24 py-1 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition" title="Eliminar"><i class="fas fa-trash mr-2"></i> Eliminar</button>';
+                    $actions .= '</div>';
+
+                    // add raw attrs for compatibility with existing JS filters
+                    $rawAttrs = 'data-dni="' . strtolower($postulante->dni) . '" data-nombre="' . strtolower($postulante->nombres . ' ' . $postulante->apellidos) . '" id="row-' . $postulante->id . '"';
+
+                    return [
+                        '_tr_class' => $trClass,
+                        '_raw_attrs' => $rawAttrs,
+                        'puesto_postula' => $postulante->puesto_postula,
+                        'distrito_nombre' => $postulante->distrito_nombre,
+                        'nombres_apellidos' => $postulante->apellidos . ' ' . $postulante->nombres,
+                        'edad_label' => ucfirst($postulante->edad) . ' años',
+                        'dni' => $postulante->dni,
+                        'nacionalidad' => $postulante->nacionalidad,
+                        'experiencia_rubro' => $postulante->experiencia_rubro,
+                        'sucamec' => $postulante->sucamec ?: '-',
+                        'grado_instruccion' => $postulante->grado_instruccion,
+                        'celular' => $postulante->celular,
+                        'licencia_arma' => $postulante->licencia_arma ?: '-',
+                        'licencia_conducir' => $postulante->licencia_conducir ?: '-',
+                        'cv' => $cv,
+                        'cul' => $cul,
+                        'actions' => $actions,
+                    ];
+                })->toArray();
+            @endphp
 
             <div class="overflow-x-auto bg-white rounded-b-xl shadow-md">
-                <table class="w-full">
-                    <thead class="bg-gradient-to-r from-blue-50 to-blue-100">
-                        <tr class="text-left">
-                            <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Puesto al que
-                                postula</th>
-                            <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Lugar de Nacimiento
-                            </th>
-                            <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Nombres y Apellidos
-                            </th>
-                            <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Edad</th>
-                            <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">DNI</th>
-                            <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Nacionalidad</th>
-                            <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Experiencia</th>
-                            <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">SUCAMEC</th>
-                            <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Grado de Instrucción
-                            </th>
-                            <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Celular</th>
-                            <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Licencia de Arma L4
-                            </th>
-                            <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Licencia de Conducir
-                                A1</th>
-                            <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">CV</th>
-                            <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">CUL</th>
-                            <!-- <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase text-center">Estado</th> -->
-                            <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200">
-                        @forelse($postulantes as $postulante)
-                            <tr id="row-{{ $postulante->id }}" data-dni="{{ strtolower($postulante->dni) }}"
-                                data-nombre="{{ strtolower($postulante->nombres . ' ' . $postulante->apellidos) }}"
-                                class="hover:bg-blue-50 transition
-                            @if ($postulante->decision === 'apto') bg-green-100
-                            @elseif ($postulante->decision === 'no_apto') bg-red-100 @endif">
-                                <td class="px-6 py-4">
-                                    <p class="text-gray-700 text-center">{{ $postulante->puesto_postula }}</p>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="text-gray-700 text-center">{{ $postulante->distrito_nombre }}</span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <p class="text-gray-700 text-center">{{ $postulante->apellidos }}
-                                        {{ $postulante->nombres }}
-                                    </p>
-                                </td>
-
-                                <td class="px-6 py-4">
-                                    <p class="text-gray-700 text-center">{{ ucfirst($postulante->edad) }} años</p>
-                                </td>
-
-                                <td class="px-6 py-4">
-                                    <p class="text-gray-700 text-center">{{ $postulante->dni }}</p>
-                                </td>
-
-                                <td class="px-6 py-4">
-                                    <p class="text-gray-700 text-center">{{ $postulante->nacionalidad }}</p>
-                                </td>
-
-                                <td class="px-6 py-4">
-                                    <p class="text-gray-700 text-center">{{ $postulante->experiencia_rubro }}</p>
-                                </td>
-
-                                <td class="px-6 py-4">
-                                    <p class="text-gray-700 text-center">{{ $postulante->sucamec ?: '-' }}</p>
-                                </td>
-
-                                <td class="px-6 py-4">
-                                    <p class="text-gray-700 text-center">{{ $postulante->grado_instruccion }}</p>
-                                </td>
-
-                                <td class="px-6 py-4">
-                                    <p class="text-gray-700 text-center">{{ $postulante->celular }}</p>
-                                </td>
-
-                                <td class="px-6 py-4 text-center">
-                                    {{ $postulante->licencia_arma ?: '-' }}
-                                </td>
-                                <td class="px-6 py-4 text-center">
-                                    {{ $postulante->licencia_conducir ?: '-' }}
-                                </td>
-
-
-                                {{-- <td class="px-6 py-4 text-center">
-                            {{ $postulante->licencia_arma ? implode(', ', $postulante->licencia_arma) : '-' }}
-                        </td>
-
-                        <td class="px-6 py-4 text-center">
-                            {{ $postulante->licencia_conducir ? implode(', ', $postulante->licencia_conducir) : '-' }}
-                        </td> --}}
-
-                                <td class="px-6 py-4 text-center">
-                                    @if ($postulante->cv)
-                                        <a href="{{ route('postulantes.ver-envuelto', ['postulante' => $postulante->id, 'tipo' => 'cv']) }}"
-                                            target="_blank"
-                                            class="flex items-center justify-center w-24 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-600 transition"
-                                            title="Ver CV">
-                                            <i class="fa-solid fa-file-pdf mr-2"></i> Ver CV
-                                        </a>
-                                    @else
-                                        <span class="text-gray-400">-</span>
-                                    @endif
-                                </td>
-
-                                <td class="px-6 py-4 text-center">
-                                    @if ($postulante->cul)
-                                        <a href="{{ route('postulantes.ver-envuelto', ['postulante' => $postulante->id, 'tipo' => 'cul']) }}"
-                                            target="_blank"
-                                            class="flex items-center justify-center w-24 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-600 transition"
-                                            title="Ver CUL">
-                                            <i class="fa-solid fa-file-pdf mr-2"></i> Ver CUL
-                                        </a>
-                                    @else
-                                        <span class="text-gray-400">-</span>
-                                    @endif
-                                </td>
-
-
-                                <td class="h-full">
-                                    <div class="flex flex-col justify-center items-center gap-2 h-full">
-                                        <!-- Botón Validar -->
-                                        <button data-id="{{ $postulante->id }}"
-                                            data-nombre="{{ $postulante->nombres }} {{ $postulante->apellidos }}"
-                                            class="btn-validar flex items-center justify-center w-24 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-600 transition"
-                                            title="Validar documentos">
-                                            <i class="fa-solid fa-clipboard-check mr-2"></i> Validar
-                                        </button>
-
-                                        <!-- Botón Editar -->
-                                        <button data-id="{{ $postulante->id }}"
-                                            class="btn-edit flex items-center justify-center w-24 py-1 rounded-lg bg-green-50 hover:bg-green-100 text-green-600 transition"
-                                            title="Editar">
-                                            <i class="fas fa-edit mr-2"></i> Editar
-                                        </button>
-
-                                        <!-- Botón Eliminar -->
-                                        <button onclick="eliminarPostulante({{ $postulante->id }})"
-                                            class="flex items-center justify-center w-24 py-1 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition"
-                                            title="Eliminar">
-                                            <i class="fas fa-trash mr-2"></i> Eliminar
-                                        </button>
-                                    </div>
-                                </td>
-
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="px-4 py-6 text-center text-gray-500">No se encontraron
-                                    resultados.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                <x-data-table :columns="$columns" :rows="$rows" :initial-per-page="25" empty-message="No se encontraron resultados." />
             </div>
 
             {{-- Modal de Eliminación --}}

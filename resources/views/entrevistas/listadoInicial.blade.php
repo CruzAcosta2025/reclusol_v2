@@ -6,7 +6,7 @@
         {{-- Encabezado --}}
         <x-block class="flex flex-col">
             <h1 class="text-xl font-bold text-M2">Entrevistas</h1>
-            <p class="text-M3 mt-1">Busque postulantes por DNI o nombre</p>
+            <p class="text-M3 text-sm">Busque postulantes por DNI o nombre</p>
         </x-block>
 
         {{-- Filtros --}}
@@ -98,154 +98,61 @@
         {{-- Tabla de postulantes --}}
         <div class="rounded-2xl border">
             {{-- Encabezado de tabla --}}
-            <div
-                class="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-4 py-3 flex justify-between items-center rounded-t-2xl">
-                <h2 class="flex items-center text-lg font-semibold">
-                    <i class="fas fa-list mr-2"></i>
-                    Listado de Postulantes en Proceso
-                </h2>
-                <span class="text-sm opacity-80">
-                    {{ $postulantes->count() }} postulantes encontrados
-                </span>
-            </div>
+            {{-- {{ $postulantes->count() }} postulantes encontrados --}}
             <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead class="bg-gradient-to-r from-blue-50 to-blue-100">
-                        <tr class="text-left">
-                            <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-center">
-                                Nombre completo</th>
-                            {{--
-                            <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-center">DNI</th>
-                            <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-center">Edad</th>
-                            <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-center">Departamento</th>
-                            --}}
+                @php
+                    $columns = [
+                        ['key' => 'nombre_completo', 'label' => 'Nombre completo', 'align' => 'text-center'],
+                        ['key' => 'cargo', 'label' => 'Cargo', 'align' => 'text-center'],
+                        ['key' => 'fecha_postula', 'label' => 'Fecha de postulación', 'align' => 'text-center'],
+                        ['key' => 'evaluado_por', 'label' => 'Evaluado por', 'align' => 'text-center'],
+                        ['key' => 'estado', 'label' => 'Estado', 'align' => 'text-center'],
+                        ['key' => 'actions', 'label' => 'Acciones', 'align' => 'text-center'],
+                    ];
 
-                            <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-center">
-                                Cargo</th>
-                            <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-center">
-                                Fecha de postulación</th>
-                            <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-center">
-                                Evaluado por</th>
-                            <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-center">
-                                Estado</th>
-                            <th class="px-6 py-4 text-xs font-bold text-gray-600 uppercase tracking-wider text-center">
-                                Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200">
-                        @forelse($postulantes as $postulante)
-                            <tr class="hover:bg-blue-50 transition-colors" data-dni="{{ strtolower($postulante->dni) }}"
-                                data-nombre="{{ strtolower($postulante->nombres . ' ' . $postulante->apellidos) }}">
-                                <td class="px-6 py-4 text-center">
-                                    <div class="flex flex-col">
-                                        <p class="text-sm font-semibold text-gray-900">{{ $postulante->nombres }}
-                                            {{ $postulante->apellidos }}
-                                        </p>
-                                    </div>
-                                </td>
+                    $rows = $postulantes->map(function ($postulante) {
+                        $trClass = 'hover:bg-blue-50 transition-colors';
 
-                                {{--
-                                     <td class="px-6 py-4 text-center">
-                                        <span
-                                            class="inline-flex items-center px-2 py-1 rounded text-xs font-mono bg-gray-100 text-gray-800">
-                                            {{ $postulante->dni }}
-                            </span>
-                            </td>
-                            <td class="px-6 py-4 text-center">
-                                <span
-                                    class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                    {{ $postulante->edad }} años
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 text-center">
-                                <span class="text-sm text-gray-900">{{ $postulante->departamento_nombre }}</span>
-                            </td>
-                            --}}
-                                <td class="px-6 py-4 text-center">
-                                    <span
-                                        class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-                                        {{ $postulante->cargo_nombre ?? ($postulante->cargo_nombre ?? 'N/A') }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 text-center">
-                                    <span
-                                        class="text-sm text-gray-900">{{ \Carbon\Carbon::parse($postulante->fecha_postula)->format('d/m/Y') }}</span>
-                                </td>
-                                <td class="px-6 py-4 text-center">
-                                    <span
-                                        class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium {{ ($postulante->estado_entrevista ?? 'No evaluado') === 'No evaluado' ? 'bg-gray-100 text-gray-600' : 'bg-indigo-100 text-indigo-800' }}">
-                                        {{ $postulante->evaluado_por ?? 'Aún no evaluado' }}
-                                    </span>
-                                </td>
+                        $cargo = '<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">' . e($postulante->cargo_nombre ?? 'N/A') . '</span>';
+                        $fecha = '<span class="text-sm text-gray-900">' . e(\Carbon\Carbon::parse($postulante->fecha_postula)->format('d/m/Y')) . '</span>';
 
-                                <td class="px-6 py-4 text-center">
-                                    @php
-                                        $estado = $postulante->estado_entrevista ?? 'No evaluado';
-                                    @endphp
+                        $evaluadoPor = '<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ' . ((($postulante->estado_entrevista ?? 'No evaluado') === 'No evaluado') ? 'bg-gray-100 text-gray-600' : 'bg-indigo-100 text-indigo-800') . '">' . e($postulante->evaluado_por ?? 'Aún no evaluado') . '</span>';
 
-                                    @if ($estado === 'Evaluado')
-                                        <span
-                                            class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                            Evaluado
-                                        </span>
-                                    @elseif($estado === 'Borrador')
-                                        <span
-                                            class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                            Borrador
-                                        </span>
-                                    @else
-                                        <span
-                                            class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
-                                            No evaluado
-                                        </span>
-                                    @endif
-                                </td>
+                        $estado = $postulante->estado_entrevista ?? 'No evaluado';
+                        if ($estado === 'Evaluado') {
+                            $estadoHtml = '<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">Evaluado</span>';
+                        } elseif ($estado === 'Borrador') {
+                            $estadoHtml = '<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Borrador</span>';
+                        } else {
+                            $estadoHtml = '<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">No evaluado</span>';
+                        }
 
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center justify-center space-x-2">
-                                        <button onclick="viewPostulante({{ $postulante->id }})"
-                                            class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 hover:bg-blue-100 text-blue-600 transition"
-                                            title="Ver detalles">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <a href="{{ route('entrevistas.evaluar', $postulante->id) }}"
-                                            class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-50 hover:bg-green-100 text-green-600 transition"
-                                            title="Entrevistar">
-                                            <i class="fas fa-comments"></i>
-                                        </a>
-                                        <button onclick="editPostulante({{ $postulante->id }})"
-                                            class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-yellow-50 hover:bg-yellow-100 text-yellow-600 transition"
-                                            title="Editar">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button onclick="deletePostulante({{ $postulante->id }})"
-                                            class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-50 hover:bg-red-100 text-red-600 transition"
-                                            title="Eliminar">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="8" class="px-6 py-12 text-center">
-                                    <div class="flex flex-col items-center justify-center">
-                                        <i class="fas fa-users text-gray-300 text-4xl mb-3"></i>
-                                        <p class="text-gray-500 text-lg">No hay postulantes en proceso</p>
-                                        <p class="text-gray-400 text-sm">Ajusta los filtros de búsqueda</p>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-            {{-- Paginación --}}
-            @if ($postulantes->hasPages())
-                <div class="px-6 py-4 border-t border-gray-200">
-                    {{ $postulantes->links() }}
+                        $actions = '<div class="flex items-center justify-center space-x-2">';
+                        $actions .= '<button onclick="viewPostulante(' . $postulante->id . ')" class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 hover:bg-blue-100 text-blue-600 transition" title="Ver detalles"><i class="fas fa-eye"></i></button>';
+                        $actions .= '<a href="' . route('entrevistas.evaluar', $postulante->id) . '" class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-50 hover:bg-green-100 text-green-600 transition" title="Entrevistar"><i class="fas fa-comments"></i></a>';
+                        $actions .= '<button onclick="editPostulante(' . $postulante->id . ')" class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-yellow-50 hover:bg-yellow-100 text-yellow-600 transition" title="Editar"><i class="fas fa-edit"></i></button>';
+                        $actions .= '<button onclick="deletePostulante(' . $postulante->id . ')" class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-50 hover:bg-red-100 text-red-600 transition" title="Eliminar"><i class="fas fa-trash"></i></button>';
+                        $actions .= '</div>';
+
+                        $rawAttrs = 'data-dni="' . strtolower($postulante->dni) . '" data-nombre="' . strtolower($postulante->nombres . ' ' . $postulante->apellidos) . '" id="row-' . $postulante->id . '"';
+
+                        return [
+                            '_tr_class' => $trClass,
+                            '_raw_attrs' => $rawAttrs,
+                            'nombre_completo' => '<div class="flex flex-col"><p class="text-sm font-semibold text-gray-900">' . e($postulante->nombres) . ' ' . e($postulante->apellidos) . '</p></div>',
+                            'cargo' => $cargo,
+                            'fecha_postula' => $fecha,
+                            'evaluado_por' => $evaluadoPor,
+                            'estado' => $estadoHtml,
+                            'actions' => $actions,
+                        ];
+                    })->toArray();
+                @endphp
+
+                <div class="bg-white">
+                    <x-data-table :columns="$columns" :rows="$rows" :initial-per-page="10" empty-message="No hay postulantes en proceso" />
                 </div>
-            @endif
+            </div>
         </div>
 
         {{-- Modal de Visualización --}}

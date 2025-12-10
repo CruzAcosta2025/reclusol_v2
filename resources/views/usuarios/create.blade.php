@@ -1,20 +1,9 @@
-<div class="p-6">
-    <div class="flex items-center justify-between mb-6">
-        <h3 class="text-lg font-semibold text-M2 flex items-center">
-            <i class="fas fa-user-plus text-M2 mr-2"></i>
-            Crear Nuevo Usuario
-        </h3>
-        <button onclick="closeCreateModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
-            <i class="fas fa-times text-xl"></i>
-        </button>
-    </div>
-
-    <form id="create-user-form" action="{{ route('usuarios.store') }}" method="POST" class="space-y-4">
+    <form id="create-user-form" action="{{ route('usuarios.store') }}" method="POST">
         @csrf
-        <div class="grid grid-cols-1 gap-4">
+        <div class="grid grid-cols-1 mb-4">
             <div class="space-y-2">
-                <label for="dni" class="block text-sm font-semibold text-gray-700">
-                    <i class="fas fa-id-card mr-2 text-blue-500"></i>
+                <label for="dni" class="block text-sm font-semibold text-M2">
+                    <i class="fas fa-id-card mr-2 text-M2"></i>
                     DNI *
                 </label>
                 <input type="text" id="dni" name="dni" maxlength="8" pattern="[0-9]{8}"
@@ -26,8 +15,8 @@
         <div class="grid grid-cols-2 gap-4">
             <!-- Nombres -->
             <div class="space-y-2">
-                <label for="nombres" class="block text-sm font-semibold text-gray-700">
-                    <i class="fas fa-user mr-2 text-blue-500"></i>
+                <label for="nombres" class="block text-sm font-semibold text-M2">
+                    <i class="fas fa-user mr-2 text-M2"></i>
                     Nombres *
                 </label>
                 <input type="text" id="nombres" name="nombres"
@@ -38,8 +27,8 @@
 
             <!-- Apellidos -->
             <div class="space-y-2">
-                <label for="apellidos" class="block text-sm font-semibold text-gray-700">
-                    <i class="fas fa-user mr-2 text-blue-500"></i>
+                <label for="apellidos" class="block text-sm font-semibold text-M2">
+                    <i class="fas fa-user mr-2 text-M2"></i>
                     Apellidos *
                 </label>
                 <input type="text" id="apellidos" name="apellidos"
@@ -69,7 +58,7 @@
 
             {{-- Nombre de usuario --}}
             <div>
-                <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
+                <label for="name" class="block text-sm font-medium text-M2 mb-2">
                     <i class="fas fa-user mr-1"></i>
                     Nombre de Usuario
                 </label>
@@ -98,7 +87,7 @@
 
             {{-- Rol --}}
             <div>
-                <label for="rol" class="block text-sm font-medium text-gray-700 mb-2">
+                <label for="rol" class="block text-sm font-medium text-M2 mb-2">
                     <i class="fas fa-user-shield mr-1"></i>
                     Rol
                 </label>
@@ -112,7 +101,7 @@
 
             {{-- Contraseña --}}
             <div>
-                <label for="contrasena" class="block text-sm font-medium text-gray-700 mb-2">
+                <label for="contrasena" class="block text-sm font-medium text-M2 mb-2">
                     <i class="fas fa-lock mr-1"></i>
                     Contraseña
                 </label>
@@ -126,15 +115,13 @@
                 <div class="error-message text-red-500 text-sm mt-1 hidden"></div>
             </div>
         </div>
-
         {{-- Botones --}}
-        <div class="flex space-x-3 pt-4 border-t border-gray-200">
+        {{-- <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200">
             <x-cancel-button type="button" onclick="closeCreateModal()">
                 Cancelar
             </x-cancel-button>
             <x-confirm-button type="submit">
                 Crear Usuario
             </x-confirm-button>
-        </div>
+        </div> --}}
     </form>
-</div>

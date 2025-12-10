@@ -18,9 +18,6 @@
     <!-- TailwindCSS CDN (funciona siempre, incluso si Vite no) -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 
-    <!-- Alpine.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js" defer></script>
-
     <!-- Custom Styles for RECLUSOL -->
     <style>
         .gradient-bg {
