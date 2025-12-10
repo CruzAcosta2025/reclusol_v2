@@ -273,7 +273,7 @@ class PostulanteController extends Controller
             'licencia_conducir'   => $validated['licencia_conducir'],
         ]);
 
-        DB::transaction(fn() =>Postulante::create($validated));
+        DB::transaction(fn() => Postulante::create($validated));
 
         return back()->with('success', 'Información guardada');
     }
@@ -1523,6 +1523,7 @@ class PostulanteController extends Controller
     /* ---------- FUNCION PARA FILTRAR ---------- */
     public function filtrar(Request $request)
     {
+
         $query = Postulante::with('requerimiento');
 
         // Normalizadores
@@ -1561,10 +1562,18 @@ class PostulanteController extends Controller
             }
         });
         $query->when($tipoCargo, fn($q) => $q->where('tipo_cargo', $tipoCargo));
-        $query->when($cargo,     fn($q) => $q->where('cargo', $cargo));
+        //$query->when($cargo,     fn($q) => $q->where('cargo', $cargo));
         $query->when($depa,      fn($q) => $q->where('departamento', $depa));
         $query->when($provi,     fn($q) => $q->where('provincia', $provi));
         $query->when($distr,     fn($q) => $q->where('distrito', $distr));
+
+
+        $query->when($cargo !== null, function ($q) use ($cargo) {
+            $q->whereHas('requerimiento', function ($qr) use ($cargo) {
+                $qr->where('cargo_solicitado', ltrim($cargo, '0'));
+            });
+        });
+
 
         // Stats con mismos filtros
         $base = clone $query;
@@ -1640,6 +1649,9 @@ class PostulanteController extends Controller
             return $code;
         };
 
+        $provincias = $provinciasStr;
+        $distritos  = $distritosStr;
+
         // Mapeo legible por fila
         foreach ($postulantes as $r) {
             $dep  = $normDigits($r->departamento ?? '', 2);
@@ -1650,9 +1662,6 @@ class PostulanteController extends Controller
             $r->departamento_nombre = $departamentos[$dep] ?? $r->departamento;
             $r->provincia_nombre    = $label2($provinciasStr, $provinciasNum, $prov, 'PROVI_DESCRIPCION');
             $r->distrito_nombre     = $label2($distritosStr,  $distritosNum,  $dist, 'DIST_DESCRIPCION');
-
-            $provincias = $provinciasStr;
-            $distritos  = $distritosStr;
 
 
             if (!$distritosStr->has($dist) && !$distritosNum->has((int)$dist)) {
