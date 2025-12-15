@@ -1,22 +1,29 @@
 @extends('layouts.app')
+@section('module', 'entrevistas')
 
 @section('content')
-<div class="min-h-screen gradient-bg py-8 pt-24">
-    {{-- Botón volver --}}
-    <a href="{{ route('entrevistas.index') }}"
-        class="absolute top-6 left-6 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold rounded-xl shadow-lg transition-colors flex items-center space-x-3 px-6 py-3 text-lg z-10 group">
-        <i class="fas fa-arrow-left text-2xl group-hover:-translate-x-1 transition-transform"></i>
-        <span class="font-medium">Volver a Entrevistas</span>
-    </a>
+<div class="space-y-6">
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {{-- Encabezado --}}
-        <div class="bg-white rounded-2xl shadow-lg p-6">
-            <div class="flex justify-between items-center">
-                <div>
-                    <h1 class="text-3xl font-bold text-gray-800">Evaluación de Entrevista</h1>
-                    <p class="text-gray-600 mt-1">Complete la evaluación del postulante y determine su aptitud para el
+        <div class="card glass-strong p-6 shadow-soft">
+            <div class="flex items-start justify-between gap-4 flex-wrap">
+                <div class="min-w-0">
+                    <h1 class="text-xl sm:text-2xl font-extrabold text-white tracking-wide">Evaluación de Entrevista</h1>
+                    <p class="text-sm text-white/70 mt-1">Complete la evaluación del postulante y determine su aptitud para el
                         puesto</p>
+                </div>
+
+                <div class="flex items-center gap-2 flex-wrap">
+                    <a href="{{ route('postulantes.formInterno') }}"
+                        class="px-4 py-2 rounded-xl font-extrabold text-sm text-white"
+                        style="background:linear-gradient(135deg,#3b82f6,#4f46e5);">
+                        <i class="fas fa-user-plus mr-2"></i>Crear Postulante
+                    </a>
+                    <a href="{{ route('dashboard') }}"
+                        class="px-4 py-2 rounded-xl font-semibold text-sm bg-white/10 hover:bg-white/15 transition text-white">
+                        <i class="fas fa-gauge-high mr-2"></i>Dashboard
+                    </a>
                 </div>
             </div>
         </div>

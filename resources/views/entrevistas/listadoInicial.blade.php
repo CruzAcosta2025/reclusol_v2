@@ -1,24 +1,74 @@
 @extends('layouts.app')
 
-@section('content')
-<div class="min-h-screen gradient-bg py-8 pt-24">
-    {{-- Botón volver --}}
-    <a href="{{ route('dashboard') }}"
-        class="absolute top-6 left-6 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold rounded-xl shadow-lg transition-colors flex items-center space-x-3 px-6 py-3 text-lg z-10 group">
-        <i class="fas fa-arrow-left text-2xl group-hover:-translate-x-1 transition-transform"></i>
-        <span class="font-bold">Volver al Dashboard</span>
-    </a>
+@section('module', 'entrevistas')
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
-        {{-- Encabezado --}}
-        <div class="bg-white rounded-2xl shadow-lg p-6">
-            <h1 class="text-3xl font-bold text-gray-800">Entrevistas</h1>
-            <p class="text-gray-600 mt-1">Busque postulantes por DNI o nombre</p>
+@section('content')
+<style>
+    /* Panel claro (no blanco puro) para que combine con el tema oscuro */
+    .panel-light {
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(249, 250, 251, 0.86));
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: 1.25rem;
+        box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
+        backdrop-filter: blur(10px);
+    }
+
+    /* Inputs dentro del panel: texto visible sobre fondo claro */
+    .panel-light input[type="text"],
+    .panel-light input[type="number"],
+    .panel-light input[type="date"],
+    .panel-light select,
+    .panel-light textarea {
+        background-color: #ffffff;
+        color: #111827 !important;
+        /* fuerza texto oscuro */
+        border-color: #e5e7eb;
+    }
+
+    .panel-light input::placeholder,
+    .panel-light textarea::placeholder {
+        color: #9ca3af;
+        opacity: 1;
+    }
+
+    /* Mejoras sutiles de tabla */
+    .table-sticky thead th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+</style>
+
+<div class="space-y-6">
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="card glass-strong p-6 shadow-soft">
+            <div class="flex items-start justify-between gap-4 flex-wrap">
+                <div class="min-w-0">
+                    <h2 class="text-xl sm:text-2xl font-extrabold text-white tracking-wide">
+                        Entrevistas
+                    </h2>
+                    <p class="text-sm text-white/70 mt-1">
+                        Busque postulantes por DNI o nombre
+                    </p>
+                </div>
+                <div class="flex items-center gap-2 flex-wrap">
+                    <a href="{{ route('postulantes.filtrar') }}"
+                        class="px-4 py-2 rounded-xl font-semibold text-sm bg-white/10 hover:bg-white/15 transition">
+                        <i class="fas fa-list mr-2"></i>Ver Postulantes
+                    </a>
+                    <a href="{{ route('dashboard') }}"
+                        class="px-4 py-2 rounded-xl font-semibold text-sm bg-white/10 hover:bg-white/15 transition">
+                        <i class="fas fa-gauge-high mr-2"></i>Dashboard
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 
+
     {{-- Filtros --}}
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <form id="filter-form" method="GET" action="{{ route('entrevistas.index') }}"
             class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white p-6 rounded-2xl shadow-lg">
             <div>
@@ -47,32 +97,46 @@
         </form>
     </div>
 
-    {{-- Estadísticas --}}
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {{-- En Proceso --}}
-            <div class="bg-yellow-100 p-4 rounded-lg text-center flex flex-col items-center">
-                <i class="fas fa-hourglass-half text-yellow-500 mb-2"></i>
-                <h3 class="text-sm text-gray-600">En Proceso</h3>
-                <p class="text-2xl font-bold">{{ $postulantes->count() }}</p>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="panel-light p-5 rounded-2xl flex items-center gap-4">
+                <div class="h-12 w-12 rounded-2xl grid place-items-center" style="background:#ecfdf5;">
+                    <i class="fas fa-hourglass-half text-green-600 text-lg"></i>
+                </div>
+                <div class="min-w-0">
+                    <div class="text-xs font-semibold text-gray-500">En proceso</div>
+                    <div class="text-2xl font-extrabold text-gray-900">{{ $postulantes->count() }}</div>
+                </div>
             </div>
-            {{-- Entrevistados --}}
-            <div class="bg-green-100 p-4 rounded-lg text-center flex flex-col items-center">
-                <i class="fas fa-check-circle text-green-500 mb-2"></i>
-                <h3 class="text-sm text-gray-600">Entrevistados</h3>
-                <p class="text-2xl font-bold">{{ $entrevistados ?? 0 }}</p>
+
+            <div class="panel-light p-5 rounded-2xl flex items-center gap-4">
+                <div class="h-12 w-12 rounded-2xl grid place-items-center" style="background:#fef2f2;">
+                    <i class="fas fa-check-circle text-red-600 text-lg"></i>
+                </div>
+                <div class="min-w-0">
+                    <div class="text-xs font-semibold text-gray-500">Entrevistados</div>
+                    <div class="text-2xl font-extrabold text-gray-900">{{ $entrevistados ?? 0 }}</div>
+                </div>
             </div>
-            {{-- Cancelados --}}
-            <div class="bg-blue-100 p-4 rounded-lg text-center flex flex-col items-center">
-                <i class="fas fa-times-circle text-blue-500 mb-2"></i>
-                <h3 class="text-sm text-gray-600">Cancelados</h3>
-                <p class="text-2xl font-bold">{{ $cancelados ?? 0 }}</p>
+
+            <div class="panel-light p-5 rounded-2xl flex items-center gap-4">
+                <div class="h-12 w-12 rounded-2xl grid place-items-center" style="background:#eff6ff;">
+                    <i class="fas fa-times-circle text-blue-600 text-lg"></i>
+                </div>
+                <div class="min-w-0">
+                    <div class="text-xs font-semibold text-gray-500">Cancelados</div>
+                    <div class="text-2xl font-extrabold text-gray-900">{{ $cancelados ?? 0 }}</div>
+                </div>
             </div>
-            {{-- Pendientes --}}
-            <div class="bg-red-100 p-4 rounded-lg text-center flex flex-col items-center">
-                <i class="fas fa-clock text-red-500 mb-2"></i>
-                <h3 class="text-sm text-gray-600">Pendientes</h3>
-                <p class="text-2xl font-bold">{{ $pendientes ?? $postulantes->count() }}</p>
+
+            <div class="panel-light p-5 rounded-2xl flex items-center gap-4">
+                <div class="h-12 w-12 rounded-2xl grid place-items-center" style="background:#fffbeb;">
+                    <i class="fas fa-clock text-yellow-600 text-lg"></i>
+                </div>
+                <div class="min-w-0">
+                    <div class="text-xs font-semibold text-gray-500">Pendientes</div>
+                    <div class="text-2xl font-extrabold text-gray-900">{{ $pendientes ?? $postulantes->count() }}</div>
+                </div>
             </div>
         </div>
     </div>
