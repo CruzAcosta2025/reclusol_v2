@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.public')
 
 @section('content')
     <div class="font-sans antialiased">
@@ -38,16 +38,6 @@
                     <span>Documentos</span>
                 </div>
             </div>
-
-            <!-- @if ($errors->any())
-    <div class="bg-red-100 text-red-800 p-4 rounded mb-6">
-                              <ul class="list-disc pl-5">
-                                @foreach ($errors->all() as $error)
-    <li>{{ $error }}</li>
-    @endforeach
-                              </ul>
-                             </div>
-    @endif -->
 
             <form method="POST" action="{{ route('postulantes.storeExterno') }}" enctype="multipart/form-data"
                 class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" id="postulanteForm">

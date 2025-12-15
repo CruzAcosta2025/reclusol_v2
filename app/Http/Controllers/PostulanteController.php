@@ -22,7 +22,6 @@ use Illuminate\Support\Facades\Response;
 use App\Models\User;
 use Illuminate\Support\Str;
 use App\Notifications\PostulanteEnListaNegra;
-use App\Notifications\NuevoPostulanteRegistrado;
 
 
 class PostulanteController extends Controller
@@ -274,6 +273,16 @@ class PostulanteController extends Controller
         ]);
 
         DB::transaction(fn() => Postulante::create($validated));
+
+        //return back()->with('success', 'Información guardada');
+        $postulante = DB::transaction(function () use ($validated) {
+            return Postulante::create($validated);
+        });
+
+        // NOTIFICACIÓN (prueba rápida)
+        if (auth()->check()) {
+            auth()->user()->notify(new NuevoPostulanteRegistrado($postulante));
+        }
 
         return back()->with('success', 'Información guardada');
     }
@@ -788,7 +797,16 @@ class PostulanteController extends Controller
             'licencia_conducir'   => $validated['licencia_conducir'],
         ]);
 
-        DB::transaction(fn() => Postulante::create($validated));
+        // DB::transaction(fn() => Postulante::create($validated));
+
+        $postulante = DB::transaction(function () use ($validated) {
+            return Postulante::create($validated);
+        });
+
+        // NOTIFICACIÓN (prueba rápida)
+        if (auth()->check()) {
+            auth()->user()->notify(new \App\Notifications\postulantes\NuevoPostulanteRegistrado($postulante));
+        }
 
         return back()->with('success', 'Información guardada');
     }

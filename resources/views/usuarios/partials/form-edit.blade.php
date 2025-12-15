@@ -14,9 +14,9 @@
     $rolActual = $user->rol ?? ($user->roles->first()->name ?? '');
 @endphp
 
-<div class="p-6">
+<div class="panel-light p-6 rounded-2xl max-w-2xl mx-auto">
     <div class="flex items-center justify-between mb-6">
-        <h3 class="text-xl font-semibold text-gray-800 flex items-center">
+        <h3 class="text-xl font-semibold text-gray-900 flex items-center">
             <i class="fas fa-user-edit text-blue-600 mr-2"></i>
             Editar Usuario
         </h3>
@@ -79,7 +79,7 @@
                     Nombre de Usuario *
                 </label>
                 <input type="text" id="name" name="name" required value="{{ old('name', $user->usuario) }}"
-                    class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-0 transition-colors"
+                    class="form-input w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-0 transition-colors bg-white text-gray-900"
                     placeholder="Usuario de inicio de sesión">
                 <div class="error-message text-red-500 text-sm mt-1 hidden"></div>
             </div>
@@ -91,12 +91,14 @@
                     Rol *
                 </label>
                 <select name="rol" id="rol" required
-                    class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-0 transition-colors">
+                    class="form-input w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-0 transition-colors bg-white text-gray-900">
                     <option value="">Seleccione el rol</option>
                     <option value="ADMINISTRADOR" {{ old('rol', $rolActual) === 'ADMINISTRADOR' ? 'selected' : '' }}>
-                        Administrador</option>
+                        Administrador
+                    </option>
                     <option value="USUARIO OPERATIVO"
-                        {{ old('rol', $rolActual) === 'USUARIO OPERATIVO' ? 'selected' : '' }}>Usuario Operativo
+                        {{ old('rol', $rolActual) === 'USUARIO OPERATIVO' ? 'selected' : '' }}>
+                        Usuario Operativo
                     </option>
                 </select>
             </div>
@@ -109,26 +111,50 @@
                 </label>
                 <div class="relative">
                     <input type="password" id="contrasena" name="contrasena" minlength="8"
-                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-0 transition-colors pr-12"
+                        class="form-input w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-0 transition-colors pr-12 bg-white text-gray-900"
                         placeholder="Dejar en blanco para mantener">
                     <button type="button" id="contrasena-eye"
-                        class="fa fa-eye absolute right-3 top-1/2 transform -translate-y-1/2"></button>
+                        class="fa fa-eye absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
+                    </button>
                 </div>
-                <div class="text-xs text-gray-500 mt-1">Si no ingresas nada, se conserva la contraseña actual.</div>
+                <div class="text-xs text-gray-500 mt-1">
+                    Si no ingresas nada, se conserva la contraseña actual.
+                </div>
                 <div class="error-message text-red-500 text-sm mt-1 hidden"></div>
             </div>
         </div>
 
         {{-- Botones --}}
-        <div class="flex space-x-3 pt-4 border-t border-gray-200">
+        <div class="flex space-x-3 pt-4 border-t border-gray-200 mt-4">
             <button type="button" onclick="closeEditModal()"
                 class="flex-1 px-4 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-xl transition-colors">
-                <i class="fas fa-times mr-2"></i> Cancelar
+                <i class="fas fa-times mr-2"></i>
+                Cancelar
             </button>
             <button type="submit"
                 class="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl transition-all">
-                <i class="fas fa-save mr-2"></i> Guardar
+                <i class="fas fa-save mr-2"></i>
+                Guardar
             </button>
         </div>
     </form>
 </div>
+
+{{-- Estilos adicionales para el panel / inputs --}}
+<style>
+    .panel-light {
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(243, 244, 246, 0.98));
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        box-shadow: 0 18px 45px rgba(15, 23, 42, 0.35);
+        backdrop-filter: blur(10px);
+    }
+
+    .form-input::placeholder {
+        color: #9ca3af;
+        opacity: 1;
+    }
+
+    .form-input:focus {
+        outline: none;
+    }
+</style>

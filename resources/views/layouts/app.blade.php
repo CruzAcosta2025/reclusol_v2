@@ -34,31 +34,30 @@
     @stack('styles')
 
     @php
-    /**
-    * Para resaltar el módulo activo en el sidebar, en cada vista agrega:
-    * @section('module', 'dashboard|solicitudes|postulantes|afiches|entrevistas|usuarios|configuracion')
-    */
-    $module = trim($__env->yieldContent('module', 'dashboard'));
+        /**
+         * Para resaltar el módulo activo en el sidebar, en cada vista agrega:
+         * @section('module', 'dashboard|solicitudes|postulantes|afiches|entrevistas|usuarios|configuracion')
+         */
+        $module = trim($__env->yieldContent('module', 'dashboard'));
 
-    $titles = [
-    'dashboard' => 'Resumen general del sistema de reclutamiento',
-    'solicitudes' => 'Módulo: Solicitudes',
-    'postulantes' => 'Módulo: Postulantes',
-    'afiches' => 'Módulo: Afiches',
-    'entrevistas' => 'Módulo: Entrevistas',
-    'usuarios' => 'Módulo: Usuarios',
-    'configuracion' => 'Módulo: Configuración',
-    ];
-    $pageTitle = $titles[$module] ?? $titles['dashboard'];
+        $titles = [
+            'dashboard' => 'Resumen general del sistema de reclutamiento',
+            'solicitudes' => 'Módulo: Solicitudes',
+            'postulantes' => 'Módulo: Postulantes',
+            'afiches' => 'Módulo: Afiches',
+            'entrevistas' => 'Módulo: Entrevistas',
+            'usuarios' => 'Módulo: Usuarios',
+        ];
+        $pageTitle = $titles[$module] ?? $titles['dashboard'];
 
-    // Evita error si una vista no manda notificaciones
-    $notificaciones = $notificaciones ?? collect();
-    $notiCount = method_exists($notificaciones, 'count') ? $notificaciones->count() : 0;
+        // Evita error si una vista no manda notificaciones
+        $notificaciones = $notificaciones ?? collect();
+        $notiCount = method_exists($notificaciones, 'count') ? $notificaciones->count() : 0;
 
-    // Abrir submenús según módulo
-    $openSolicitudes = $module === 'solicitudes';
-    $openPostulantes = $module === 'postulantes';
-    $openAfiches = $module === 'afiches';
+        // Abrir submenús según módulo
+        $openSolicitudes = $module === 'solicitudes';
+        $openPostulantes = $module === 'postulantes';
+        $openAfiches = $module === 'afiches';
     @endphp
 
     <!-- Custom Styles for RECLUSOL -->
@@ -157,7 +156,7 @@
                                 </div>
                                 <div class="leading-tight">
                                     <div class="font-semibold tracking-wide">RECLUSOL</div>
-                                    <div class="text-xs text-white/70">Recruiting Dashboard</div>
+                                    <div class="text-xs text-white/70">Plataforma de reclutamiento</div>
                                 </div>
                             </div>
                         </div>
@@ -173,11 +172,12 @@
                         <div class="flex items-center gap-3">
                             <div class="hidden lg:flex items-center gap-2 text-white/80 pill rounded-xl px-3 py-1.5">
                                 <i class="fas fa-calendar-alt text-white/80"></i>
-                                <span class="text-sm">{{ now()->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}</span>
+                                <span
+                                    class="text-sm">{{ now()->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}</span>
                             </div>
 
                             <!-- User Dropdown -->
-                            <div class="relative" x-data="{ open:false }">
+                            <div class="relative" x-data="{ open: false }">
                                 <button @click="open=!open"
                                     class="flex items-center gap-3 rounded-2xl px-3 py-2 pill hover:bg-white/10 transition">
                                     <div class="h-9 w-9 rounded-xl grid place-items-center bg-white/10">
@@ -202,7 +202,8 @@
                                             </div>
                                             <div>
                                                 <div class="font-semibold">{{ Auth::user()->name ?? 'INVITADO' }}</div>
-                                                <div class="text-sm text-gray-600">{{ Auth::user()->rol ?? 'Sin rol' }}</div>
+                                                <div class="text-sm text-gray-600">{{ Auth::user()->rol ?? 'Sin rol' }}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -222,47 +223,94 @@
 
                                         <div class="space-y-2 max-h-60 overflow-y-auto">
                                             @forelse ($notificaciones as $noti)
-                                            <div class="flex items-start gap-3 p-2 rounded-xl hover:bg-gray-50 transition cursor-pointer">
-                                                <div class="h-9 w-9 rounded-xl grid place-items-center flex-shrink-0
-                                                        @if ($noti->type == 'App\Notifications\PostulanteEnListaNegra') bg-red-100
-                                                        @elseif($noti->type == 'App\Notifications\NuevoRequerimientoCreado') bg-green-100
-                                                        @elseif(str_contains($noti->data['mensaje'] ?? '', 'reprogramada')) bg-orange-100
-                                                        @elseif(str_contains($noti->data['mensaje'] ?? '', 'urgente')) bg-blue-100
-                                                        @else bg-amber-100 @endif">
-                                                    @if ($noti->type == 'App\Notifications\PostulanteEnListaNegra')
-                                                    <i class="fas fa-user-slash text-red-600 text-xs"></i>
-                                                    @elseif($noti->type == 'App\Notifications\NuevoRequerimientoCreado')
-                                                    <i class="fas fa-users text-green-600 text-xs"></i>
-                                                    @elseif(str_contains($noti->data['mensaje'] ?? '', 'reprogramada'))
-                                                    <i class="fas fa-clock text-orange-600 text-xs"></i>
-                                                    @elseif(str_contains($noti->data['mensaje'] ?? '', 'urgente'))
-                                                    <i class="fas fa-info-circle text-blue-600 text-xs"></i>
-                                                    @else
-                                                    <i class="fas fa-exclamation-triangle text-amber-600 text-xs"></i>
-                                                    @endif
-                                                </div>
+                                                @php
+                                                    $data = $noti->data ?? [];
+                                                    $titulo = $data['titulo'] ?? null;
+                                                    $mensaje = $data['mensaje'] ?? 'Tienes una nueva notificación.';
+                                                    $nivel = $data['nivel'] ?? 'info'; // info|alerta|urgente
+                                                    $url = $data['url'] ?? null;
+                                                    $icono = $data['icono'] ?? null; // ej: user-plus, shield-alert, clock, etc.
 
-                                                <div class="min-w-0">
-                                                    <div class="text-sm font-medium text-gray-900 break-words">
-                                                        {{ $noti->data['mensaje'] ?? 'Tienes una nueva notificación.' }}
-                                                        @if (!empty($noti->data['nombre']))
-                                                        <div class="text-xs text-gray-500">{{ $noti->data['nombre'] }}</div>
-                                                        @endif
+                                                    // Estilos por nivel
+                                                    $bg = match ($nivel) {
+                                                        'urgente' => 'bg-red-100',
+                                                        'alerta' => 'bg-amber-100',
+                                                        default => 'bg-sky-100',
+                                                    };
+
+                                                    $text = match ($nivel) {
+                                                        'urgente' => 'text-red-600',
+                                                        'alerta' => 'text-amber-600',
+                                                        default => 'text-sky-600',
+                                                    };
+
+                                                    // Fallback de iconos si aún no mandas icono en data
+                                                    if (!$icono) {
+                                                        $icono = match ($nivel) {
+                                                            'urgente' => 'exclamation-triangle',
+                                                            'alerta' => 'bell',
+                                                            default => 'info-circle',
+                                                        };
+                                                    }
+
+                                                    $isUnread = is_null($noti->read_at);
+                                                @endphp
+
+                                                <a href="{{ $url ?: '#' }}" class="block"
+                                                    @if (!$url) role="button" @endif>
+                                                    <div
+                                                        class="flex items-start gap-3 p-2 rounded-xl hover:bg-gray-50 transition cursor-pointer {{ $isUnread ? 'ring-1 ring-indigo-200 bg-indigo-50/40' : '' }}">
+
+                                                        <div
+                                                            class="h-9 w-9 rounded-xl grid place-items-center flex-shrink-0 {{ $bg }}">
+                                                            <i
+                                                                class="fas fa-{{ $icono }} {{ $text }} text-xs"></i>
+                                                        </div>
+
+                                                        <div class="min-w-0 flex-1">
+                                                            @if ($titulo)
+                                                                <div
+                                                                    class="text-sm font-semibold text-gray-900 break-words">
+                                                                    {{ $titulo }}
+                                                                    @if ($isUnread)
+                                                                        <span
+                                                                            class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-600 text-white">
+                                                                            NUEVA
+                                                                        </span>
+                                                                    @endif
+                                                                </div>
+                                                                <div class="text-sm text-gray-700 break-words mt-0.5">
+                                                                    {{ $mensaje }}
+                                                                </div>
+                                                            @else
+                                                                {{-- Compatibilidad con tus notificaciones antiguas (solo mensaje) --}}
+                                                                <div
+                                                                    class="text-sm font-medium text-gray-900 break-words">
+                                                                    {{ $mensaje }}
+                                                                </div>
+                                                            @endif
+
+                                                            @if (!empty($data['nombre']))
+                                                                <div class="text-xs text-gray-500 mt-1">
+                                                                    {{ $data['nombre'] }}</div>
+                                                            @endif
+
+                                                            <div class="text-xs text-gray-500 mt-1">
+                                                                {{ $noti->created_at->diffForHumans() }}
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                    <div class="text-xs text-gray-500 mt-1">
-                                                        {{ $noti->created_at->diffForHumans() }}
-                                                    </div>
-                                                </div>
-                                            </div>
+                                                </a>
                                             @empty
-                                            <div class="text-center text-gray-400 text-sm py-6">
-                                                No tienes notificaciones nuevas.
-                                            </div>
+                                                <div class="text-center text-gray-400 text-sm py-6">
+                                                    No tienes notificaciones nuevas.
+                                                </div>
                                             @endforelse
                                         </div>
 
                                         <div class="mt-3 pt-3 border-t border-gray-200">
-                                            <a href="#" class="text-sm text-indigo-600 hover:text-indigo-800 font-semibold">
+                                            <a href="#"
+                                                class="text-sm text-indigo-600 hover:text-indigo-800 font-semibold">
                                                 Ver todas las notificaciones
                                             </a>
                                         </div>
@@ -284,9 +332,11 @@
                             </div>
 
                             <!-- Mobile menu button -->
-                            <button type="button" class="sm:hidden h-10 w-10 rounded-xl pill grid place-items-center hover:bg-white/10 transition"
+                            <button type="button"
+                                class="sm:hidden h-10 w-10 rounded-xl pill grid place-items-center hover:bg-white/10 transition"
                                 @click="$store.ui.mobileMenuOpen = !$store.ui.mobileMenuOpen" title="Menú">
-                                <i class="fas" :class="$store.ui.mobileMenuOpen ? 'fa-xmark' : 'fa-ellipsis-vertical'"></i>
+                                <i class="fas"
+                                    :class="$store.ui.mobileMenuOpen ? 'fa-xmark' : 'fa-ellipsis-vertical'"></i>
                             </button>
                         </div>
 
@@ -297,10 +347,12 @@
 
         <div class="flex">
             <!-- Sidebar -->
-            <aside class="hidden sm:flex flex-col glass border-r border-white/10 min-h-[calc(100vh-4rem)] transition-all duration-300"
+            <aside
+                class="hidden sm:flex flex-col glass border-r border-white/10 min-h-[calc(100vh-4rem)] transition-all duration-300"
                 :class="$store.ui.sidebarOpen ? 'w-72' : 'w-20'">
                 <nav class="p-4 space-y-1">
-                    <a href="{{ url('/dashboard') }}" class="nav-item {{ $module === 'dashboard' ? 'nav-item-active text-white' : 'text-white/80' }}">
+                    <a href="{{ url('/dashboard') }}"
+                        class="nav-item {{ $module === 'dashboard' ? 'nav-item-active text-white' : 'text-white/80' }}">
                         <i class="fas fa-gauge-high text-white/90"></i>
                         <span x-show="$store.ui.sidebarOpen" x-transition>Dashboard</span>
                     </a>
@@ -385,19 +437,13 @@
 
                     <!-- USUARIOS -->
                     @role('ADMINISTRADOR')
-                    <a href="{{ route('usuarios.index') }}"
-                        class="nav-item {{ $module === 'usuarios' ? 'nav-item-active text-white' : 'text-white/80' }}">
-                        <i class="fas fa-users-gear"></i>
-                        <span x-show="$store.ui.sidebarOpen" x-transition>Usuarios</span>
-                    </a>
+                        <a href="{{ route('usuarios.index') }}"
+                            class="nav-item {{ $module === 'usuarios' ? 'nav-item-active text-white' : 'text-white/80' }}">
+                            <i class="fas fa-users-gear"></i>
+                            <span x-show="$store.ui.sidebarOpen" x-transition>Usuarios</span>
+                        </a>
                     @endrole
 
-                    <!-- CONFIGURACIÓN -->
-                    <a href="#"
-                        class="nav-item {{ $module === 'configuracion' ? 'nav-item-active text-white' : 'text-white/80' }}">
-                        <i class="fas fa-gear"></i>
-                        <span x-show="$store.ui.sidebarOpen" x-transition>Configuración</span>
-                    </a>
                 </nav>
             </aside>
 

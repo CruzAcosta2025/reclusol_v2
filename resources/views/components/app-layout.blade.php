@@ -15,16 +15,18 @@
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
-    <!-- TailwindCSS CDN (funciona siempre, incluso si Vite no) -->
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- ✅ TailwindCSS v3 (para que funcione bg-slate-950, etc.) -->
+    <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- Alpine.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js" defer></script>
 
-    <!-- Custom Styles for RECLUSOL -->
+    <!-- Custom Styles -->
     <style>
         .gradient-bg {
-            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #1d4ed8 100%);
+            background: radial-gradient(1200px circle at 20% 0%, rgba(99, 102, 241, .22), transparent 55%),
+                radial-gradient(900px circle at 80% 20%, rgba(16, 185, 129, .16), transparent 55%),
+                linear-gradient(135deg, #020617 0%, #0b1220 55%, #020617 100%);
         }
 
         .card-hover {
@@ -69,11 +71,8 @@
     </style>
 </head>
 
-<body>
-
-    <body class="font-sans antialiased">
-
-        @yield('content')
-    </body>
+<body class="font-sans antialiased bg-slate-950 text-slate-100">
+    @yield('content')
+</body>
 
 </html>

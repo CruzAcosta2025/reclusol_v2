@@ -148,7 +148,7 @@
                                 onclick="showTab('tab-font', this)">Fuente</button>
                         </div>
 
-                        <div id="tab-plantillas" class="option-tab-content">
+                        <div id="tab-plantillas" class="option-tab-content hidden">
                             <div class="grid grid-cols-2 gap-3">
                                 @forelse($plantillas ?? [] as $tpl)
                                     @php
@@ -309,7 +309,8 @@
                                 Mensaje predeterminado para publicar:
                             </label>
                             <textarea id="mensaje-predeterminado"
-                                class="w-full p-3 rounded-lg border border-gray-300 text-sm text-gray-700 bg-gray-50 resize-none" rows="8" readonly></textarea>
+                                class="w-full p-3 rounded-lg border border-gray-300 text-sm text-gray-700 bg-gray-50 resize-none" rows="8"
+                                readonly></textarea>
                             <button
                                 class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg mt-2 flex items-center justify-center space-x-2"
                                 onclick="copiarMensaje()">
@@ -374,18 +375,18 @@
 
         // Mostrar la primera tab por defecto
         document.addEventListener('DOMContentLoaded', () => {
-            showTab('tab-plantillas', document.querySelector('.option-tab'));
-
+            // No abrimos ninguna pestaña por defecto; el usuario decide cuál ver.
             const firstReq = document.querySelector('.requirement-item');
             if (firstReq) firstReq.click();
 
             const firstTpl = document.querySelector('.template-option');
-            if (firstTpl) firstTpl.click(); // esto llama a selectTemplate(...)
+            if (firstTpl) firstTpl.click(); // deja una plantilla preseleccionada (aunque la pestaña esté oculta)
 
             if (fontSelect) {
                 fontSelect.addEventListener('change', () => selectFont(fontSelect.value));
             }
         });
+
 
 
         function showTab(tabId, btn) {
@@ -590,4 +591,24 @@
             document.getElementById('download-menu').classList.toggle('hidden');
         }
     </script>
+
+    {{-- Estilos adicionales --}}
+    <style>
+        .panel-light {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(249, 250, 251, 0.95));
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.25);
+            backdrop-filter: blur(10px);
+        }
+
+        .form-input::placeholder {
+            color: #9ca3af;
+            opacity: 1;
+        }
+
+        .form-input:focus {
+            outline: none;
+        }
+    </style>
+
 @endsection
