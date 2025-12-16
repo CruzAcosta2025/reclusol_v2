@@ -15,12 +15,20 @@
         document.addEventListener('DOMContentLoaded', () => {
             Swal.fire({
                 icon: 'success',
-                title: '¡Éxito!',
-                text: @json($success),
-                 width: 500,          // ancho exacto — 500 px
-                 heightAuto: true,    // (por defecto) ajusta alto al contenido
-                 padding: '2rem',     // espacio interior (≈ 32 px)
-                confirmButtonColor: '#3085d6',
+                title: '¡Registro Completado!',
+                html: @json($success),
+                width: 550,
+                heightAuto: true,
+                padding: '2rem',
+                confirmButtonColor: '#10b981',
+                confirmButtonText: 'Aceptar',
+                background: '#ffffff',
+                didOpen: (modal) => {
+                    modal.querySelector('.swal2-title').style.color = '#059669';
+                    modal.querySelector('.swal2-html-container').style.color = '#374151';
+                    modal.querySelector('.swal2-html-container').style.fontSize = '1rem';
+                    modal.querySelector('.swal2-html-container').style.lineHeight = '1.5';
+                }
             });
         });
     </script>
@@ -31,13 +39,20 @@
         document.addEventListener('DOMContentLoaded', () => {
             Swal.fire({
                 icon: 'error',
-                title: 'Corrige los campos',
-                 width: 500,          // ancho exacto — 500 px
-                 heightAuto: true,    // (por defecto) ajusta alto al contenido
-                 padding: '2rem',     // espacio interior (≈ 32 px)
-        
+                title: 'Error en la Validación',
+                width: 550,
+                heightAuto: true,
+                padding: '2rem',
                 html: `{!! implode('<br>', $errors->all()) !!}`,
-                confirmButtonColor: '#d33',
+                confirmButtonColor: '#ef4444',
+                confirmButtonText: 'Reintentar',
+                background: '#ffffff',
+                didOpen: (modal) => {
+                    modal.querySelector('.swal2-title').style.color = '#dc2626';
+                    modal.querySelector('.swal2-html-container').style.color = '#374151';
+                    modal.querySelector('.swal2-html-container').style.fontSize = '0.95rem';
+                    modal.querySelector('.swal2-html-container').style.lineHeight = '1.6';
+                }
             });
         });
     </script>
