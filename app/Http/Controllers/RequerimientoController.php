@@ -19,7 +19,6 @@ use Illuminate\Support\Facades\Log;
 use App\Notifications\NuevoRequerimientoCreado;
 use App\Services\RequerimientoService;
 
-
 class RequerimientoController extends Controller
 {
 
@@ -30,9 +29,9 @@ class RequerimientoController extends Controller
         $this->service = $service;
     }
 
-    public function mostrar()
+    public function mostrar() //registro
     {
-        $data = $this->service->getFormData();
+        $data = $this->service->getCatalogos();
         return view('requerimientos.requerimiento', $data);
     }
 
@@ -83,116 +82,6 @@ class RequerimientoController extends Controller
         ]);
     }
 
-    /* public function mostrar()
-    {
-        $estados = EstadoRequerimiento::all();
-        $prioridades = PrioridadRequerimiento::all();
-        $sucursales =  Sucursal::forSelect();
-        $tipoCargos = TipoCargo::forSelect();
-        $cargos = Cargo::forSelect();
-        $tipoPersonal = TipoPersonal::forSelect();
-
-        // Clientes (base CONTROLCLIENTES2018)
-        $clientes = collect(DB::connection('sqlsrv')->select('EXEC dbo.SP_LISTAR_CLIENTES'));
-
-        return view('requerimientos.requerimiento', compact(
-            'estados',
-            'prioridades',
-            'clientes',
-            'sucursales',
-            'tipoPersonal',
-        ));
-    } */
-
-    /* public function clientesPorSucursalSP(Request $r)
-    {
-        $sucursal = trim((string) $r->query('codigo_sucursal', ''));
-        $buscar   = $r->query('q'); // opcional para autocompletar
-
-        if ($sucursal === '') {
-            return response()->json([], 200);
-        }
-
-        try {
-            // Ajusta la conexión si tu SP vive en otra DB (p.ej. 'sqlsrv')
-            // Firma sugerida del SP: dbo.USP_RECLUSOL_CLIENTES_POR_SUCURSAL @CODIGO_SUCURSAL, @BUSCAR = NULL
-            $rows = DB::connection('sqlsrv')->select(
-                'EXEC dbo.USP_RECLUSOL_CLIENTES_POR_SUCURSAL ?, ?',
-                [$sucursal, $buscar]
-            );
-
-            // Normaliza llaves para el <select>
-            $data = array_map(function ($x) {
-                $cod = $x->CODIGO_CLIENTE ?? $x->codigo_cliente ?? null;
-                $nom = $x->NOMBRE_CLIENTE ?? $x->nombre_cliente ?? null;
-                return [
-                    'CODIGO_CLIENTE' => is_string($cod) ? trim($cod) : $cod,
-                    'NOMBRE_CLIENTE' => $nom,
-                ];
-            }, $rows);
-
-            return response()->json($data, 200);
-        } catch (\Throwable $e) {
-            Log::error('SP clientesPorSucursal error', [
-                'sucursal' => $sucursal,
-                'error'    => $e->getMessage()
-            ]);
-            // No rompas el form: responde vacío
-            return response()->json([], 200);
-        }
-    }
-
-
-    public function sedesPorCliente(Request $request)
-    {
-        $codigo = $request->input('codigo_cliente');
-
-        $sedes = collect(DB::select(
-            'EXEC USP_SICOS_2024_LISTAR_SEDES_X_CLIENTE ?, ?, ?',
-            [$codigo, '', 0]
-        ));
-
-        return response()->json($sedes);
-    }
-
-
-    public function tiposPorTipoPersonal(Request $request)
-    {
-        $tipoPersonal = $request->query('tipo_personal'); // '01' o '02'
-        if (!$tipoPersonal) return response()->json([]);
-
-        $rows = DB::connection('sqlsrv')->select(
-            'EXEC dbo.REC_TIPOS_CARGO_POR_TIPO_PERSONAL ?',
-            [$tipoPersonal]
-        );
-        return response()->json($rows);
-    }
-
-    public function cargosPorTipo(Request $request)
-    {
-        $tipoPersonal = $request->query('tipo_personal'); // '01' o '02'
-        $tipoCargo    = $request->query('tipo_cargo');    // p.ej. '01'
-        if (!$tipoPersonal || !$tipoCargo) return response()->json([]);
-
-        $rows = DB::connection('sqlsrv')->select(
-            'EXEC dbo.REC_CARGOS_POR_TIPO ?, ?',
-            [$tipoPersonal, $tipoCargo]
-        );
-
-        return response()->json($rows);
-    }
-
-    public function cargoTipo($codiCarg)
-    {
-        $tipo = DB::connection('sqlsrv')->table('CARGOS')
-            ->where('CODI_CARG', $codiCarg)
-            ->value('CARGO_TIPO'); // '01' operativo, '02' administrativo
-
-        return response()->json([
-            'cargo_tipo' => $tipo ? str_pad($tipo, 2, '0', STR_PAD_LEFT) : null
-        ]);
-    } */
-
     public function index()
     {
         return view('requerimientos.filtrar');
@@ -211,7 +100,7 @@ class RequerimientoController extends Controller
 
     public function detalle($id)
     {
-        $detalle = $this->service->getDetalleCompleto($id);
+        $detalle = $this->service->getDetalleConCatalogos($id);
 
         if (!$detalle) {
             return response()->json(['error' => 'No encontrado'], 404);
@@ -222,17 +111,8 @@ class RequerimientoController extends Controller
 
     public function store(Request $request)
     {
-        /* ---------- 1. VALIDACIÓN ---------- */
-        Log::info('=== INICIANDO STORE DE REQUERIMIENTO ===');
-        Log::info('Datos recibidos:', $request->all());
-        
         try {
             $validated = $request->validate([
-                // DATOS AUTOMÁTICOS (se agregan luego, no validar)
-                // 'user_id' => ...,
-                // 'cargo_usuario' => ...,
-                // 'fecha_solicitud' => ...,
-
                 'area_solicitante'     => 'nullable|string|max:50',
                 'departamento'         => 'nullable|string|max:50',
                 'provincia'            => 'nullable|string|max:50',
@@ -272,8 +152,6 @@ class RequerimientoController extends Controller
                 //'requisitos_adicionales'    => 'nullable|string',
             ]);
             
-            Log::info('Validación exitosa');
-
             /* ---------- 2. CAMPOS AUTOMÁTICOS ---------- */
             $validated['user_id'] = Auth::id();
             $validated['fecha_solicitud'] = now();
@@ -283,8 +161,6 @@ class RequerimientoController extends Controller
             $validated['requiere_sucamec'] = $request->boolean('requiere_sucamec');
             $validated['validado_rrhh'] = $request->boolean('validado_rrhh');
 
-            Log::info('Datos validados y procesados:', $validated);
-
             /* ---------- 4. CREAR EN TRANSACCIÓN ---------- */
             $requerimiento = DB::transaction(function () use ($validated) {
                 Log::info('Iniciando transacción...');
@@ -293,15 +169,12 @@ class RequerimientoController extends Controller
                 return $req;
             });
 
-            Log::info('Transacción completada. ID generado:', ['id' => $requerimiento->id]);
-
             /* ---------- 5. NOTIFICACIONES ---------- */
             try {
                 $usuarios = User::all();
                 foreach ($usuarios as $usuario) {
                     $usuario->notify(new NuevoRequerimientoCreado($requerimiento));
                 }
-                Log::info('Notificaciones enviadas');
             } catch (\Throwable $notifError) {
                 Log::warning('Error al enviar notificaciones (pero se guardó el registro):', [
                     'message' => $notifError->getMessage()
@@ -356,8 +229,6 @@ class RequerimientoController extends Controller
                 ->withErrors(['general' => 'Error al guardar. Inténtalo de nuevo.']);
         }
     }
-
-
 
     //REVIEW FILTRAR
 
@@ -517,7 +388,6 @@ class RequerimientoController extends Controller
 
     public function filtrar(Request $request)
     {
-
         $query = Requerimiento::query();
 
         $norm = function (?string $val, int $len = null) {
@@ -563,7 +433,6 @@ class RequerimientoController extends Controller
 
         $query->orderBy('created_at', 'desc');
         $requerimientos = $query->paginate(15)->withQueryString();
-
 
         // Catálogos para la vista
         $departamentos = Departamento::forSelect(); // [DEPA_CODIGO => DEPA_DESCRIPCION]
@@ -665,7 +534,6 @@ class RequerimientoController extends Controller
         // Contar vencidos
         $requerimientosVencidos = Requerimiento::where('estado', 4)->count(); // estado 4 = Vencido
 
-
         // Exponer catálogos que usan los partials del modal
         $estados = EstadoRequerimiento::all();
         
@@ -693,75 +561,16 @@ class RequerimientoController extends Controller
 
     public function edit(Requerimiento $requerimiento)
     {
-        $estados = EstadoRequerimiento::all();
-        $sucursales =  Sucursal::forSelect();
-        $tipoCargos = TipoCargo::forSelect();
-        $cargos = Cargo::forSelect();
-        /*
-        $sucursales = DB::connection('si_solmar')
-            ->table('SISO_SUCURSAL')
-            ->select('SUCU_CODIGO', 'SUCU_DESCRIPCION')
-            ->where('SUCU_VIGENCIA', 'SI')
-            ->get();
-
-        $tipoCargos = DB::connection('si_solmar')
-            ->table('TIPO_CARGO')
-            ->select('CODI_TIPO_CARG', 'DESC_TIPO_CARG')
-            ->get();
-
-        $cargos = DB::connection('si_solmar')
-            ->table('CARGOS')
-            ->select('CODI_CARG', 'DESC_CARGO', 'TIPO_CARG')
-            ->where('CARG_VIGENCIA', 'SI')
-            ->get();
-
-        $nivelEducativo = DB::connection('si_solmar')
-            ->table('SUNAT_NIVEL_EDUCATIVO')
-            ->select('NIED_CODIGO', 'NIED_DESCRIPCION')
-            ->get();
-
-        $departamentos = DB::connection('si_solmar')
-            ->table('ADMI_DEPARTAMENTO')
-            ->select('DEPA_CODIGO', 'DEPA_DESCRIPCION')
-            ->where('DEPA_VIGENCIA', 'SI')
-            ->orderBy('DEPA_DESCRIPCION')
-            ->get()
-            ->keyBy('DEPA_CODIGO');
-
-
-        $provincias = DB::connection('si_solmar')
-            ->table('ADMI_PROVINCIA')
-            ->select('PROVI_CODIGO', 'PROVI_DESCRIPCION', 'DEPA_CODIGO')
-            ->where('PROVI_VIGENCIA', 'SI')
-            ->orderBy('PROVI_DESCRIPCION')
-            ->get()
-            ->keyBy('PROVI_CODIGO');
-
-        $distritos = DB::connection('si_solmar')
-            ->table('ADMI_DISTRITO')
-            ->select('DIST_CODIGO', 'DIST_DESCRIPCION', 'PROVI_CODIGO')
-            ->where('DIST_VIGENCIA', 'SI')
-            ->orderBy('DIST_DESCRIPCION')
-            ->get()
-            ->keyBy('DIST_CODIGO'); */
-
-
-        return view('requerimientos.partials.form-edit', compact(
-            'requerimiento',
-            'estados',
-            'sucursales',
-            'tipoCargos',
-            'cargos',
-            'nivelEducativo',
-            'departamentos',
-            'provincias',
-            'distritos'
-        ));
+        // Obtener todos los catálogos desde el servicio
+        $catalogos = $this->service->getCatalogos();
+        
+        // Agregar el requerimiento al array
+        $catalogos['requerimiento'] = $requerimiento;
+        
+        // Retornar la vista con todos los datos
+        return view('requerimientos.partials.form-edit', $catalogos);
     }
 
-    /**
-     * Valida y actualiza el postulante.
-     */
     public function update(Request $request, Requerimiento $requerimiento)
     {
         // 1. Validar sólo los campos editables
@@ -806,9 +615,6 @@ class RequerimientoController extends Controller
         }
     }
 
-    /**
-     * Elimina un requerimiento
-     */
     public function destroy(Requerimiento $requerimiento)
     {
         try {

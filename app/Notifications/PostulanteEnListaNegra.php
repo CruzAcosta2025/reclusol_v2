@@ -40,7 +40,6 @@ class PostulanteEnListaNegra extends Notification
         ];
     }
 
-
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)

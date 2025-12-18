@@ -70,7 +70,7 @@
 </head>
 
 <body class="font-sans antialiased">
-    {{ $slot }}
+    @yield('content')
 </body>
 
 </html>

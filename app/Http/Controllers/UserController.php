@@ -26,7 +26,7 @@ class UserController extends Controller
             ->when($buscar, function ($query, $buscar) {
                 $query->where(function ($q) use ($buscar) {
                     $q->where('name', 'like', "%{$buscar}%")   // nombres + apellidos
-                        ->orWhere('usuario', 'like', "%{$buscar}%");
+                      ->orWhere('usuario', 'like', "%{$buscar}%");
                 });
             })
             // Filtro por cargo (si lo usas)
@@ -430,7 +430,6 @@ class UserController extends Controller
         return view('usuarios.show', compact('user'));
     }
 
-
     public function update(Request $request, User $user)
     {
         $request->validate([
@@ -468,8 +467,6 @@ class UserController extends Controller
         }
         return view('usuarios.form-edit', compact('user')); // página completa sólo si la navegas directa
     }
-
-
 
     public function destroy(User $user)
     {

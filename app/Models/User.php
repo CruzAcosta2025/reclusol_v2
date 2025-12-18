@@ -5,9 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Traits\HasRoles;
-
 
 class User extends Authenticatable
 {
@@ -18,7 +16,6 @@ class User extends Authenticatable
     protected $primaryKey = 'id';
     public    $timestamps = true;
 
-    /* Campos que puedes asignar masivamente */
     protected $fillable = [
         'name',
         'usuario',
@@ -29,14 +26,13 @@ class User extends Authenticatable
         'habilitado',
     ];
 
-    /* Ocultar al serializar (JSON, etc.) */
+
     protected $hidden = [
         'password',
         'contrasena',
         'remember_token',
     ];
 
-    /* Casts (Laravel 10/11 permite 'hashed') */
     protected $casts = [
         //'email_verified_at' => 'datetime',
         //'password' => 'hashed',
@@ -46,10 +42,8 @@ class User extends Authenticatable
         'updated_at' => 'datetime',
     ];
 
-    /* Laravel usará esto para validar la contraseña */
     public function getAuthPassword()
     {
-        // Priorizar 'password' estándar de Laravel, fallback a 'contrasena'
         return $this->password ?? $this->contrasena;
     }
 

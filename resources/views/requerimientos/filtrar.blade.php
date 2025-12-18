@@ -282,7 +282,7 @@
                             'align' => 'text-center',
                         ],
                         ['key' => 'fecha_fin', 'label' => 'Fecha Final', 'sortable' => true, 'align' => 'text-center'],
-                        ['key' => 'actions', 'label' => 'Acciones', 'sortable' => false, 'align' => 'text-center'],
+                        ['key' => 'actions', 'label' => 'Acciones', 'sortable' => false, 'align' => 'text-center', 'sticky' => true],
                     ];
 
                     // Prepare rows as plain arrays that include HTML for actions and labels
@@ -533,199 +533,10 @@
                         <h2 class="text-lg text-M2 font-bold">Editar Requerimiento</h2>
                         <p class="text-sm text-M3">Modifica los datos del requerimiento según sea necesario.</p>
                     </x-slot>
-
-                    <div id="edit-panel" class="max-h-[70vh] overflow-y-auto">
-                        <form id="form-edit" method="POST" action="" enctype="multipart/form-data"
-                            class="space-y-5 text-xs p-4">
-                            @csrf
-                            <input type="hidden" name="_method" value="PUT">
-
-                            {{-- Área, Sucursal, Cliente --}}
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div>
-                                    <label for="area_solicitante_edit" class="block font-medium text-gray-700 mb-1">Área
-                                        Solicitante</label>
-                                    <select id="area_solicitante_edit" name="area_solicitante" required
-                                        class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500 text-xs">
-                                        <option value="">Selecciona el área</option>
-                                        <option value="recursos_humanos">Recursos Humanos</option>
-                                        <option value="operaciones">Operaciones</option>
-                                        <option value="administracion">Administración</option>
-                                        <option value="seguridad">Seguridad</option>
-                                        <option value="sistemas">Sistemas</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label for="sucursal_edit"
-                                        class="block font-medium text-gray-700 mb-1">Sucursal</label>
-                                    <select id="sucursal_edit" name="sucursal" required
-                                        class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500 text-xs">
-                                        <option value="">Selecciona la sucursal</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label for="cliente_edit" class="block font-medium text-gray-700 mb-1">Cliente</label>
-                                    <input type="text" id="cliente_edit" name="cliente" required maxlength="50"
-                                        class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500 text-xs">
-                                </div>
-                            </div>
-
-                            {{-- Departamento, Provincia, Distrito --}}
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div>
-                                    <label for="departamento_edit"
-                                        class="block font-medium text-gray-700 mb-1">Departamento</label>
-                                    <select id="departamento_edit" name="departamento" required
-                                        class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500 text-xs">
-                                        <option value="">Selecciona el departamento</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label for="provincia_edit"
-                                        class="block font-medium text-gray-700 mb-1">Provincia</label>
-                                    <select id="provincia_edit" name="provincia" required data-value=""
-                                        class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500 text-xs">
-                                        <option value="">Selecciona la provincia</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label for="distrito_edit"
-                                        class="block font-medium text-gray-700 mb-1">Distrito</label>
-                                    <select id="distrito_edit" name="distrito" required data-value=""
-                                        class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500 text-xs">
-                                        <option value="">Selecciona el distrito</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            {{-- Tipo de Cargo, Cargo Solicitado --}}
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label for="tipo_cargo_edit" class="block font-medium text-gray-700 mb-1">Tipo de
-                                        Cargo</label>
-                                    <select id="tipo_cargo_edit" name="tipo_cargo" required
-                                        class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500 text-xs">
-                                        <option value="">Selecciona el tipo de cargo</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label for="cargo_edit" class="block font-medium text-gray-700 mb-1">Cargo
-                                        Solicitado</label>
-                                    <select id="cargo_edit" name="cargo_solicitado" required data-value=""
-                                        class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500 text-xs">
-                                        <option value="">Selecciona el cargo</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            {{-- Fecha, Edad, Cantidad --}}
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div>
-                                    <label for="fecha_limite_edit" class="block font-medium text-gray-700 mb-1">Fecha
-                                        Límite</label>
-                                    <input type="date" id="fecha_limite_edit" name="fecha_limite" required
-                                        class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500 text-xs">
-                                </div>
-                                <div>
-                                    <label for="edad_minima_edit" class="block font-medium text-gray-700 mb-1">Edad
-                                        Mínima</label>
-                                    <input type="number" id="edad_minima_edit" name="edad_minima" required
-                                        min="18" max="65"
-                                        class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500 text-xs">
-                                </div>
-                                <div>
-                                    <label for="edad_maxima_edit" class="block font-medium text-gray-700 mb-1">Edad
-                                        Máxima</label>
-                                    <input type="number" id="edad_maxima_edit" name="edad_maxima" required
-                                        min="18" max="65"
-                                        class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500 text-xs">
-                                </div>
-                            </div>
-
-                            {{-- Cantidad Requerida --}}
-                            <div>
-                                <label for="cantidad_requerida_edit" class="block font-medium text-gray-700 mb-1">Cantidad
-                                    Requerida</label>
-                                <input type="number" id="cantidad_requerida_edit" name="cantidad_requerida" required
-                                    min="1" max="255"
-                                    class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500 text-xs">
-                            </div>
-
-                            {{-- Checkboxes --}}
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="flex items-center">
-                                    <input type="checkbox" id="requiere_licencia_conducir_edit"
-                                        name="requiere_licencia_conducir" value="1" class="mr-2">
-                                    <label for="requiere_licencia_conducir_edit" class="text-gray-700">Requiere Licencia
-                                        de Conducir</label>
-                                </div>
-                                <div class="flex items-center">
-                                    <input type="checkbox" id="requiere_sucamec_edit" name="requiere_sucamec"
-                                        value="1" class="mr-2">
-                                    <label for="requiere_sucamec_edit" class="text-gray-700">Requiere SUCAMEC</label>
-                                </div>
-                            </div>
-
-                            {{-- Nivel de Estudios y Experiencia Mínima --}}
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label for="nivel_estudios_edit" class="block font-medium text-gray-700 mb-1">Nivel de
-                                        Estudios</label>
-                                    <select id="nivel_estudios_edit" name="nivel_estudios" required
-                                        class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500 text-xs">
-                                        <option value="">Selecciona nivel</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label for="experiencia_minima_edit"
-                                        class="block font-medium text-gray-700 mb-1">Experiencia Mínima</label>
-                                    <select id="experiencia_minima_edit" name="experiencia_minima" required
-                                        class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500 text-xs">
-                                        <option value="">Selecciona experiencia</option>
-                                        <option value="sin_experiencia">Sin experiencia</option>
-                                        <option value="menos_1_año">Menos de 1 año</option>
-                                        <option value="1_2_años">1-2 años</option>
-                                        <option value="3_5_años">3-5 años</option>
-                                        <option value="mas_5_años">Más de 5 años</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            {{-- Requisitos Adicionales --}}
-                            <div>
-                                <label for="requisitos_adicionales_edit"
-                                    class="block font-medium text-gray-700 mb-1">Requisitos Adicionales</label>
-                                <textarea id="requisitos_adicionales_edit" name="requisitos_adicionales" rows="3"
-                                    class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500 text-xs"></textarea>
-                            </div>
-
-                            {{-- Prioridad y Estado --}}
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label for="prioridad_edit"
-                                        class="block font-medium text-gray-700 mb-1">Prioridad</label>
-                                    <select id="prioridad_edit" name="prioridad"
-                                        class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500 text-xs">
-                                        <option value="">Selecciona prioridad</option>
-                                        <option value="baja">Baja</option>
-                                        <option value="media">Media</option>
-                                        <option value="alta">Alta</option>
-                                        <option value="urgente">Urgente</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label for="estado_edit" class="block font-medium text-gray-700 mb-1">Estado</label>
-                                    <select id="estado_edit" name="estado"
-                                        class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500 text-xs">
-                                        <option value="">Selecciona un estado</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </form>
+                    <div id="edit-modal-content">
                     </div>
-
                     <x-slot name="footer">
-                        <x-cancel-button type="button" x-on:click="$dispatch('close')">
+                        <x-cancel-button type="button" x-on:click="$dispatch('close-modal', 'form-edit')">
                             Cancelar
                         </x-cancel-button>
                         <x-confirm-button type="button" id="edit-submit-btn"
@@ -1137,9 +948,6 @@
             });
         }
 
-
-
-
         document.addEventListener('DOMContentLoaded', function() {
             // Selecciona los campos
             const cantidadRequerida = document.getElementById('cantidad_requerida');
@@ -1293,7 +1101,7 @@
             }
         });
 
-
+        //METODO PARA CALCULAR LA URGENCIA AUTOMÁTICA ----**
         document.addEventListener('DOMContentLoaded', function() {
             const fechaInicio = document.getElementById('fecha_inicio');
             const fechaFin = document.getElementById('fecha_fin');
@@ -1485,8 +1293,6 @@
                 }
             }
         });
-
-
 
         // Update scale info based on selection
         document.getElementById('beneficios').addEventListener('change', function() {
@@ -1716,16 +1522,15 @@
                     .then(res => res.json())
                     .then(data => {
                         // SECCIÓN 1: INFORMACIÓN GENERAL
-                        setValueIfExists('requerimiento-id', data.id);
                         setValueIfExists('requerimiento-fecha-solicitud', data.fecha_solicitud);
                         setValueIfExists('requerimiento-usuario', data.usuario_nombre || data.user_id);
                         setValueIfExists('requerimiento-sucursal', data.sucursal_nombre);
                         setValueIfExists('requerimiento-cliente', data.cliente_nombre);
 
                         // SECCIÓN 2: DETALLES DEL PUESTO
-                        setValueIfExists('requerimiento-tipo-personal', data.tipo_personal);
+                        setValueIfExists('requerimiento-tipo-personal', data.tipo_personal_nombre);
                         setValueIfExists('requerimiento-cargo', data.cargo_nombre);
-                        setValueIfExists('requerimiento-cantidad', data.cantidad);
+                        setValueIfExists('requerimiento-cantidad', data.cantidad_requerida);
                         setValueIfExists('requerimiento-fecha-inicio', data.fecha_inicio);
                         setValueIfExists('requerimiento-fecha-fin', data.fecha_fin);
 
@@ -1741,7 +1546,7 @@
                             sueldoElement.value = data.sueldo_basico ? 'S/ ' + parseFloat(data.sueldo_basico)
                                 .toFixed(2) : '—';
                         }
-                        setValueIfExists('requerimiento-beneficios', data.beneficios);
+                        setValueIfExists('requerimiento-beneficios', data.beneficios_nombre || data.beneficios);
 
                         // SECCIÓN 5: ESTADO
                         setValueIfExists('requerimiento-estado', data.estado_nombre);
@@ -1755,119 +1560,32 @@
 
             // Modal de Editar Requerimiento
             if (modalName === 'form-edit' && id) {
-                // Actualizar la acción del formulario
-                const form = document.getElementById('form-edit');
-                if (form) {
-                    form.action = `/requerimientos/${id}`;
+                const container = document.getElementById('edit-modal-content');
+                if (container) {
+                    // Mostrar loader
+                    container.innerHTML = `
+                        <div class="text-center py-8">
+                            <i class="fas fa-spinner fa-spin text-gray-400 text-2xl"></i>
+                            <p class="text-gray-500 mt-2">Cargando formulario...</p>
+                        </div>
+                    `;
+
+                    // Cargar el partial desde el método edit()
+                    fetch(`/requerimientos/${id}/edit`)
+                        .then(res => res.text())
+                        .then(html => {
+                            container.innerHTML = html;
+                        })
+                        .catch(err => {
+                            console.error('Error al cargar formulario de edición:', err);
+                            container.innerHTML = `
+                                <div class="text-center py-8 text-red-600">
+                                    <i class="fas fa-exclamation-triangle text-2xl"></i>
+                                    <p class="mt-2">Error al cargar el formulario</p>
+                                </div>
+                            `;
+                        });
                 }
-
-                // Cargar datos del requerimiento
-                fetch(`/requerimientos/${id}/detalle`)
-                    .then(res => res.json())
-                    .then(data => {
-                        // Función auxiliar para setear valores
-                        function setFormValue(elementId, value) {
-                            const element = document.getElementById(elementId);
-                            if (element) {
-                                if (element.type === 'checkbox') {
-                                    element.checked = value == 1 || value == true;
-                                } else {
-                                    element.value = value || '';
-                                }
-                            }
-                        }
-
-                        // Llenar campos del formulario
-                        setFormValue('area_solicitante_edit', data.area_solicitante);
-                        setFormValue('cliente_edit', data.cliente);
-                        setFormValue('fecha_limite_edit', data.fecha_limite);
-                        setFormValue('edad_minima_edit', data.edad_minima);
-                        setFormValue('edad_maxima_edit', data.edad_maxima);
-                        setFormValue('cantidad_requerida_edit', data.cantidad_requerida);
-                        setFormValue('requiere_licencia_conducir_edit', data.requiere_licencia_conducir);
-                        setFormValue('requiere_sucamec_edit', data.requiere_sucamec);
-                        setFormValue('experiencia_minima_edit', data.experiencia_minima);
-                        setFormValue('requisitos_adicionales_edit', data.requisitos_adicionales);
-                        setFormValue('prioridad_edit', data.prioridad);
-
-                        // Llenar sucursales
-                        const sucursalSelect = document.getElementById('sucursal_edit');
-                        if (sucursalSelect) {
-                            sucursalSelect.innerHTML = '<option value="">Selecciona la sucursal</option>';
-                            sucursales.forEach(s => {
-                                const option = document.createElement('option');
-                                option.value = s.SUCU_CODIGO;
-                                option.textContent = s.SUCU_DESCRIPCION;
-                                if (s.SUCU_CODIGO === data.sucursal) option.selected = true;
-                                sucursalSelect.appendChild(option);
-                            });
-                        }
-
-                        // Llenar departamentos
-                        const departamentoSelect = document.getElementById('departamento_edit');
-                        if (departamentoSelect) {
-                            departamentoSelect.innerHTML =
-                                '<option value="">Selecciona el departamento</option>';
-                            departamentos.forEach(d => {
-                                const option = document.createElement('option');
-                                option.value = d.DEPA_CODIGO;
-                                option.textContent = d.DEPA_DESCRIPCION;
-                                if (d.DEPA_CODIGO === data.departamento) option.selected = true;
-                                departamentoSelect.appendChild(option);
-                            });
-                        }
-
-                        // Llenar tipos de cargo
-                        const tipoCargoSelect = document.getElementById('tipo_cargo_edit');
-                        if (tipoCargoSelect) {
-                            tipoCargoSelect.innerHTML = '<option value="">Selecciona el tipo de cargo</option>';
-                            tipoCargos.forEach(t => {
-                                const option = document.createElement('option');
-                                option.value = t.CODI_TIPO_CARG;
-                                option.textContent = t.DESC_TIPO_CARG;
-                                if (t.CODI_TIPO_CARG === data.tipo_cargo) option.selected = true;
-                                tipoCargoSelect.appendChild(option);
-                            });
-                        }
-
-                        // Llenar nivel educativo
-                        const nivelEstudiosSelect = document.getElementById('nivel_estudios_edit');
-                        if (nivelEstudiosSelect) {
-                            nivelEstudiosSelect.innerHTML = '<option value="">Selecciona nivel</option>';
-                            nivelEducativo.forEach(n => {
-                                const option = document.createElement('option');
-                                option.value = n.NIED_CODIGO;
-                                option.textContent = n.NIED_DESCRIPCION;
-                                if (n.NIED_CODIGO === data.nivel_estudios) option.selected = true;
-                                nivelEstudiosSelect.appendChild(option);
-                            });
-                        }
-
-                        // Llenar estados
-                        const estadoSelect = document.getElementById('estado_edit');
-                        if (estadoSelect) {
-                            estadoSelect.innerHTML = '<option value="">Selecciona un estado</option>';
-                            estados.forEach(est => {
-                                const option = document.createElement('option');
-                                option.value = est.id;
-                                option.textContent = est.nombre;
-                                if (est.id == data.estado) option.selected = true;
-                                estadoSelect.appendChild(option);
-                            });
-                        }
-
-                        // Guardar valores para selects dependientes
-                        document.getElementById('cargo_edit').dataset.value = data.cargo_solicitado;
-                        document.getElementById('provincia_edit').dataset.value = data.provincia;
-                        document.getElementById('distrito_edit').dataset.value = data.distrito;
-
-                        // Inicializar selects dependientes
-                        initEditForm(document.getElementById('edit-panel'));
-                    })
-                    .catch(err => {
-                        console.error('Error al cargar datos del requerimiento:', err);
-                        alert('Error al cargar los detalles del requerimiento');
-                    });
             }
         });
     </script>

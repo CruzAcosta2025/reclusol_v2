@@ -15,7 +15,7 @@
                 <div class="text-center text-M2">
                     <h1 class="text-xl font-bold mb-1">Formulario de Postulación</h1>
                     <p class="text-base text-M3">Complete todos los campos para registrar al postulante</p>
-                </div>
+                </div> 
             </div>
             <!-- Progress Bar -->
             <div class="w-full mt-4">
@@ -416,7 +416,7 @@
                             </label>
                             <div
                                 class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-purple-400 transition-colors">
-                                <input type="file" id="cv" name="cv" accept=".pdf" data-max=5
+                                <input type="file" id="cv" name="cv" accept=".pdf" data-max=5 required
                                     class="hidden" onchange="handleFileUpload(this, 'cv-preview')">
                                 <label for="cv" class="cursor-pointer">
                                     <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
@@ -430,6 +430,7 @@
                                     </div>
                                 </div>
                             </div>
+                            <span class="error-message text-red-500 text-sm hidden"></span>
                         </div>
 
                         <!-- CUL Upload -->
@@ -440,7 +441,7 @@
                             </label>
                             <div
                                 class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-purple-400 transition-colors">
-                                <input type="file" id="cul" name="cul" accept=".pdf" data-max=5
+                                <input type="file" id="cul" name="cul" accept=".pdf" data-max=5 required
                                     class="hidden" onchange="handleFileUpload(this, 'cul-preview')">
                                 <label for="cul" class="cursor-pointer">
                                     <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
@@ -454,6 +455,7 @@
                                     </div>
                                 </div>
                             </div>
+                            <span class="error-message text-red-500 text-sm hidden"></span>
                         </div>
                     </div>
 
@@ -554,6 +556,136 @@
 
         let currentStep = 1;
         const totalSteps = 3;
+
+        // Manejador para el envío del formulario
+        document.getElementById('postulanteForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validar el último paso (paso 3) antes de enviar
+            if (!validateCurrentStep()) {
+                console.log('Validación del paso 3 falló');
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Campos incompletos',
+                    text: 'Por favor completa todos los campos obligatorios',
+                    confirmButtonColor: '#d33'
+                });
+                return;
+            }
+
+            // Mostrar overlay de carga
+            const loadingOverlay = document.getElementById('loading-overlay');
+            if (loadingOverlay) {
+                loadingOverlay.classList.remove('hidden');
+            }
+
+            // Enviar el formulario
+            const form = this;
+            const formData = new FormData(form);
+
+            fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                },
+                body: formData
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                
+                // Primero verificar el tipo de contenido
+                const contentType = response.headers.get('content-type');
+                console.log('Content-Type:', contentType);
+                
+                if (!response.ok) {
+                    // Si es JSON, intentar parsear los errores
+                    if (contentType && contentType.includes('application/json')) {
+                        return response.json().then(err => {
+                            console.log('Error JSON:', err);
+                            return Promise.reject(err);
+                        });
+                    } else {
+                        // Si no es JSON, obtener el texto para debugging
+                        return response.text().then(text => {
+                            console.log('Error HTML/Text (primeros 500 chars):', text.substring(0, 500));
+                            return Promise.reject({
+                                message: `Error del servidor (${response.status}). Por favor verifica los datos e intenta nuevamente.`
+                            });
+                        });
+                    }
+                }
+                
+                // Si es exitoso, parsear como JSON
+                if (contentType && contentType.includes('application/json')) {
+                    return response.json();
+                } else {
+                    // Si no es JSON pero es exitoso, obtener el texto
+                    return response.text().then(text => {
+                        console.log('Respuesta exitosa pero no es JSON (primeros 500 chars):', text.substring(0, 500));
+                        return Promise.reject({
+                            message: 'El servidor retornó una respuesta inesperada. Por favor contacta al administrador.'
+                        });
+                    });
+                }
+            })
+            .then(data => {
+                // Ocultar overlay
+                if (loadingOverlay) {
+                    loadingOverlay.classList.add('hidden');
+                }
+
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Éxito!',
+                        text: data.message || 'Postulación enviada correctamente',
+                        confirmButtonColor: '#3085d6',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false
+                    }).then(result => {
+                        if (result.isConfirmed) {
+                            window.location.href = data.redirect || '{{ route("postulantes.filtrar") }}';
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.message || 'Error al enviar la postulación',
+                        confirmButtonColor: '#d33'
+                    });
+                }
+            })
+            .catch(error => {
+                // Ocultar overlay
+                if (loadingOverlay) {
+                    loadingOverlay.classList.add('hidden');
+                }
+
+                console.error('Error completo:', error);
+                let errorMessage = 'Error al procesar la postulación';
+                
+                if (error.message) {
+                    errorMessage = error.message;
+                } else if (error.errors) {
+                    // Laravel validation errors
+                    const errorList = Object.entries(error.errors)
+                        .map(([field, messages]) => `• ${messages.join(', ')}`)
+                        .join('\n');
+                    errorMessage = errorList || 'Error de validación';
+                }
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error de validación',
+                    html: errorMessage.replace(/\n/g, '<br>'),
+                    confirmButtonColor: '#d33'
+                });
+            });
+        });
 
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -820,9 +952,23 @@
             let isValid = true;
 
             requiredFields.forEach(field => {
-                const errorMessage = field.parentElement.querySelector('.error-message');
-                if (!field.value.trim()) {
-                    console.log('Campo vacío:', field.name || field.id, field); // <--- agrega esto
+                let isEmpty = false;
+
+                // Validar según el tipo de campo
+                if (field.type === 'file') {
+                    // Para inputs file, verificar si hay archivos seleccionados
+                    isEmpty = !field.files || field.files.length === 0;
+                } else {
+                    // Para otros campos, verificar si el valor está vacío
+                    isEmpty = !field.value || field.value.trim() === '';
+                }
+
+                // Encontrar el contenedor con error-message
+                const errorContainer = field.closest('.space-y-2') || field.closest('.space-y-4') || field.parentElement;
+                const errorMessage = errorContainer?.querySelector('.error-message');
+
+                if (isEmpty) {
+                    console.log('Campo vacío:', field.name || field.id, field);
                     field.classList.add('border-red-500');
                     if (errorMessage) {
                         errorMessage.textContent = 'Este campo es obligatorio';
@@ -836,7 +982,6 @@
                     }
                 }
             });
-
             return isValid;
         }
 
@@ -889,29 +1034,4 @@
         // Initialize
         updateProgressBar();
     </script>
-
-    <style>
-        .gradient-bg {
-            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #1d4ed8 100%);
-        }
-
-        .form-input {
-            transition: all 0.3s ease;
-        }
-
-        .form-input:focus {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.15);
-        }
-
-        .btn-primary {
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-        }
-    </style>
-
 @endsection

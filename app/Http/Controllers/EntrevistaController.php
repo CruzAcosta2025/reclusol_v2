@@ -4,140 +4,44 @@ namespace App\Http\Controllers;
 
 use App\Models\Postulante;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use App\Models\Cargo;
-use App\Models\Cliente;
-use Illuminate\Support\Str;
-use App\Models\Sucursal;
 use App\Models\Departamento;
-use App\Models\Provincia;
 use App\Models\Distrito;
 use App\Models\TipoCargo;
 use App\Models\Entrevista;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
-use Symfony\Component\HttpFoundation\StreamedResponse;
-
+use App\Services\EntrevistaService;
 
 class EntrevistaController extends Controller
 {
 
-    public function listadoInicial(Request $request)
+    protected EntrevistaService $entrevistaService;
+
+    public function __construct(EntrevistaService $entrevistaService)
     {
-        // Cargamos requerimiento + entrevistas con su entrevistador
-        $query = Postulante::with([
-            'requerimiento',
-            'entrevistas.entrevistador', // 👈 relación en Entrevista
-        ])
-            ->where('estado', 2)      // apto
-            ->where('decision', 'apto');
-
-        // filtros
-        if ($request->filled('dni')) {
-            $query->where('dni', 'like', '%' . $request->dni . '%');
-        }
-
-        if ($request->filled('nombre')) {
-            $nombre = $request->nombre;
-            $query->where(function ($q) use ($nombre) {
-                $q->where('nombres', 'like', "%{$nombre}%")
-                    ->orWhere('apellidos', 'like', "%{$nombre}%");
-            });
-        }
-
-        $postulantes = $query->orderBy('fecha_postula', 'asc')
-            ->paginate(15)
-            ->withQueryString();
-
-        // catálogos
-        $cargos        = Cargo::forSelect();        // ['0008' => 'AGENTE...', ...]
-        $departamentos = Departamento::forSelect();
-        $provincias    = Provincia::forSelect();
-        $distritos     = Distrito::forSelect();
-
-        // contadores para las tarjetas
-        $entrevistados = 0;
-        $pendientes    = 0;
-        $cancelados    = 0; // por ahora 0
-
-        foreach ($postulantes as $p) {
-
-            // === CARGO DESDE EL REQUERIMIENTO (simple) ===
-            $codigoCargo = null;
-
-            if (!empty($p->cargo)) {
-                // compatibilidad con registros viejos
-                $codigoCargo = str_pad($p->cargo, 4, '0', STR_PAD_LEFT);
-            } elseif ($p->requerimiento) {
-                // nuevos registros: lo sacamos del requerimiento
-                $codigoCargo = str_pad($p->requerimiento->cargo_solicitado, 4, '0', STR_PAD_LEFT);
-            }
-
-            if ($codigoCargo) {
-                $p->cargo_nombre = $cargos->get($codigoCargo) ?? $codigoCargo;
-            } else {
-                $p->cargo_nombre = 'N/A';
-            }
-
-            // Ubigeo
-            $p->departamento_nombre = $departamentos->get($p->departamento) ?? $p->departamento;
-            $p->provincia_nombre    = $provincias->get($p->provincia) ?? $p->provincia;
-            $p->distrito_nombre     = $distritos->get($p->distrito) ?? $p->distrito;
-
-            // === INFORMACIÓN DE ENTREVISTA (evaluado por / estado) ===
-            $ultima = $p->entrevistas
-                ->sortByDesc('fecha_entrevista')
-                ->first();
-
-            if (!$ultima) {
-                // nunca entrevistado
-                $p->evaluado_por      = 'Aún no evaluado';
-                $p->estado_entrevista = 'No evaluado';
-                $pendientes++;
-            } else {
-                $p->evaluado_por = optional($ultima->entrevistador)->name ?? 'Sin nombre';
-
-                if ($ultima->resultado === 'BORRADOR') {
-                    $p->estado_entrevista = 'Borrador';
-                } else {
-                    // cualquier otro valor lo tomamos como Evaluado
-                    $p->estado_entrevista = 'Evaluado';
-                }
-
-                // si quieres contar solo los evaluados finales:
-                if ($p->estado_entrevista === 'Evaluado') {
-                    $entrevistados++;
-                } else {
-                    $pendientes++;
-                }
-            }
-        }
-
-        // lista negra igual que ya tenías
-        $listaNegra = collect();
-        if ($request->filled('dni') || $request->filled('nombre')) {
-            $dni    = $request->dni ?? null;
-            $nombre = $request->nombre ?? null;
-
-            $listaNegra = collect(DB::select(
-                'EXEC SP_PERSONAL_CESADO @dni = :dni, @nombre = :nombre',
-                ['dni' => $dni, 'nombre' => $nombre]
-            ));
-        }
-
-        return view('entrevistas.listadoInicial', compact(
-            'postulantes',
-            'listaNegra',
-            'entrevistados',
-            'cancelados',
-            'pendientes'
-        ));
+        $this->entrevistaService = $entrevistaService;
     }
 
+    public function listadoInicial(Request $request)
+    {
+        $data = $this->entrevistaService
+            ->prepararListadoEntrevistas(
+                $request->only('dni', 'nombre')
+            );
 
+        $listaNegra = $this->entrevistaService
+            ->verificarListaNegra(
+                $request->dni,
+                $request->nombre
+            );
+
+        return view('entrevistas.listadoInicial', array_merge($data, [
+            'listaNegra' => $listaNegra,
+        ]));
+    }
 
     public function evaluar(Request $request, Postulante $postulante)
     {
@@ -203,12 +107,8 @@ class EntrevistaController extends Controller
         return view('entrevistas.evaluar', compact('postulante', 'esOperativo', 'esAdministrativo', 'entrevista'));
     }
 
-
-
-
     public function verArchivo(Postulante $postulante, string $tipo): StreamedResponse
     {
-
         $path = $postulante->{$tipo};
         $disk = config('filesystems.default', 'local');
 
@@ -251,6 +151,10 @@ class EntrevistaController extends Controller
         return Storage::disk('postulantes')->download($rel, basename($rel));
     }
 
+    public function store(Request $request, Postulante $postulante)
+    {
+        return $this->guardarEvaluacion($request, $postulante);
+    }
 
     public function guardarEvaluacion(Request $request, Postulante $postulante)
     {
@@ -261,8 +165,8 @@ class EntrevistaController extends Controller
             'formacion'       => ['nullable', 'array'],
             'formacion.*'     => ['string', 'max:50'],
 
-            'competencias'    => ['nullable', 'array'],          // 👈 NUEVO
-            'competencias.*'  => ['string', 'max:100'],          // 👈 NUEVO
+            'competencias'    => ['nullable', 'array'],
+            'competencias.*'  => ['string', 'max:100'],
 
             'otros_cursos'    => ['nullable', 'string', 'max:255'],
             'fortalezas'      => ['nullable', 'string'],

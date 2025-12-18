@@ -2,8 +2,6 @@
 
 @section('content')
     <div class="space-y-4">
-
-        {{-- Encabezado --}}
         <x-block class="flex flex-col">
             <div class="flex justify-between items-center">
                 <div>

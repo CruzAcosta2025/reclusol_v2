@@ -11,14 +11,17 @@ use App\Models\Sucursal;
 use App\Models\TipoCargo;
 use App\Models\Cargo;
 use App\Models\TipoPersonal;
+use App\Models\Departamento;
+use App\Models\Provincia;
+use App\Models\Distrito;
 use App\Repositories\Interfaces\RequerimientosRepositoryInterface;
-
 
 class RequerimientosRepository implements RequerimientosRepositoryInterface
 {
     protected Requerimiento $modelo;
 
-    public function __construct(Requerimiento $modelo){
+    public function __construct(Requerimiento $modelo)
+    {
         $this->modelo = $modelo;
     }
 
@@ -35,7 +38,7 @@ class RequerimientosRepository implements RequerimientosRepositoryInterface
     public function getByIdWithRelations(mixed $id): ?array
     {
         $requerimiento = $this->getById($id);
-        
+
         if (!$requerimiento) {
             return null;
         }
@@ -78,12 +81,11 @@ class RequerimientosRepository implements RequerimientosRepositoryInterface
                 ->firstWhere('CODIGO_CLIENTE', $requerimiento->cliente);
             $data['cliente_nombre'] = $cliente ? $cliente->NOMBRE_CLIENTE : $requerimiento->cliente;
         }
-
         return $data;
     }
 
     public function store(array $data)
-    {
+    { 
         return Requerimiento::create($data);
     }
 
@@ -97,7 +99,7 @@ class RequerimientosRepository implements RequerimientosRepositoryInterface
         return Requerimiento::where('id', $id)->delete();
     }
 
-    public function getEstados():array
+    public function getEstados(): array
     {
         return EstadoRequerimiento::all()->toArray();
     }
@@ -109,7 +111,16 @@ class RequerimientosRepository implements RequerimientosRepositoryInterface
 
     public function getSucursales(): array
     {
-        return Sucursal::forSelect()->toArray();
+        return Sucursal::vigentes()
+            ->sinEspeciales()
+            ->get(['SUCU_CODIGO', 'SUCU_DESCRIPCION'])
+            ->map(function ($item) {
+                return (object) [
+                    'SUCU_CODIGO' => $item->SUCU_CODIGO,
+                    'SUCU_DESCRIPCION' => $item->SUCU_DESCRIPCION,
+                ];
+            })
+            ->toArray();
     }
 
     public function getTipoPersonal(): array
@@ -119,7 +130,16 @@ class RequerimientosRepository implements RequerimientosRepositoryInterface
 
     public function getTipoCargos(): array
     {
-        return TipoCargo::all()->toArray();
+        // Devolver objetos con llaves CODI_TIPO_CARG y DESC_TIPO_CARG
+        return TipoCargo::query()
+            ->get(['CODI_TIPO_CARG', 'DESC_TIPO_CARG'])
+            ->map(function ($item) {
+                return (object) [
+                    'CODI_TIPO_CARG' => $item->CODI_TIPO_CARG,
+                    'DESC_TIPO_CARG' => $item->DESC_TIPO_CARG,
+                ];
+            })
+            ->toArray();
     }
 
     public function getCargos(): array
@@ -157,7 +177,7 @@ class RequerimientosRepository implements RequerimientosRepositoryInterface
         return collect(DB::select(
             'EXEC USP_SICOS_2024_LISTAR_SEDES_X_CLIENTE ?, ?, ?',
             [$codigo, '', 0]
-        ))-> toArray();
+        ))->toArray();
     }
 
     public function getTiposPorTipoPersonal(string $tipoPersonal): array
@@ -182,6 +202,39 @@ class RequerimientosRepository implements RequerimientosRepositoryInterface
     {
         return DB::connection('sqlsrv')->table('CARGOS')
             ->where('CODI_CARG', $codiCarg)
-            ->value('CARGO_TIPO');
+            ->value('CA RGO_TIPO');
+    }
+
+    public function getDepartamentos(): array
+    {
+        return Departamento::vigentes()->get()->map(function($item) {
+            return (object)$item->toArray();
+        })->toArray();
+    }
+
+    public function getProvincias(): array
+    {
+        return Provincia::vigentes()->get()->map(function($item) {
+            return (object)$item->toArray();
+        })->toArray();
+    }
+
+    public function getDistritos(): array
+    {
+        return Distrito::vigentes()->get()->map(function($item) {
+            return (object)$item->toArray();
+        })->toArray();
+    }
+
+    public function getNivelesEducativos(): array
+    {
+        return DB::connection('sqlsrv')
+            ->table('SUNAT_NIVEL_EDUCATIVO')
+            ->select('NIED_CODIGO', 'NIED_DESCRIPCION')
+            ->get()
+            ->map(function($item) {
+                return (object)$item;
+            })
+            ->toArray();
     }
 }

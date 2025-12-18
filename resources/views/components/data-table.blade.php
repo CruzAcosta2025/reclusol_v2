@@ -52,27 +52,32 @@
 
         <div class="flex items-center gap-2">
             <input x-model.debounce="search" @input="page=1; applyFilters()" type="search" placeholder="Buscar..."
-                class="px-3 py-2 rounded border border-gray-200 text-sm w-64" />
+                   class="px-3 py-2 rounded border border-gray-200 text-sm w-64"/>
         </div>
     </div>
 
-    <!-- Desktop table -->
     <div class="overflow-x-auto">
-        <table class="w-full bg-white">
-            <thead class="bg-neutral-lightest rounded-t-2xl border border-neutral">
+        <div class="overflow-y-auto border border-neutral" style="height: 500px;">
+            <table class="w-full bg-white">
+                <thead class="bg-neutral-lightest sticky top-0 z-30">
                 <tr class="text-left text-xs">
                     @foreach ($columns as $col)
-                        @php $align = $col['align'] ?? 'text-center'; @endphp
-                        <th class="px-4 py-3 font-bold text-M2 uppercase {{ $align }}">
+                        @php
+                            $align = $col['align'] ?? 'text-center';
+                            $isSticky = $col['sticky'] ?? false;
+                            $stickyClass = $isSticky ? 'sticky right-0 z-20 bg-neutral-lightest' : '';
+                            $shadowStyle = $isSticky ? 'filter: drop-shadow(-4px 0 6px rgba(0, 0, 0, 0.15));' : '';
+                        @endphp
+                        <th class="px-4 py-3 font-bold text-M2 uppercase {{ $align }} {{ $stickyClass }}"
+                            style="{{ $shadowStyle }}">
                             {{ $col['label'] }}
                         </th>
                     @endforeach
                 </tr>
-            </thead>
-            <tbody x-ref="tbody" class="divide-y divide-neutral">
+                </thead>
+                <tbody x-ref="tbody" class="divide-y divide-neutral">
                 @forelse ($rows as $r)
                     @php
-                        // build searchable string and data attributes
                         $searchParts = [];
                         $dataAttrs = '';
                         foreach($columns as $col){
@@ -88,21 +93,29 @@
                     @endphp
                     <tr class="{{ $trClass }}" {!! $rawAttrs !!} data-search="{{ $searchValue }}" {!! $dataAttrs !!}>
                         @foreach($columns as $col)
-                            @php $k = $col['key']; $align = $col['align'] ?? 'text-center'; @endphp
-                            <td class="px-4 py-3 text-M2 text-xs {{ $align }}">
+                            @php
+                                $k = $col['key'];
+                                $align = $col['align'] ?? 'text-center';
+                                $isSticky = $col['sticky'] ?? false;
+                                $stickyClass = $isSticky ? 'sticky right-0 z-20 bg-white' : '';
+                                $shadowStyle = $isSticky ? 'filter: drop-shadow(-4px 0 6px rgba(0, 0, 0, 0.15));' : '';
+                            @endphp
+                            <td class="px-4 py-3 text-M2 text-xs {{ $align }} {{ $stickyClass }}"
+                                style="{{ $shadowStyle }}">
                                 {!! data_get($r, $k, '—') !!}
                             </td>
                         @endforeach
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="{{ count($columns) }}" class="text-center py-6 text-M2 text-sm">{{ $emptyMessage }}</td>
+                        <td colspan="{{ count($columns) }}"
+                            class="text-center py-6 text-M2 text-sm">{{ $emptyMessage }}</td>
                     </tr>
                 @endforelse
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
     </div>
-
 
     <script>
         // Ensure initial pagination/filter run after Alpine initializes

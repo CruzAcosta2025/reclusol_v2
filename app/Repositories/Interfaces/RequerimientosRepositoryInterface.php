@@ -12,6 +12,7 @@ interface RequerimientosRepositoryInterface
     public function getByIdWithRelations(mixed $id): ?array;
     public function store(array $data);
     public function update($id, $data);
+    public function destroy($id); //cambiar
     public function getEstados(): array;
     public function getPrioridades(): array;
     public function getSucursales(): array;
@@ -24,4 +25,8 @@ interface RequerimientosRepositoryInterface
     public function getTiposPorTipoPersonal(string $tipoPersonal): array;
     public function getCargosPorTipo(string $tipoPersonal, string $tipoCargo): array;
     public function getTipoCargo(string $codiCarg): ?string;
+    public function getDepartamentos(): array;
+    public function getProvincias(): array;
+    public function getDistritos(): array;
+    public function getNivelesEducativos(): array;
 }

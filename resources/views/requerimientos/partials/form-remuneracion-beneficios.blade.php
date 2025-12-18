@@ -9,7 +9,6 @@
                 <h2 class="text-lg font-bold text-M2">Remuneración y Beneficios</h2>
             </div>
         </div>
-
         <div class="space-y-6 w-full">
             <label for="sueldo_basico" class="block text-sm font-semibold text-gray-700">
                 <i class="fas fa-chart-line mr-2 text-purple-500"></i>
@@ -31,15 +30,53 @@
                 <select id="beneficios" name="beneficios" required
                     class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all duration-300">
                     <option value="">Selecciona</option>
-                    <option value="escala_a">Seguro de Salud</option>
-                    <option value="escala_b">CTS</option>
-                    <option value="escala_c">Vacaciones</option>
-                    <option value="escala_d">Asignación familiar</option>
-                    <option value="escala_d">Utilidades</option>
+                    @if (!empty($beneficios) && is_array($beneficios))
+                        @foreach ($beneficios as $key => $label)
+                            <option value="{{ $key }}"
+                                {{ old('beneficios', $requerimiento->beneficios ?? '') == $key ? 'selected' : '' }}>
+                                {{ $label }}</option>
+                        @endforeach
+                    @else
+                        <option value="escala_a">Seguro de Salud</option>
+                        <option value="escala_b">CTS</option>
+                        <option value="escala_c">Vacaciones</option>
+                        <option value="escala_d">Asignación familiar</option>
+                        <option value="escala_e">Utilidades</option>
+                    @endif
                 </select>
+                <p id="beneficios-info" class="text-sm text-gray-600 mt-2"></p>
                 <span class="error-message text-red-500 text-sm hidden"></span>
             </div>
             <span class="error-message text-red-500 text-sm hidden"></span>
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        function initBeneficios(selectId = 'beneficios') {
+            const sel = document.getElementById(selectId);
+            const info = document.getElementById(selectId + '-info');
+            if (!sel) return;
+
+            function updateInfo() {
+                const opt = sel.options[sel.selectedIndex];
+                if (info) info.textContent = sel.value ? ('Seleccionado: ' + (opt ? opt.text : sel.value)) : '';
+            }
+
+            sel.addEventListener('change', updateInfo);
+            updateInfo();
+
+            // helper para asignar valor desde JS (por ejemplo modal)
+            window.setBeneficiosValue = function(value, id = selectId) {
+                const s = document.getElementById(id);
+                if (!s) return;
+                s.value = value || '';
+                s.dispatchEvent(new Event('change'));
+            };
+        }
+
+        initBeneficios('beneficios');
+        initBeneficios('beneficios_edit'); // por si existe en modal
+    });
+</script>

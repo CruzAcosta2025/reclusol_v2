@@ -212,7 +212,6 @@ rounded-full flex items-center justify-center flex-shrink-0">
                 @yield('content')
             </main>
         </div>
-
     </div>
 
     <script>

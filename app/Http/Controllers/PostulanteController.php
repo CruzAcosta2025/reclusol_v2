@@ -273,7 +273,7 @@ class PostulanteController extends Controller
             'licencia_conducir'   => $validated['licencia_conducir'],
         ]);
 
-        DB::transaction(fn() =>Postulante::create($validated));
+        DB::transaction(fn() => Postulante::create($validated));
 
         return back()->with('success', 'Información guardada');
     }
@@ -657,233 +657,292 @@ class PostulanteController extends Controller
 
     public function storeInterno(Request $request)
     {
-        // 0) Buscar el requerimiento seleccionado
-        $requerimiento = Requerimiento::findOrFail($request->input('requerimiento_id'));
+        try {
+            // 0) Buscar el requerimiento seleccionado
+            $requerimiento = Requerimiento::findOrFail($request->input('requerimiento_id'));
 
-        /* ================= DETECCIÓN TIPO PERSONAL + LOG ================= */
+            /* ================= DETECCIÓN TIPO PERSONAL + LOG ================= */
 
-        $rawCodigo = trim((string) $requerimiento->tipo_personal_codigo); // puede venir NULL o vacío
-        $rawTexto  = strtoupper(trim((string) $requerimiento->tipo_personal)); // puede venir "01", "OPERATIVO 4º", etc.
+            $rawCodigo = trim((string) $requerimiento->tipo_personal_codigo); // puede venir NULL o vacío
+            $rawTexto  = strtoupper(trim((string) $requerimiento->tipo_personal)); // puede venir "01", "OPERATIVO 4º", etc.
 
-        // Si en tipo_personal guardas "01" o "OPERATIVO 4º", saco solo dígitos
-        $codigoDesdeTexto = preg_replace('/\D+/', '', $rawTexto); // "OPERATIVO 4º" => "4", "01" => "01"
-        if ($codigoDesdeTexto === '') {
-            $codigoDesdeTexto = null;
+            // Si en tipo_personal guardas "01" o "OPERATIVO 4º", saco solo dígitos
+            $codigoDesdeTexto = preg_replace('/\D+/', '', $rawTexto); // "OPERATIVO 4º" => "4", "01" => "01"
+            if ($codigoDesdeTexto === '') {
+                $codigoDesdeTexto = null;
+            }
+
+            // Prioridad: primero tipo_personal_codigo, si está vacío uso lo que saqué del texto
+            $codigoBase = $rawCodigo !== '' ? $rawCodigo : $codigoDesdeTexto;
+            $codigoBase = $codigoBase !== null ? $codigoBase : '00';
+
+            // Normalizo a 2 dígitos
+            $tipoCodigo = str_pad($codigoBase, 2, '0', STR_PAD_LEFT);
+
+            // En tu tabla ADMI_TIPO_PERSONAL:
+            // 01 OPERATIVO 4º
+            // 03 OPERATIVO 5º
+            // 02,05,06 no son operativos
+            $esOperativo = in_array($tipoCodigo, ['01', '03'], true);
+
+            Log::info('POSTULANTE storeExterno - detección tipo personal', [
+                'req_id'                   => $requerimiento->id,
+                'raw_tipo_personal_codigo' => $rawCodigo,
+                'raw_tipo_personal'        => $rawTexto,
+                'codigoDesdeTexto'         => $codigoDesdeTexto,
+                'tipoCodigo_final'         => $tipoCodigo,
+                'esOperativo'              => $esOperativo,
+                'request_sucamec'          => $request->input('sucamec'),
+                'request_carne_sucamec'    => $request->input('carne_sucamec'),
+                'request_licencia_arma'    => $request->input('licencia_arma'),
+                'request_licencia_conducir' => $request->input('licencia_conducir'),
+            ]);
+
+            /* ================= VALIDACIÓN ================= */
+
+            $validated = $request->validate([
+                'fecha_postula'      => ['required', 'date'],
+                'dni'                => ['required', 'string', 'size:8', 'unique:postulantes,dni'],
+                'nombres'            => ['required', 'string', 'max:50'],
+                'apellidos'          => ['required', 'string', 'max:50'],
+                'fecha_nacimiento'   => ['required', 'date'],
+                'edad'               => ['required', 'integer', 'min:18', 'max:120'],
+                'departamento'       => ['required', 'string', 'max:50'],
+                'provincia'          => ['required', 'string', 'max:50'],
+                'distrito'           => ['required', 'string', 'max:50'],
+                'nacionalidad'       => ['required', 'string', 'max:50'],
+                'grado_instruccion'  => ['required', 'string', 'max:50'],
+                'celular'            => ['required', 'digits:9'],
+                'celular_referencia' => ['nullable', 'digits:9'],
+
+                'requerimiento_id'   => ['required', 'exists:requerimientos,id'],
+
+                'experiencia_rubro'  => ['required', 'string', 'max:50'],
+
+                // SOLO obligatorios si es operativo
+                'sucamec'           => [$esOperativo ? 'required' : 'nullable', 'in:SI,NO'],
+                'carne_sucamec'     => [$esOperativo ? 'required' : 'nullable', 'in:SI,NO'],
+                'licencia_arma'     => [$esOperativo ? 'required' : 'nullable', 'string', 'max:10'],
+                'licencia_conducir' => [$esOperativo ? 'required' : 'nullable', 'string', 'max:10'],
+
+                // Archivos
+                'cv'  => ['required', 'file', 'mimes:pdf', 'max:5120'],
+                'cul' => ['required', 'file', 'mimes:pdf', 'max:5120'],
+            ], [
+                'required' => 'El campo :attribute es obligatorio.',
+                'exists'   => 'El valor seleccionado en :attribute no es válido.',
+                'in'       => 'Selecciona una opción válida en :attribute.',
+                'mimes'    => 'El archivo :attribute debe ser PDF.',
+            ], [
+                'carne_sucamec'     => 'carné SUCAMEC vigente',
+                'sucamec'           => 'curso SUCAMEC vigente',
+                'licencia_arma'     => 'licencia de arma',
+                'licencia_conducir' => 'licencia de conducir',
+                'experiencia_rubro' => 'experiencia en el rubro',
+                'requerimiento_id'  => 'vacante / requerimiento',
+                'cv'                => 'Currículum (PDF)',
+                'cul'               => 'Certificado Único Laboral (PDF)',
+            ]);
+
+            /* ================= NORMALIZAR CAMPOS OPERATIVOS ================= */
+
+            if ($esOperativo) {
+                // Me aseguro de que SIEMPRE se seteen estos 4 campos
+                $validated['sucamec']           = $request->input('sucamec');
+                $validated['carne_sucamec']     = $request->input('carne_sucamec');
+                $validated['licencia_arma']     = $request->input('licencia_arma');
+                $validated['licencia_conducir'] = $request->input('licencia_conducir');
+            } else {
+                $validated['sucamec']           = null;
+                $validated['carne_sucamec']     = null;
+                $validated['licencia_arma']     = null;
+                $validated['licencia_conducir'] = null;
+            }
+
+            /* ================= ARCHIVOS ================= */
+
+            $dni  = $validated['dni'];
+            $disk = config('filesystems.default', 'local');
+            $dir  = "postulantes/{$dni}";
+            $validated['cv']  = $request->file('cv')->store($dir, $disk);
+            $validated['cul'] = $request->file('cul')->store($dir, $disk);
+
+            /* ================= COPIAR DATOS DEL REQUERIMIENTO ================= */
+
+            $validated['requerimiento_id']     = $requerimiento->id;
+            $validated['tipo_cargo']           = $requerimiento->tipo_cargo;
+            $validated['cargo']                = $requerimiento->cargo;
+            $validated['tipo_personal_codigo'] = $tipoCodigo;            // ya corregido
+            $validated['tipo_personal']        = $requerimiento->tipo_personal;
+
+            $validated['origin']     = 'interno';
+            $validated['created_by'] = auth()->id();
+
+            Log::info('POSTULANTE storeExterno - datos finales validados', [
+                'dni'                 => $validated['dni'],
+                'esOperativo'         => $esOperativo,
+                'tipo_personal_codigo' => $validated['tipo_personal_codigo'],
+                'tipo_personal'       => $validated['tipo_personal'],
+                'sucamec'             => $validated['sucamec'],
+                'carne_sucamec'       => $validated['carne_sucamec'],
+                'licencia_arma'       => $validated['licencia_arma'],
+                'licencia_conducir'   => $validated['licencia_conducir'],
+            ]);
+
+            DB::transaction(fn() => Postulante::create($validated));
+
+            // Retornar JSON si es AJAX, HTML si es request normal
+            if ($request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Postulación enviada correctamente',
+                    'redirect' => route('postulantes.filtrar')
+                ], 200);
+            }
+
+            return back()->with('success', 'Información guardada');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Laravel maneja esto automáticamente para AJAX
+            throw $e;
+        } catch (\Exception $e) {
+            Log::error('Error en storeInterno: ' . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            if ($request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error al procesar la postulación: ' . $e->getMessage()
+                ], 500);
+            }
+
+            return back()->withErrors(['error' => 'Error al procesar la postulación: ' . $e->getMessage()]);
         }
-
-        // Prioridad: primero tipo_personal_codigo, si está vacío uso lo que saqué del texto
-        $codigoBase = $rawCodigo !== '' ? $rawCodigo : $codigoDesdeTexto;
-        $codigoBase = $codigoBase !== null ? $codigoBase : '00';
-
-        // Normalizo a 2 dígitos
-        $tipoCodigo = str_pad($codigoBase, 2, '0', STR_PAD_LEFT);
-
-        // En tu tabla ADMI_TIPO_PERSONAL:
-        // 01 OPERATIVO 4º
-        // 03 OPERATIVO 5º
-        // 02,05,06 no son operativos
-        $esOperativo = in_array($tipoCodigo, ['01', '03'], true);
-
-        Log::info('POSTULANTE storeExterno - detección tipo personal', [
-            'req_id'                   => $requerimiento->id,
-            'raw_tipo_personal_codigo' => $rawCodigo,
-            'raw_tipo_personal'        => $rawTexto,
-            'codigoDesdeTexto'         => $codigoDesdeTexto,
-            'tipoCodigo_final'         => $tipoCodigo,
-            'esOperativo'              => $esOperativo,
-            'request_sucamec'          => $request->input('sucamec'),
-            'request_carne_sucamec'    => $request->input('carne_sucamec'),
-            'request_licencia_arma'    => $request->input('licencia_arma'),
-            'request_licencia_conducir' => $request->input('licencia_conducir'),
-        ]);
-
-        /* ================= VALIDACIÓN ================= */
-
-        $validated = $request->validate([
-            'fecha_postula'      => ['required', 'date'],
-            'dni'                => ['required', 'string', 'size:8', 'unique:postulantes,dni'],
-            'nombres'            => ['required', 'string', 'max:50'],
-            'apellidos'          => ['required', 'string', 'max:50'],
-            'fecha_nacimiento'   => ['required', 'date'],
-            'edad'               => ['required', 'integer', 'min:18', 'max:120'],
-            'departamento'       => ['required', 'string', 'max:50'],
-            'provincia'          => ['required', 'string', 'max:50'],
-            'distrito'           => ['required', 'string', 'max:50'],
-            'nacionalidad'       => ['required', 'string', 'max:50'],
-            'grado_instruccion'  => ['required', 'string', 'max:50'],
-            'celular'            => ['required', 'digits:9'],
-            'celular_referencia' => ['nullable', 'digits:9'],
-
-            'requerimiento_id'   => ['required', 'exists:requerimientos,id'],
-
-            'experiencia_rubro'  => ['required', 'string', 'max:50'],
-
-            // SOLO obligatorios si es operativo
-            'sucamec'           => [$esOperativo ? 'required' : 'nullable', 'in:SI,NO'],
-            'carne_sucamec'     => [$esOperativo ? 'required' : 'nullable', 'in:SI,NO'],
-            'licencia_arma'     => [$esOperativo ? 'required' : 'nullable', 'string', 'max:10'],
-            'licencia_conducir' => [$esOperativo ? 'required' : 'nullable', 'string', 'max:10'],
-
-            // Archivos
-            'cv'  => ['required', 'file', 'mimes:pdf', 'max:5120'],
-            'cul' => ['required', 'file', 'mimes:pdf', 'max:5120'],
-        ], [
-            'required' => 'El campo :attribute es obligatorio.',
-            'exists'   => 'El valor seleccionado en :attribute no es válido.',
-            'in'       => 'Selecciona una opción válida en :attribute.',
-            'mimes'    => 'El archivo :attribute debe ser PDF.',
-        ], [
-            'carne_sucamec'     => 'carné SUCAMEC vigente',
-            'sucamec'           => 'curso SUCAMEC vigente',
-            'licencia_arma'     => 'licencia de arma',
-            'licencia_conducir' => 'licencia de conducir',
-            'experiencia_rubro' => 'experiencia en el rubro',
-            'requerimiento_id'  => 'vacante / requerimiento',
-            'cv'                => 'Currículum (PDF)',
-            'cul'               => 'Certificado Único Laboral (PDF)',
-        ]);
-
-        /* ================= NORMALIZAR CAMPOS OPERATIVOS ================= */
-
-        if ($esOperativo) {
-            // Me aseguro de que SIEMPRE se seteen estos 4 campos
-            $validated['sucamec']           = $request->input('sucamec');
-            $validated['carne_sucamec']     = $request->input('carne_sucamec');
-            $validated['licencia_arma']     = $request->input('licencia_arma');
-            $validated['licencia_conducir'] = $request->input('licencia_conducir');
-        } else {
-            $validated['sucamec']           = null;
-            $validated['carne_sucamec']     = null;
-            $validated['licencia_arma']     = null;
-            $validated['licencia_conducir'] = null;
-        }
-
-        /* ================= ARCHIVOS ================= */
-
-        $dni  = $validated['dni'];
-        $disk = config('filesystems.default', 'local');
-        $dir  = "postulantes/{$dni}";
-        $validated['cv']  = $request->file('cv')->store($dir, $disk);
-        $validated['cul'] = $request->file('cul')->store($dir, $disk);
-
-        /* ================= COPIAR DATOS DEL REQUERIMIENTO ================= */
-
-        $validated['requerimiento_id']     = $requerimiento->id;
-        $validated['tipo_cargo']           = $requerimiento->tipo_cargo;
-        $validated['cargo']                = $requerimiento->cargo;
-        $validated['tipo_personal_codigo'] = $tipoCodigo;            // ya corregido
-        $validated['tipo_personal']        = $requerimiento->tipo_personal;
-
-        $validated['origin']     = 'interno';
-        $validated['created_by'] = auth()->id();
-
-        Log::info('POSTULANTE storeExterno - datos finales validados', [
-            'dni'                 => $validated['dni'],
-            'esOperativo'         => $esOperativo,
-            'tipo_personal_codigo' => $validated['tipo_personal_codigo'],
-            'tipo_personal'       => $validated['tipo_personal'],
-            'sucamec'             => $validated['sucamec'],
-            'carne_sucamec'       => $validated['carne_sucamec'],
-            'licencia_arma'       => $validated['licencia_arma'],
-            'licencia_conducir'   => $validated['licencia_conducir'],
-        ]);
-
-        DB::transaction(fn() => Postulante::create($validated));
-
-        return back()->with('success', 'Información guardada');
     }
 
-    /*
-    public function storeInterno(Request $request)
+    /* 
+   public function storeInterno(Request $request)
     {
-        // 0) Buscar el requerimiento seleccionado
-        $requerimiento = Requerimiento::findOrFail($request->input('requerimiento_id'));
+        try {
+            // 0) Buscar el requerimiento seleccionado
+            $requerimiento = Requerimiento::findOrFail($request->input('requerimiento_id'));
 
-        // 1) Inferir si es OPERATIVO según el requerimiento
-        $esOperativo = $requerimiento->tipo_personal_codigo === '01'
-            || strtoupper($requerimiento->tipo_personal) === 'OPERATIVO';
+            // 1) Inferir si es OPERATIVO según el requerimiento
+            $esOperativo = $requerimiento->tipo_personal_codigo === '01'
+                || strtoupper($requerimiento->tipo_personal) === 'OPERATIVO';
 
-        // 2) Validación
-        $validated = $request->validate([
-            'fecha_postula'      => ['required', 'date'],
-            'dni'                => ['required', 'string', 'size:8', 'unique:postulantes,dni'],
-            'nombres'            => ['required', 'string', 'max:50'],
-            'apellidos'          => ['required', 'string', 'max:50'],
-            'fecha_nacimiento'   => ['required', 'date'],
-            'edad'               => ['required', 'integer', 'min:18', 'max:120'],
-            'departamento'       => ['required', 'string', 'max:50'],
-            'provincia'          => ['required', 'string', 'max:50'],
-            'distrito'           => ['required', 'string', 'max:50'],
-            'nacionalidad'       => ['required', 'string', 'max:50'],
-            'grado_instruccion'  => ['required', 'string', 'max:50'],
-            'celular'            => ['required', 'digits:9'],
-            'celular_referencia' => ['nullable', 'digits:9'],
+            // 2) Validación
+            $validated = $request->validate([
+                'fecha_postula'      => ['required', 'date'],
+                'dni'                => ['required', 'string', 'size:8', 'unique:postulantes,dni'],
+                'nombres'            => ['required', 'string', 'max:50'],
+                'apellidos'          => ['required', 'string', 'max:50'],
+                'fecha_nacimiento'   => ['required', 'date'],
+                'edad'               => ['required', 'integer', 'min:18', 'max:120'],
+                'departamento'       => ['required', 'string', 'max:50'],
+                'provincia'          => ['required', 'string', 'max:50'],
+                'distrito'           => ['required', 'string', 'max:50'],
+                'nacionalidad'       => ['required', 'string', 'max:50'],
+                'grado_instruccion'  => ['required', 'string', 'max:50'],
+                'celular'            => ['required', 'digits:9'],
+                'celular_referencia' => ['nullable', 'digits:9'],
 
-            // 👇 nuevo: el requerimiento es obligatorio
-            'requerimiento_id'   => ['required', 'exists:requerimientos,id'],
+                // 👇 nuevo: el requerimiento es obligatorio
+                'requerimiento_id'   => ['required', 'exists:requerimientos,id'],
 
-            // ya NO confiamos en lo que venga del formulario para tipo_cargo/cargo
-            // 'tipo_cargo'       => ['required', 'string', 'max:50'],
-            // 'cargo'            => ['required', 'exists:cargos,CODI_CARG'],
+                // ya NO confiamos en lo que venga del formulario para tipo_cargo/cargo
+                // 'tipo_cargo'       => ['required', 'string', 'max:50'],
+                // 'cargo'            => ['required', 'exists:cargos,CODI_CARG'],
 
-            'experiencia_rubro'  => ['required', 'string', 'max:50'],
+                'experiencia_rubro'  => ['required', 'string', 'max:50'],
 
-            // === Solo obligatorios si $esOperativo ===
-            'sucamec'           => [Rule::requiredIf($esOperativo), 'nullable', 'in:SI,NO'],
-            'carne_sucamec'     => [Rule::requiredIf($esOperativo), 'nullable', 'in:SI,NO'],
-            'licencia_arma'     => [Rule::requiredIf($esOperativo), 'nullable', 'string', 'max:10'],
-            'licencia_conducir' => [Rule::requiredIf($esOperativo), 'nullable', 'string', 'max:10'],
+                // === Solo obligatorios si $esOperativo ===
+                'sucamec'           => [Rule::requiredIf($esOperativo), 'nullable', 'in:SI,NO'],
+                'carne_sucamec'     => [Rule::requiredIf($esOperativo), 'nullable', 'in:SI,NO'],
+                'licencia_arma'     => [Rule::requiredIf($esOperativo), 'nullable', 'string', 'max:10'],
+                'licencia_conducir' => [Rule::requiredIf($esOperativo), 'nullable', 'string', 'max:10'],
 
-            // Archivos
-            'cv'  => ['required', 'file', 'mimes:pdf', 'max:5120'],
-            'cul' => ['required', 'file', 'mimes:pdf', 'max:5120'],
-        ], [
-            'required' => 'El campo :attribute es obligatorio.',
-            'exists'   => 'El valor seleccionado en :attribute no es válido.',
-            'in'       => 'Selecciona una opción válida en :attribute.',
-            'mimes'    => 'El archivo :attribute debe ser PDF.',
-        ], [
-            'carne_sucamec'     => 'carné SUCAMEC vigente',
-            'sucamec'           => 'curso SUCAMEC vigente',
-            'licencia_arma'     => 'licencia de arma',
-            'licencia_conducir' => 'licencia de conducir',
-            'experiencia_rubro' => 'experiencia en el rubro',
-            'requerimiento_id'  => 'vacante / requerimiento',
-            'cv'                => 'Currículum (PDF)',
-            'cul'               => 'Certificado Único Laboral (PDF)',
-        ]);
+                // Archivos
+                'cv'  => ['required', 'file', 'mimes:pdf', 'max:5120'],
+                'cul' => ['required', 'file', 'mimes:pdf', 'max:5120'],
+            ], [
+                'required' => 'El campo :attribute es obligatorio.',
+                'exists'   => 'El valor seleccionado en :attribute no es válido.',
+                'in'       => 'Selecciona una opción válida en :attribute.',
+                'mimes'    => 'El archivo :attribute debe ser PDF.',
+            ], [
+                'carne_sucamec'     => 'carné SUCAMEC vigente',
+                'sucamec'           => 'curso SUCAMEC vigente',
+                'licencia_arma'     => 'licencia de arma',
+                'licencia_conducir' => 'licencia de conducir',
+                'experiencia_rubro' => 'experiencia en el rubro',
+                'requerimiento_id'  => 'vacante / requerimiento',
+                'cv'                => 'Currículum (PDF)',
+                'cul'               => 'Certificado Único Laboral (PDF)',
+            ]);
 
-        // 3) Si NO es operativo, limpiar campos
-        if (!$esOperativo) {
-            $validated['sucamec']           = null;
-            $validated['carne_sucamec']     = null;
-            $validated['licencia_arma']     = null;
-            $validated['licencia_conducir'] = null;
+            // 3) Si NO es operativo, limpiar campos
+            if (!$esOperativo) {
+                $validated['sucamec']           = null;
+                $validated['carne_sucamec']     = null;
+                $validated['licencia_arma']     = null;
+                $validated['licencia_conducir'] = null;
+            }
+
+            // 4) Subida de archivos
+            $dni  = $validated['dni'];
+            $disk = config('filesystems.default', 'local');
+            $dir  = "postulantes/{$dni}";
+            $validated['cv']  = $request->file('cv')->store($dir, $disk);
+            $validated['cul'] = $request->file('cul')->store($dir, $disk);
+
+            // 5) Copiar datos del requerimiento al postulante
+            $validated['requerimiento_id']     = $requerimiento->id;
+            $validated['tipo_cargo']           = $requerimiento->tipo_cargo;
+            $validated['cargo']                = $requerimiento->cargo;
+            $validated['tipo_personal_codigo'] = $requerimiento->tipo_personal_codigo;
+            $validated['tipo_personal']        = $requerimiento->tipo_personal;
+
+            $validated['origin']     = 'interno';
+            $validated['created_by'] = auth()->id();
+
+            DB::transaction(fn() => \App\Models\Postulante::create($validated));
+
+            // Retornar JSON si es AJAX, HTML si es request normal
+            if ($request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Postulación enviada correctamente',
+                    'redirect' => route('postulantes.filtrar')
+                ], 200);
+            }
+
+            return back()->with('success', 'Información guardada');
+            
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Laravel maneja esto automáticamente para AJAX
+            throw $e;
+            
+        } catch (\Exception $e) {
+            \Log::error('Error en storeInterno: ' . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            if ($request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error al procesar la postulación: ' . $e->getMessage()
+                ], 500);
+            }
+            
+            return back()->withErrors(['error' => 'Error al procesar la postulación: ' . $e->getMessage()]);
         }
-
-        // 4) Subida de archivos
-        $dni  = $validated['dni'];
-        $disk = config('filesystems.default', 'local');
-        $dir  = "postulantes/{$dni}";
-        $validated['cv']  = $request->file('cv')->store($dir, $disk);
-        $validated['cul'] = $request->file('cul')->store($dir, $disk);
-
-        // 5) Copiar datos del requerimiento al postulante
-        $validated['requerimiento_id']     = $requerimiento->id;
-        $validated['tipo_cargo']           = $requerimiento->tipo_cargo;
-        $validated['cargo']                = $requerimiento->cargo;
-        $validated['tipo_personal_codigo'] = $requerimiento->tipo_personal_codigo;
-        $validated['tipo_personal']        = $requerimiento->tipo_personal;
-
-        $validated['origin']     = 'interno';
-        $validated['created_by'] = auth()->id();
-
-        DB::transaction(fn() => \App\Models\Postulante::create($validated));
-
-        return back()->with('success', 'Información guardada');
     }
-    /*
-
+    */
 
     /* ---------- FUNCION PARA VERIFICAR SI UN POSTULANTE ESTUVO O NO
     EN LA LISTA NEGRA ---------- */
@@ -915,15 +974,6 @@ class PostulanteController extends Controller
         }
     }
 
-    /* ---------- FUNCION PARA ABRIR Y MOSTRAR LA VISTA DE EDICION ---------- 
-    public function edit(Postulante $postulante)
-    {
-        // resources/views/postulantes/partials/form-edit.blade.php
-        return view('postulantes.partials.form-edit', compact('postulante'));
-    }
-    /*
-
-
     /* ---------- FUNCION PARA ACTUALIZAR LOS DATOS DE UN POSTULANTE---------- 
 
     public function update(Request $request, Postulante $postulante)
@@ -949,7 +999,8 @@ class PostulanteController extends Controller
             'grado_instruccion'   => 'required|string|max:50',
             'servicio_militar'    => 'required|string|max:15',
             'licencia_arma'       => 'required|string|max:10',
-            'licencia_conducir'   => 'required|string|max:10',
+
+                        'licencia_conducir'   => 'required|string|max:10',
 
             // si permites cambiar archivos, validalos y guárdalos aquí
         ]);
@@ -1096,8 +1147,6 @@ class PostulanteController extends Controller
         }
     }
 
-
-
     /* ---------- FUNCION PARA ELIMINAR UN POSTULANTE ---------- */
     public function destroy(Postulante $postulante)
     {
@@ -1144,13 +1193,11 @@ class PostulanteController extends Controller
         ]);
     }
 
-
     /* ---------- FUNCION PARA ABRIR Y MOSTRAR LA VISTA ---------- */
     public function ver()
     {
         return view('postulantes.selection');
     }
-
 
     /* ---------- FUNCION PARA ABRIR Y MOSTRAR LA VISTA ---------- */
     public function formExterno()

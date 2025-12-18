@@ -107,7 +107,7 @@
                         ['key' => 'fecha_postula', 'label' => 'Fecha de postulación', 'align' => 'text-center'],
                         ['key' => 'evaluado_por', 'label' => 'Evaluado por', 'align' => 'text-center'],
                         ['key' => 'estado', 'label' => 'Estado', 'align' => 'text-center'],
-                        ['key' => 'actions', 'label' => 'Acciones', 'align' => 'text-center'],
+                        ['key' => 'actions', 'label' => 'Acciones', 'align' => 'text-center', 'sticky' => true],
                     ];
 
                     $rows = $postulantes->map(function ($postulante) {

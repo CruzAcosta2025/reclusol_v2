@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.guest')
 
 @section('content')
     <div class="font-sans antialiased">
@@ -41,12 +41,12 @@
 
             <!-- @if ($errors->any())
     <div class="bg-red-100 text-red-800 p-4 rounded mb-6">
-                                                          <ul class="list-disc pl-5">
-                                                            @foreach ($errors->all() as $error)
+                                                              <ul class="list-disc pl-5">
+                                                                @foreach ($errors->all() as $error)
     <li>{{ $error }}</li>
     @endforeach
-                                                          </ul>
-                                                         </div>
+                                                              </ul>
+                                                             </div>
     @endif -->
 
             <form method="POST" action="{{ route('postulantes.storeExterno') }}" enctype="multipart/form-data"

@@ -78,7 +78,6 @@
                     </x-select>
                 </div>
 
-
                 {{-- Provincia --}}
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Provincia</label>
@@ -165,7 +164,7 @@
                     ['key' => 'licencia_conducir', 'label' => 'Lic. Conducir A1', 'align' => 'text-center'],
                     ['key' => 'cv', 'label' => 'CV', 'align' => 'text-center'],
                     ['key' => 'cul', 'label' => 'CUL', 'align' => 'text-center'],
-                    ['key' => 'actions', 'label' => 'Acciones', 'align' => 'text-center'],
+                    ['key' => 'actions', 'label' => 'Acciones', 'align' => 'text-center', 'sticky' => true ],
                 ];
 
                 $rows = $postulantes->map(function ($postulante) {
