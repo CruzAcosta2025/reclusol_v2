@@ -30,8 +30,6 @@
             </div>
         </div>
 
-
-
         @if ($errors->any())
         <div class="bg-red-100 text-red-800 p-4 rounded mb-6">
             <ul class="list-disc pl-5">
@@ -230,24 +228,6 @@
                             <span id="error-cantidad" class="error-message text-red-500 text-sm hidden"></span>
                         </div>
 
-                        <!-- Cantidad por sexo -->
-                        <div class="space-y-2">
-                            <label class="block text-sm font-semibold text-gray-700">
-                                <i class="fa-solid fa-venus-mars text-blue-500"></i>
-                                Sexo requerido *
-                            </label>
-                            <div class="flex gap-2">
-                                <input type="number" id="cantidad_masculino" name="cantidad_masculino"
-                                    placeholder="Masculino" min="0" max="999"
-                                    class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300"
-                                    required>
-                                <input type="number" id="cantidad_femenino" name="cantidad_femenino"
-                                    placeholder="Femenino" min="0" max="999"
-                                    class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300"
-                                    required>
-                            </div>
-                            <span id="error-sexo" class="error-message text-red-500 text-sm hidden"></span>
-                        </div>
                     </div>
                 </div>
 

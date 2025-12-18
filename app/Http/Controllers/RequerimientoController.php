@@ -16,7 +16,7 @@ use App\Models\Departamento;
 //use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Notifications\NuevoRequerimientoCreado;
+
 
 
 class RequerimientoController extends Controller
@@ -85,7 +85,6 @@ class RequerimientoController extends Controller
         }
     }
 
-
     public function sedesPorCliente(Request $request)
     {
         $codigo = $request->input('codigo_cliente');
@@ -150,18 +149,12 @@ class RequerimientoController extends Controller
     {
         /* ---------- 1. VALIDACIÓN ---------- */
         $validated = $request->validate([
-            // DATOS AUTOMÁTICOS (se agregan luego, no validar)
-            // 'user_id' => ...,
-            // 'cargo_usuario' => ...,
-            // 'fecha_solicitud' => ...,
-
             'area_solicitante'     => 'nullable|string|max:50',
             'departamento'         => 'nullable|string|max:50',
             'provincia'            => 'nullable|string|max:50',
             'distrito'             => 'nullable|string|max:50',
             'sucursal'             => 'required|string|max:50',
             'cliente'              => 'required|string|max:50',
-            'sede'                 => 'nullable|string|max:50',
             'tipo_personal'        => 'required|string|max:50',
             'tipo_cargo'           => 'required|string|max:50',
             'cargo_solicitado'     => 'required|string|max:50',
@@ -170,8 +163,8 @@ class RequerimientoController extends Controller
             'fecha_fin'            => 'required|date|after_or_equal:fecha_inicio',
             'urgencia'             => 'required|string|max:50',
             'cantidad_requerida'   => 'required|integer|min:1|max:255',
-            'cantidad_masculino'   => 'required|integer|min:0|max:255',
-            'cantidad_femenino'    => 'required|integer|min:0|max:255',
+            //'cantidad_masculino'   => 'required|integer|min:0|max:255',
+            //'cantidad_femenino'    => 'required|integer|min:0|max:255',
             'edad_minima'          => 'required|integer|min:18|max:65',
             'edad_maxima'          => 'required|integer|min:18|max:70',
             'experiencia_minima'   => 'required|string|max:50',
@@ -185,15 +178,12 @@ class RequerimientoController extends Controller
             'validado_rrhh'             => 'boolean',
             'sueldo_basico'             => 'required|string|max:50',
             'beneficios'                => 'required|string|max:50',
-
             //'prioridad'                 => 'nullable|exists:prioridad_requerimiento,id',
             'estado'                    => 'required|exists:estado_requerimiento,id',
             //'fecha_limite'              => 'nullable|date|after_or_equal:today',
-
             //'requiere_sucamec'          => 'boolean',
             //'requisitos_adicionales'    => 'nullable|string',
         ]);
-
 
         /* ---------- 2. CAMPOS AUTOMÁTICOS ---------- */
         $validated['user_id'] = Auth::id();
@@ -212,7 +202,7 @@ class RequerimientoController extends Controller
             // Notificar a todos los usuarios (puedes filtrar si quieres solo admins/reclutadores)
             $usuarios = User::all(); // O un filtro si prefieres
             foreach ($usuarios as $usuario) {
-                $usuario->notify(new NuevoRequerimientoCreado($requerimiento));
+                $usuario->notify(new \App\Notifications\requerimientos\NuevoRequerimientoCreado($requerimiento));
             }
 
             Log::info('Requerimiento guardado', $requerimiento->toArray());
@@ -553,119 +543,118 @@ class RequerimientoController extends Controller
     }
 
 
-
-    /*
-    public function edit(Requerimiento $requerimiento)
+    public function edit(Requerimiento $requerimiento, Request $request)
     {
-        $estados = EstadoRequerimiento::all();
+        abort_unless($request->ajax(), 404);
 
-        $sucursales = DB::connection('si_solmar')
-            ->table('SISO_SUCURSAL')
-            ->select('SUCU_CODIGO', 'SUCU_DESCRIPCION')
-            ->where('SUCU_VIGENCIA', 'SI')
-            ->get();
+        $departamentos = Departamento::forSelect();
+        $sucursales    = Sucursal::forSelect();
 
-        $tipoCargos = DB::connection('si_solmar')
-            ->table('TIPO_CARGO')
-            ->select('CODI_TIPO_CARG', 'DESC_TIPO_CARG')
-            ->get();
+        $clientes = collect(DB::connection('sqlsrv')->select('EXEC dbo.SP_LISTAR_CLIENTES'))
+            ->mapWithKeys(fn($x) => [trim((string)$x->CODIGO_CLIENTE) => $x->NOMBRE_CLIENTE])
+            ->toArray();
 
-        $cargos = DB::connection('si_solmar')
-            ->table('CARGOS')
-            ->select('CODI_CARG', 'DESC_CARGO', 'TIPO_CARG')
-            ->where('CARG_VIGENCIA', 'SI')
-            ->get();
+        $tipoCargos   = TipoCargo::forSelect();
+        $tipoPersonal = TipoPersonal::forSelect();
 
-        $nivelEducativo = DB::connection('si_solmar')
-            ->table('SUNAT_NIVEL_EDUCATIVO')
-            ->select('NIED_CODIGO', 'NIED_DESCRIPCION')
-            ->get();
+        $cargos = Cargo::vigentes()
+            ->get(['CODI_CARG', 'DESC_CARGO', 'TIPO_CARG'])
+            ->keyBy('CODI_CARG');
 
-        $departamentos = DB::connection('si_solmar')
-            ->table('ADMI_DEPARTAMENTO')
-            ->select('DEPA_CODIGO', 'DEPA_DESCRIPCION')
-            ->where('DEPA_VIGENCIA', 'SI')
-            ->orderBy('DEPA_DESCRIPCION')
-            ->get()
-            ->keyBy('DEPA_CODIGO');
-
-
-        $provincias = DB::connection('si_solmar')
-            ->table('ADMI_PROVINCIA')
+        $provincias = DB::connection('sqlsrv')->table('ADMI_PROVINCIA')
             ->select('PROVI_CODIGO', 'PROVI_DESCRIPCION', 'DEPA_CODIGO')
-            ->where('PROVI_VIGENCIA', 'SI')
-            ->orderBy('PROVI_DESCRIPCION')
-            ->get()
-            ->keyBy('PROVI_CODIGO');
+            ->where('PROVI_VIGENCIA', 'SI')->get();
 
-        $distritos = DB::connection('si_solmar')
-            ->table('ADMI_DISTRITO')
+        $distritos = DB::connection('sqlsrv')->table('ADMI_DISTRITO')
             ->select('DIST_CODIGO', 'DIST_DESCRIPCION', 'PROVI_CODIGO')
-            ->where('DIST_VIGENCIA', 'SI')
-            ->orderBy('DIST_DESCRIPCION')
-            ->get()
-            ->keyBy('DIST_CODIGO');
+            ->where('DIST_VIGENCIA', 'SI')->get();
+
+        $estados = EstadoRequerimiento::orderBy('nombre')->get();
 
         return view('requerimientos.partials.form-edit', compact(
             'requerimiento',
-            'estados',
             'sucursales',
+            'clientes',
+            'tipoPersonal',
             'tipoCargos',
             'cargos',
-            'nivelEducativo',
             'departamentos',
             'provincias',
-            'distritos'
+            'distritos',
+            'estados'
         ));
     }
-    */
 
-    /**
-     * Valida y actualiza el postulante.
-     */
     public function update(Request $request, Requerimiento $requerimiento)
     {
-        // 1. Validar sólo los campos editables
-        $data = $request->validate([
-            'area_solicitante'           => 'required|string|max:50',
-            'distrito'                   => 'required|string|max:50',
-            'provincia'                  => 'required|string|max:50',
-            'departamento'               => 'required|string|max:50',
-            'cliente'                    => 'required|string|max:50',
-            'tipo_cargo'                 => 'required|string|max:50',
-            'sucursal'                   => 'required|string|max:50',
-            'cargo_solicitado'           => 'required|string|max:50',
-            'cantidad_requerida'         => 'required|integer|min:1|max:255',
-            'fecha_limite'               => 'required|date|after_or_equal:today',
-            'edad_minima'                => 'required|integer|min:18|max:65',
-            'edad_maxima'                => 'required|integer|min:18|max:65',
-            'requiere_licencia_conducir' => 'required|string|max:50',
-            'requiere_sucamec'           => 'boolean',
-            'nivel_estudios'             => 'required|string|max:50',
-            'experiencia_minima'         => 'required|string|max:50',
-            'requisitos_adicionales'     => 'nullable|string',
-            //'validado_rrhh'              => 'boolean',
-            //'escala_remunerativa'        => 'required|string|max:10',
-            'prioridad'                  => 'required|exists:prioridad_requerimiento,id',
-            'estado'                     => 'required|exists:estado_requerimiento,id',
+        $rules = [
+            // SECCIÓN 1: Datos de la solicitud
+            'sucursal'           => 'required|string|max:10',
+            'cliente'            => 'required|string|max:10',
+            'tipo_personal'      => 'required|string|max:2',
+            'tipo_cargo'         => 'required|string|max:2',
+            'cargo_solicitado'   => 'required|string|max:50',
 
-        ]);
+            'fecha_inicio'       => 'required|date',
+            'fecha_fin'          => 'required|date|after_or_equal:fecha_inicio',
 
-        // 2. Actualizar
+            // urgencia se setea automáticamente en el JS, pero se valida aquí
+            'urgencia'           => 'required|in:Alta,Media,Baja,Mayor',
+
+            'cantidad_requerida' => 'required|integer|min:1|max:255',
+
+            // SECCIÓN 2: Perfil y requisitos (comunes)
+            'edad_minima'        => 'required|integer|min:18|max:65',
+            'edad_maxima'        => 'required|integer|min:18|max:70|gte:edad_minima',
+
+            'experiencia_minima' => 'required|string|max:50',
+            'grado_academico'    => 'required|string|max:50',
+
+            // CAMPOS SOLO PARA OPERATIVO (se validan como nullable y se limpian si no es 01)
+            'curso_sucamec_operativo'    => 'nullable|in:si,no',
+            'carne_sucamec_operativo'    => 'nullable|in:si,no',
+            'licencia_armas'             => 'nullable|in:si,no',
+            'requiere_licencia_conducir' => 'nullable|in:si,no',
+            'servicio_acuartelado'       => 'nullable|in:no,con_habitabilidad,con_alimentacion,con_movilidad',
+
+            // SECCIÓN 4: Remuneración y beneficios
+            'sueldo_basico'      => 'required|numeric|min:0',
+            'beneficios'         => 'required|string|max:50',
+
+            // SECCIÓN 5: Estado
+            'estado'             => 'required|exists:estado_requerimiento,id',
+        ];
+
+        $data = $request->validate($rules);
+
+        // Si NO es operativo (01), limpiamos los campos exclusivos de operativo
+        if (($data['tipo_personal'] ?? null) !== '01') {
+            $data['curso_sucamec_operativo']    = null;
+            $data['carne_sucamec_operativo']    = null;
+            $data['licencia_armas']             = null;
+            $data['requiere_licencia_conducir'] = null;
+            $data['servicio_acuartelado']       = null;
+        }
+
         try {
             $requerimiento->update($data);
+
             return response()->json(['success' => true]);
         } catch (\Throwable $e) {
-            Log::error('Error al actualizar postulante', [
+            Log::error('Error al actualizar requerimiento', [
                 'id'    => $requerimiento->id,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
+
             return response()->json([
                 'success' => false,
-                'message' => 'No se pudo actualizar. Intenta de nuevo.'
+                'message' => 'No se pudo actualizar. Intenta de nuevo.',
             ], 500);
         }
     }
+
+
+
 
     /**
      * Elimina un requerimiento

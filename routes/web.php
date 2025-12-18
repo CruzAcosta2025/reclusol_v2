@@ -60,7 +60,6 @@ Route::middleware('auth')->group(function () {
     Route::delete('/requerimientos/{requerimiento}', [RequerimientoController::class, 'destroy'])->name('requerimientos.destroy');
     Route::get('/requerimientos/{requerimiento}/edit', [RequerimientoController::class, 'edit'])->name('requerimientos.edit');
     Route::put('/requerimientos/{requerimiento}', [RequerimientoController::class, 'update'])->name('requerimientos.update');
-    Route::get('/api/cargos', [CargoController::class, 'cargosPorTipo'])->name('api.cargos');
     Route::get('/requerimientos/clientes-por-sucursal', [RequerimientoController::class, 'clientesPorSucursalSP'])->name('requerimientos.clientes_por_sucursal');
     Route::get('/cargos', [CargoController::class, 'index']);
     Route::get('/cargos/{id}', [CargoController::class, 'show']);

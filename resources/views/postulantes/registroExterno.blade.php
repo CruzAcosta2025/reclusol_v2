@@ -485,6 +485,34 @@
             let currentStep = 1;
             const totalSteps = 3;
 
+            // ========== VERIFICAR ERROR DE DUPLICADO AL CARGAR ==========
+            document.addEventListener('DOMContentLoaded', function() {
+                @if (session('duplicate_entry'))
+                    Swal.fire({
+                        icon: 'error',
+                        title: '❌ Postulación Duplicada',
+                        html: `
+                            <div class="text-left">
+                                <p class="mb-3 font-bold text-lg">
+                                    Ya existe una postulación registrada con este DNI.
+                                </p>
+                                <p class="text-sm text-gray-700 mb-2">
+                                    Solo se permite una postulación por persona en el sistema.
+                                </p>
+                            </div>
+                        `,
+                        confirmButtonColor: '#dc2626',
+                        confirmButtonText: 'Entendido',
+                        width: 450,
+                        padding: '2.5rem',
+                        backdrop: true,
+                    }).then(() => {
+                        // Solo recargar la página
+                        location.reload();
+                    });
+                @endif
+            });
+
             document.addEventListener('DOMContentLoaded', function() {
                 const depSelect = document.getElementById('departamento');
                 const provSelect = document.getElementById('provincia');

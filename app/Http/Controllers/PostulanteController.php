@@ -281,10 +281,10 @@ class PostulanteController extends Controller
 
         // NOTIFICACIÓN (prueba rápida)
         if (auth()->check()) {
-            auth()->user()->notify(new NuevoPostulanteRegistrado($postulante));
+            auth()->user()->notify(new \App\Notifications\postulantes\NuevoPostulanteRegistrado($postulante));
         }
 
-        return back()->with('success', '¡Excelente! Su postulación ha sido registrada correctamente. Nos pondremos en contacto con usted pronto.');
+        return back()->with('success', 'Información guardada');
     }
 
 
@@ -808,8 +808,7 @@ class PostulanteController extends Controller
             auth()->user()->notify(new \App\Notifications\postulantes\NuevoPostulanteRegistrado($postulante));
         }
 
-        $nombreCompleto = $postulante->nombres . ' ' . $postulante->apellidos;
-        return back()->with('success', '¡Excelente! El postulante ' . $nombreCompleto . ' ha sido registrado correctamente.');
+        return back()->with('success', 'Información guardada');
     }
 
     /*

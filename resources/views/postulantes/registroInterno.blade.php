@@ -518,6 +518,24 @@
         let currentStep = 1;
         const totalSteps = 3;
 
+        // ========== VERIFICAR ERROR DE DUPLICADO AL CARGAR ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            @if (session('duplicate_entry'))
+                Swal.fire({
+                    icon: 'warning',
+                    title: '⚠️ Postulante Duplicado',
+                    text: 'El postulante ya está registrado en la base de datos.',
+                    confirmButtonColor: '#f59e0b',
+                    confirmButtonText: 'Aceptar',
+                    width: 400,
+                    padding: '2rem',
+                    backdrop: true,
+                }).then(() => {
+                    // Redirigir a la página de postulantes
+                    window.location.href = "{{ route('postulantes.filtrar') }}";
+                });
+            @endif
+        });
 
         document.addEventListener('DOMContentLoaded', function() {
             const depSelect = document.getElementById('departamento');

@@ -371,32 +371,35 @@
         {{-- Modales (eliminación, edición, validación) --}}
         {{-- Modal de Eliminación --}}
         <div id="delete-modal"
-            class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" role="dialog"
+            class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md" role="dialog"
             aria-modal="true" aria-labelledby="delete-title" aria-describedby="delete-desc">
             <!-- Panel -->
-            <div class="bg-white w-full max-w-md mx-4 rounded-2xl shadow-2xl border border-gray-100 p-6 opacity-0 translate-y-2 transition-all duration-200 ease-out data-[open=true]:opacity-100 data-[open=true]:translate-y-0"
+            <div class="bg-white w-full max-w-md mx-4 rounded-2xl shadow-2xl border-2 border-red-100 p-8 opacity-0 translate-y-2 transition-all duration-300 ease-out data-[open=true]:opacity-100 data-[open=true]:translate-y-0"
                 id="delete-panel" data-open="true">
                 <!-- Encabezado -->
-                <div class="flex items-start gap-3 mb-4">
-                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-50">
-                        <i class="fa-solid fa-triangle-exclamation text-red-600"></i>
+                <div class="text-center mb-6">
+                    <div class="flex justify-center mb-4">
+                        <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-red-100 to-red-50 border-2 border-red-200">
+                            <i class="fa-solid fa-triangle-exclamation text-red-600 text-2xl"></i>
+                        </div>
                     </div>
-                    <div>
-                        <h3 id="delete-title" class="text-xl font-semibold">¿Eliminar postulante?</h3>
-                        <p id="delete-desc" class="text-sm text-gray-600 mt-1">Esta acción no se puede deshacer.</p>
-                    </div>
+                    <h3 id="delete-title" class="text-2xl font-bold text-gray-900 mb-2">¿Eliminar postulante?</h3>
+                    <p id="delete-desc" class="text-base text-gray-700 leading-relaxed">Esta acción no se puede deshacer. Por favor, confirma que deseas eliminar este postulante.</p>
                 </div>
 
+                <!-- Línea separadora -->
+                <div class="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent my-6"></div>
+
                 <!-- Botones -->
-                <div class="mt-5 flex justify-end gap-3 pt-4 border-t border-gray-100">
+                <div class="flex justify-center gap-3 pt-2">
                     <button type="button" onclick="closeDeleteModal()"
-                        class="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 focus:outline-none focus:ring focus:ring-gray-300 transition">
-                        Cancelar
+                        class="px-6 py-3 rounded-lg font-semibold text-gray-800 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 transition-all duration-200 min-w-[120px]">
+                        <i class="fas fa-times mr-2"></i>Cancelar
                     </button>
 
                     <button type="button" onclick="confirmDelete()"
-                        class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white focus:outline-none focus:ring focus:ring-red-300 transition">
-                        Eliminar
+                        class="px-6 py-3 rounded-lg font-semibold text-white bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-200 min-w-[120px]">
+                        <i class="fas fa-trash-alt mr-2"></i>Eliminar
                     </button>
                 </div>
             </div>
