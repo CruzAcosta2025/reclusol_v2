@@ -265,9 +265,9 @@
                                         $estadoNombre = $requerimiento->estado_nombre; // ya viene del controller
                                         $statusColors = [
                                             'en proceso' => 'bg-yellow-100 text-yellow-800',
-                                            'cubierto' => 'bg-green-100 text-green-800',
+                                            'aprobado' => 'bg-green-100 text-green-800',
                                             'cancelado' => 'bg-red-100 text-red-800',
-                                            'vencido' => 'bg-gray-200 text-gray-700',
+                                            'cerrado' => 'bg-gray-200 text-gray-700',
                                         ];
                                         $statusClass =
                                             $statusColors[strtolower($estadoNombre ?? '')] ??

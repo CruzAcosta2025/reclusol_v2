@@ -17,8 +17,6 @@ use App\Models\Departamento;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-
-
 class RequerimientoController extends Controller
 {
     /*-------------------------------------------------
