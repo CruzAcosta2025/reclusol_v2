@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('module', 'requerimientos')
 
@@ -281,35 +281,35 @@
 
 
                                 <td class="px-6 py-4 text-gray-700 text-center">
-                                    {{ $requerimiento->fecha_inicio ? $requerimiento->fecha_inicio->format('d/m/Y') : '—' }}
+                                    {{ $requerimiento->fecha_inicio ? $requerimiento->fecha_inicio->format('d/m/Y') : 'â€”' }}
                                 </td>
 
                                 <td class="px-6 py-4 text-gray-700 text-center">
-                                    {{ $requerimiento->fecha_fin ? $requerimiento->fecha_fin->format('d/m/Y') : '—' }}
+                                    {{ $requerimiento->fecha_fin ? $requerimiento->fecha_fin->format('d/m/Y') : 'â€”' }}
                                 </td>
 
                                 <td class="px-6 py-4 text-gray-700 text-center">
-                                    {{ $requerimiento->edad_minima ? $requerimiento->edad_minima . ' años' : '—' }}
+                                    {{ $requerimiento->edad_minima ? $requerimiento->edad_minima . ' aÃ±os' : 'â€”' }}
                                 </td>
 
                                 <td class="px-6 py-4 text-gray-700 text-center">
-                                    {{ $requerimiento->edad_maxima ? $requerimiento->edad_maxima . ' años' : '—' }}
+                                    {{ $requerimiento->edad_maxima ? $requerimiento->edad_maxima . ' aÃ±os' : 'â€”' }}
                                 </td>
 
                                 <td class="px-6 py-4 text-gray-700 text-center">
-                                    {{ $requerimiento->experiencia_minima ? $requerimiento->experiencia_minima : '—' }}
+                                    {{ $requerimiento->experiencia_minima ? $requerimiento->experiencia_minima : 'â€”' }}
                                 </td>
 
                                 <td class="px-6 py-4 text-gray-700 text-center">
-                                    {{ $requerimiento->grado_academico ? $requerimiento->grado_academico : '—' }}
+                                    {{ $requerimiento->grado_academico ? $requerimiento->grado_academico : 'â€”' }}
                                 </td>
                                 
                                 <td class="px-6 py-4 text-gray-700 text-center">
-                                    {{ $requerimiento->sueldo_basico ? 'S/' . $requerimiento->sueldo_basico : '—' }}
+                                    {{ $requerimiento->sueldo_basico ? 'S/' . $requerimiento->sueldo_basico : 'â€”' }}
                                 </td>
 
                                 <td class="px-6 py-4 text-gray-700 text-center">
-                                    {{ $requerimiento->beneficios ? $requerimiento->beneficios: '—' }}
+                                    {{ $requerimiento->beneficios ? $requerimiento->beneficios: 'â€”' }}
                                 </td>
 
                                 <td class="px-4 py-3 flex space-x-2">
@@ -335,20 +335,20 @@
                 </table>
             </div>
 
-            {{-- Modal de Edición --}}
+            {{-- Modal de EdiciÃ³n --}}
             <div id="edit-modal"
-                class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm transition-all duration-300">
+                class="hidden fixed inset-0 z-50 items-center justify-center bg-black/50 backdrop-blur-sm">
                 <div id="edit-panel"
-                    class="bg-white w-full max-w-2xl mx-4 rounded-lg shadow-xl border border-gray-200
+                    class="bg-white w-full max-w-3xl mx-4 rounded-2xl shadow-2xl border border-gray-100
               max-h-[90vh] overflow-y-auto
-              opacity-0 scale-90 transition-all duration-300 ease-out
+              opacity-0 scale-95 transition duration-200 ease-out
               data-[open=true]:opacity-100 data-[open=true]:scale-100">
-                    <div id="edit-modal-content"><!-- aquí se inyecta el formulario --></div>
+                    <div id="edit-modal-content"><!-- aquÃ­ se inyecta el formulario --></div>
                 </div>
             </div>
 
 
-            {{-- Modal de Eliminación --}}
+            {{-- Modal de EliminaciÃ³n --}}
             <div id="delete-modal"
                 class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md"
                 role="dialog" aria-modal="true" aria-labelledby="delete-title" aria-describedby="delete-desc">
@@ -365,10 +365,10 @@
                             </div>
                         </div>
                         <h3 id="delete-title" class="text-2xl font-bold text-gray-900 mb-2">¿Eliminar requerimiento?</h3>
-                        <p id="delete-desc" class="text-base text-gray-700 leading-relaxed">Esta acción no se puede deshacer. Por favor, confirma que deseas eliminar este requerimiento.</p>
+                        <p id="delete-desc" class="text-base text-gray-700 leading-relaxed">Esta accion no se puede deshacer. Confirma que deseas eliminar este requerimiento.</p>
                     </div>
 
-                    <!-- Línea separadora -->
+                    <!-- LÃ­nea separadora -->
                     <div class="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent my-6"></div>
 
                     <!-- Botones -->
@@ -403,7 +403,7 @@
         const editContent = document.getElementById('edit-modal-content');
         let editTriggerEl = null;
 
-        // Datos base que ya usas (provincias y distritos sí se aprovechan)
+        // Datos base que ya usas (provincias y distritos sÃ­ se aprovechan)
         const cargos = Object.values(@json($cargos));
         const provincias = Object.values(@json($provincias));
         const distritos = Object.values(@json($distritos));
@@ -445,8 +445,8 @@
         // Mapea ADMIN/OPER -> 02/01 (y si ya viene 01/02 lo deja igual)
         const mapTipoPersonal = (v) => {
             const x = String(v ?? '').trim().toUpperCase();
-            if (x === '01' || x === 'OPERATIVO 4º' || x.includes('OPERATIVO 4º')) return '01';
-            if (x === '02' || x === 'ADMINISTRADOR 4º' || x.includes('ADMINISTRADOR 4º')) return '02';
+            if (x === '01' || x === 'OPERATIVO 4Âº' || x.includes('OPERATIVO 4Âº')) return '01';
+            if (x === '02' || x === 'ADMINISTRADOR 4Âº' || x.includes('ADMINISTRADOR 4Âº')) return '02';
             return x;
         };
 
@@ -545,14 +545,14 @@
             const prevEliminarText = btnEliminar?.textContent;
             btnEliminar.disabled = true;
             btnCancelar.disabled = true;
-            btnEliminar.textContent = 'Eliminando…';
+            btnEliminar.textContent = 'Eliminando...';
+            let deleted = false;
 
             try {
                 const res = await fetch(`/requerimientos/${deleteRequerimientoId}`, {
                     method: 'DELETE',
                     headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
-                            'content'),
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                         'X-Requested-With': 'XMLHttpRequest',
                         'Accept': 'application/json',
                     },
@@ -565,15 +565,32 @@
                 }
 
                 if (res.ok && (!data || data.success !== false)) {
-                    window.location.reload();
+                    deleted = true;
+                    closeDeleteModal();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Requerimiento eliminado',
+                        text: 'Se elimino el requerimiento correctamente.',
+                        timer: 1600,
+                        timerProgressBar: true,
+                        showConfirmButton: false,
+                    }).then(() => window.location.reload());
                     return;
-                } else {
-                    alert((data && data.message) ? data.message : 'Error al eliminar');
                 }
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error al eliminar',
+                    text: (data && data.message) ? data.message : 'No se pudo eliminar el requerimiento.',
+                });
             } catch (err) {
-                alert('Error al eliminar');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error al eliminar',
+                    text: 'No se pudo eliminar el requerimiento.',
+                });
             } finally {
-                if (!document.hidden) {
+                if (!document.hidden && !deleted) {
                     if (prevEliminarText) btnEliminar.textContent = prevEliminarText;
                     btnEliminar.disabled = false;
                     btnCancelar.disabled = false;
@@ -591,9 +608,9 @@
             }
         }
 
-        /* ==================== FILTRO: TIPO_CARGO → CARGO ==================== */
+        /* ==================== FILTRO: TIPO_CARGO â†’ CARGO ==================== */
 
-        // Esto lo mantengo como ya lo tenías (cliente-side con el array cargos)
+        // Esto lo mantengo como ya lo tenÃ­as (cliente-side con el array cargos)
         document.getElementById('tipo_cargo')?.addEventListener('change', function() {
             const tipoCargoId = this.value;
             const cargoSelect = document.getElementById('cargo');
@@ -620,7 +637,7 @@
         });
 
 
-        /* ==================== Sucursal → Cliente (filtro y modal) ==================== */
+        /* ==================== Sucursal â†’ Cliente (filtro y modal) ==================== */
         async function loadClientesPorSucursalEnSelect(
             codigoSucursal,
             selectEl,
@@ -672,7 +689,7 @@
         }
 
 
-        // Inicializar Sucursal→Cliente en el formulario de filtro (arriba)
+        // Inicializar Sucursalâ†’Cliente en el formulario de filtro (arriba)
         document.addEventListener('DOMContentLoaded', () => {
             const sucursalFilter = document.getElementById('sucursal');
             const clienteFilter = document.getElementById('cliente');
@@ -695,13 +712,13 @@
         });
 
 
-        /* ========== TipoPersonal → TipoCargo → CargoSolicitado (solo MODAL) ========== */
+        /* ========== TipoPersonal â†’ TipoCargo â†’ CargoSolicitado (solo MODAL) ========== */
 
         async function fetchTiposCargoPorTipoPersonal(tipoPersonal) {
             if (!tipoPersonal) return [];
 
-            // OJO: aquí NO mapeo ADMIN/OPER porque tú dices que ya usas 01/02.
-            // Si tu select manda texto, ahí sí se mapea (te dejo abajo un extra).
+            // OJO: aquÃ­ NO mapeo ADMIN/OPER porque tÃº dices que ya usas 01/02.
+            // Si tu select manda texto, ahÃ­ sÃ­ se mapea (te dejo abajo un extra).
             try {
                 const url = `${TIPOS_POR_TIPO_PERSONAL_URL}?tipo_personal=${encodeURIComponent(tipoPersonal)}`;
                 const res = await fetch(url, {
@@ -714,7 +731,7 @@
 
                 const data = await res.json();
 
-                // ✅ tu SP devuelve value/label
+                // âœ… tu SP devuelve value/label
                 return (data || []).map(row => ({
                     value: (row.value ?? row.VALUE ?? '').toString().trim(),
                     label: (row.label ?? row.LABEL ?? '').toString().trim(),
@@ -849,7 +866,7 @@
         }
 
 
-        /* ==================== MODAL DE EDICIÓN ==================== */
+        /* ==================== MODAL DE EDICIÃ“N ==================== */
 
         async function openEditModal(url, triggerEl = null) {
             editTriggerEl = triggerEl || document.activeElement;
@@ -879,7 +896,7 @@
                 const html = await res.text();
                 editContent.innerHTML = html;
 
-                // Inicializar lógica del modal (dependencias + toggles)
+                // Inicializar lÃ³gica del modal (dependencias + toggles)
                 initEditModal(editContent);
 
                 const firstEl = editContent.querySelector('[autofocus], input, select, textarea, button');
@@ -947,8 +964,8 @@
                         if (data.success) {
                             Swal.fire({
                                 icon: 'success',
-                                title: '¡Éxito!',
-                                text: '¡Requerimiento actualizado correctamente!',
+                                title: 'Â¡Ã‰xito!',
+                                text: 'Â¡Requerimiento actualizado correctamente!',
                                 confirmButtonColor: '#3085d6',
                                 timer: 1800,
                                 timerProgressBar: true,
@@ -966,22 +983,22 @@
                         }
                     })
                     .catch(err => {
-                        let mensaje = 'Ocurrió un error inesperado.';
+                        let mensaje = 'OcurriÃ³ un error inesperado.';
                         if (err.errors) {
                             mensaje = Object.values(err.errors).flat().join('\n');
                         }
                         Swal.fire({
                             icon: 'error',
-                            title: 'Error de validación',
+                            title: 'Error de validaciÃ³n',
                             text: mensaje,
                             confirmButtonColor: '#d33'
                         });
-                        console.error('Errores de validación:', err.errors || err);
+                        console.error('Errores de validaciÃ³n:', err.errors || err);
                     });
             }
         });
 
-        /* ========== Inicialización interna del MODAL (incluye tus 2 cadenas pedidas) ========== */
+        /* ========== InicializaciÃ³n interna del MODAL (incluye tus 2 cadenas pedidas) ========== */
 
         function initEditModal(root) {
             if (!root) return;
@@ -1005,12 +1022,12 @@
             const expMin = root.querySelector('#experiencia_minima_edit');
             const grado = root.querySelector('#grado_academico_edit');
 
-            // Campos para urgencia automática
-            // Campos para urgencia automática
+            // Campos para urgencia automÃ¡tica
+            // Campos para urgencia automÃ¡tica
             const fechaInicioEdit = root.querySelector('#fecha_inicio_edit');
             const fechaFinEdit = root.querySelector('#fecha_fin_edit');
             const urgenciaSelect = root.querySelector('#urgencia_edit');
-            const urgenciaDiv = root.querySelector('#urgencia_auto_edit'); // pequeño texto debajo del select (opcional)
+            const urgenciaDiv = root.querySelector('#urgencia_auto_edit'); // pequeÃ±o texto debajo del select (opcional)
 
             /*
             const fechaInicioEdit = root.querySelector('#fecha_inicio_edit');
@@ -1020,7 +1037,7 @@
             const baseUrgClasses = urgenciaSelect ? urgenciaSelect.className : '';
             /*
 
-            /* ================== Sucursal → Cliente (modal) ================== */
+            /* ================== Sucursal â†’ Cliente (modal) ================== */
             if (sucursalEdit && clienteEdit) {
                 const msgEl = ensureMsgEl(clienteEdit, 'cliente-edit');
                 const clienteInicial = clienteEdit.dataset.value || clienteEdit.value || '';
@@ -1046,13 +1063,13 @@
                 });
             }
 
-            /* ===== TipoPersonal → TipoCargo → CargoSolicitado (modal) ===== */
+            /* ===== TipoPersonal â†’ TipoCargo â†’ CargoSolicitado (modal) ===== */
             if (tipoPersonalSel && tipoCargoSelect && cargoSelect) {
                 initTipoPersonalChain(tipoPersonalSel, tipoCargoSelect, cargoSelect);
             }
 
-            /* ===== Ubicación (Departamento → Provincia → Distrito) ===== */
-            const setOptions = (select, list, placeholder = 'Selecciona…') => {
+            /* ===== UbicaciÃ³n (Departamento â†’ Provincia â†’ Distrito) ===== */
+            const setOptions = (select, list, placeholder = 'Seleccionaâ€¦') => {
                 if (!select) return;
                 select.innerHTML = `<option value="">${placeholder}</option>`;
                 list.forEach(it => {
@@ -1072,7 +1089,7 @@
                         value: padDigits(p.PROVI_CODIGO, 4),
                         label: p.PROVI_DESCRIPCION
                     }));
-                setOptions(provSelect, list, 'Selecciona…');
+                setOptions(provSelect, list, 'Seleccionaâ€¦');
                 if (preselect) provSelect.value = padDigits(preselect, 4);
             };
 
@@ -1085,7 +1102,7 @@
                         value: padDigits(d.DIST_CODIGO, 6),
                         label: d.DIST_DESCRIPCION
                     }));
-                setOptions(distSelect, list, 'Selecciona…');
+                setOptions(distSelect, list, 'Seleccionaâ€¦');
                 if (preselect) distSelect.value = padDigits(preselect, 6);
             };
 
@@ -1095,7 +1112,7 @@
 
                 depaSelect.addEventListener('change', () => {
                     fillProvincias(depaSelect.value, null);
-                    setOptions(distSelect, [], 'Selecciona…');
+                    setOptions(distSelect, [], 'Seleccionaâ€¦');
                 });
 
                 provSelect.addEventListener('change', () => {
@@ -1132,10 +1149,10 @@
                 togglePerfilPorTipoPersonal(); // inicial
             }
 
-            /* ===== Urgencia automática según fechas (solo modal) ===== */
+            /* ===== Urgencia automÃ¡tica segÃºn fechas (solo modal) ===== */
             if (fechaInicioEdit && fechaFinEdit && urgenciaSelect) {
 
-                // Hacer que NO sea editable, pero que igual se envíe en el form
+                // Hacer que NO sea editable, pero que igual se envÃ­e en el form
                 urgenciaSelect.style.pointerEvents = 'none'; // no se puede abrir con el mouse
                 urgenciaSelect.addEventListener('mousedown', e => e.preventDefault());
                 urgenciaSelect.addEventListener('keydown', e => e.preventDefault());
@@ -1150,8 +1167,8 @@
                             'mt-1 text-xs font-semibold rounded px-2 py-1 inline-block ' + colorClass;
                     }
 
-                    // Valor real que se enviará en el formulario
-                    // (si quieres guardar "Invalida" cámbialo por valor directamente)
+                    // Valor real que se enviarÃ¡ en el formulario
+                    // (si quieres guardar "Invalida" cÃ¡mbialo por valor directamente)
                     if (valor === 'Invalida') {
                         urgenciaSelect.value = '';
                     } else {
@@ -1167,7 +1184,7 @@
                         const diffDias = diffMs / (1000 * 60 * 60 * 24);
 
                         if (isNaN(diffDias) || diffDias < 0) {
-                            setUrgencia("Invalida", "¡Fechas inválidas!", "bg-gray-400 text-white");
+                            setUrgencia("Invalida", "Â¡Fechas invÃ¡lidas!", "bg-gray-400 text-white");
                         } else if (diffDias <= 7) {
                             setUrgencia("Alta", "Nivel de urgencia: Alta (1 semana)", "bg-red-500 text-white");
                         } else if (diffDias > 7 && diffDias <= 14) {
@@ -1178,7 +1195,7 @@
                             setUrgencia("Mayor", "Plazo mayor a 1 mes", "bg-blue-400 text-white");
                         }
                     } else {
-                        setUrgencia("", "NO SE SELECCIONÓ LA FECHA", "bg-gray-200 text-gray-700");
+                        setUrgencia("", "NO SE SELECCIONÃ“ LA FECHA", "bg-gray-200 text-gray-700");
                     }
                 }
 
@@ -1189,8 +1206,8 @@
                 // Inicializar al abrir el modal (por si ya trae fechas)
                 calcularUrgencia();
             }
-
         }
+
     </script>
 
     <style>
@@ -1228,7 +1245,7 @@
             z-index: 1;
         }
 
-        /* Estilos para el Modal de Edición - Mejorados */
+        /* Estilos para el Modal de EdiciÃ³n - Mejorados */
         #edit-modal-content {
             background-color: #ffffff;
             color: #111827;
@@ -1330,3 +1347,7 @@
     </style>
 
 @endsection
+
+
+
+

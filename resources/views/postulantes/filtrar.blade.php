@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('module', 'postulantes')
 
@@ -47,7 +47,7 @@
                 <div class="flex items-start justify-between gap-4 flex-wrap">
                     <div class="min-w-0">
                         <h1 class="text-xl sm:text-2xl font-extrabold text-white tracking-wide">Listado de Postulantes</h1>
-                        <p class="text-sm text-white/70 mt-1">Ver y filtrar postulantes según diferentes criterios</p>
+                        <p class="text-sm text-white/70 mt-1">Ver y filtrar postulantes segÃºn diferentes criterios</p>
                     </div>
 
                     <div class="flex items-center gap-2 flex-wrap">
@@ -239,8 +239,9 @@
                         <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">DNI</th>
                         <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Nacionalidad</th>
                         <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Experiencia</th>
-                        <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">SUCAMEC</th>
-                        <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Grado de Instrucción
+                        <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Curso SUCAMEC</th>
+                        <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">CarnÃ© SUCAMEC</th>
+                        <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Grado de InstrucciÃ³n
                         </th>
                         <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Celular</th>
                         <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Licencia de Arma L4
@@ -272,7 +273,7 @@
                             </td>
 
                             <td class="px-6 py-4">
-                                <p class="text-gray-700 text-center">{{ ucfirst($postulante->edad) }} años</p>
+                                <p class="text-gray-700 text-center">{{ ucfirst($postulante->edad) }} aÃ±os</p>
                             </td>
 
                             <td class="px-6 py-4">
@@ -289,6 +290,10 @@
 
                             <td class="px-6 py-4">
                                 <p class="text-gray-700 text-center">{{ $postulante->sucamec ?: '-' }}</p>
+                            </td>
+
+                            <td class="px-6 py-4">
+                                <p class="text-gray-700 text-center">{{ $postulante->carne_sucamec ?: '-' }}</p>
                             </td>
 
                             <td class="px-6 py-4">
@@ -332,49 +337,47 @@
                                 @endif
                             </td>
 
-                            <td class="h-full">
-                                <div class="flex flex-col justify-center items-center gap-2 h-full">
-                                    <!-- Botón Validar -->
+                            <td class="px-4 py-3 align-middle">
+                                <div class="flex items-center justify-center gap-2">
                                     <button data-id="{{ $postulante->id }}"
                                         data-nombre="{{ $postulante->nombres }} {{ $postulante->apellidos }}"
-                                        class="btn-validar flex items-center justify-center w-24 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-600 transition"
+                                        class="btn-validar inline-flex items-center justify-center h-8 px-3 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-600 transition"
                                         title="Validar documentos">
-                                        <i class="fa-solid fa-clipboard-check mr-2"></i> Validar
+                                        <i class="fa-solid fa-clipboard-check mr-2"></i>
                                     </button>
 
-                                    <!-- Botón Editar -->
                                     <button data-id="{{ $postulante->id }}"
-                                        class="btn-edit flex items-center justify-center w-24 py-1 rounded-lg bg-green-50 hover:bg-green-100 text-green-600 transition"
+                                        class="btn-edit inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-50 hover:bg-green-100 text-green-600 transition"
                                         title="Editar">
-                                        <i class="fas fa-edit mr-2"></i> Editar
+                                        <i class="fas fa-edit"></i>
                                     </button>
 
-                                    <!-- Botón Eliminar -->
                                     <button onclick="eliminarPostulante({{ $postulante->id }})"
-                                        class="flex items-center justify-center w-24 py-1 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition"
+                                        class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-50 hover:bg-red-100 text-red-600 transition"
                                         title="Eliminar">
-                                        <i class="fas fa-trash mr-2"></i> Eliminar
+                                        <i class="fas fa-trash"></i>
                                     </button>
                                 </div>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-4 py-6 text-center text-gray-500">No se encontraron
-                                resultados.</td>
+                            <td colspan="6" class="px-4 py-6 text-center text-gray-500">No se encontraron resultados.</td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
 
-        {{-- Modales (eliminación, edición, validación) --}}
-        {{-- Modal de Eliminación --}}
+        {{-- Modales (eliminaciÃ³n, ediciÃ³n, validaciÃ³n) --}}
+        {{-- Modal de EliminaciÃ³n --}}
         <div id="delete-modal"
-            class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md" role="dialog"
-            aria-modal="true" aria-labelledby="delete-title" aria-describedby="delete-desc">
+            class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md"
+            role="dialog" aria-modal="true" aria-labelledby="delete-title" aria-describedby="delete-desc">
             <!-- Panel -->
-            <div class="bg-white w-full max-w-md mx-4 rounded-2xl shadow-2xl border-2 border-red-100 p-8 opacity-0 translate-y-2 transition-all duration-300 ease-out data-[open=true]:opacity-100 data-[open=true]:translate-y-0"
+            <div class="bg-white w-full max-w-md mx-4 rounded-2xl shadow-2xl border-2 border-red-100 p-8
+       opacity-0 translate-y-2 transition-all duration-300 ease-out
+       data-[open=true]:opacity-100 data-[open=true]:translate-y-0"
                 id="delete-panel" data-open="true">
                 <!-- Encabezado -->
                 <div class="text-center mb-6">
@@ -384,10 +387,10 @@
                         </div>
                     </div>
                     <h3 id="delete-title" class="text-2xl font-bold text-gray-900 mb-2">¿Eliminar postulante?</h3>
-                    <p id="delete-desc" class="text-base text-gray-700 leading-relaxed">Esta acción no se puede deshacer. Por favor, confirma que deseas eliminar este postulante.</p>
+                    <p id="delete-desc" class="text-base text-gray-700 leading-relaxed">Esta accion no se puede deshacer. Confirma que deseas eliminar este postulante.</p>
                 </div>
 
-                <!-- Línea separadora -->
+                <!-- LÃ­nea separadora -->
                 <div class="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent my-6"></div>
 
                 <!-- Botones -->
@@ -405,67 +408,88 @@
             </div>
         </div>
 
-        {{-- Modal de Edición --}}
+        {{-- Modal de EdiciÃ³n --}}
         <div id="edit-modal" class="hidden fixed inset-0 z-50 items-center justify-center bg-black/50 backdrop-blur-sm">
             <div id="edit-panel"
                 class="panel-light w-full max-w-3xl mx-4 rounded-2xl shadow-2xl border border-gray-100 max-h-[90vh] overflow-y-auto opacity-0 scale-95 transition duration-200 ease-out data-[open=true]:opacity-100 data-[open=true]:scale-100">
-                <div id="edit-modal-content"><!-- aquí se inyecta el formulario --></div>
+                <div id="edit-modal-content"><!-- aquÃ­ se inyecta el formulario --></div>
             </div>
         </div>
 
-        {{-- Modal de Validación --}}
+        {{-- Modal de ValidaciÃ³n --}}
         <div id="validar-modal"
-            class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" role="dialog"
+            class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md" role="dialog"
             aria-modal="true" aria-labelledby="validar-title" aria-describedby="validar-desc">
             <div
-                class="panel-light p-6 rounded-2xl w-full max-w-md shadow-2xl border border-gray-100 mx-4 focus:outline-none focus-visible:ring focus-visible:ring-emerald-200">
+                class="bg-white w-full max-w-md mx-4 rounded-2xl shadow-2xl border-2 border-emerald-100 p-8
+           opacity-0 translate-y-2 transition-all duration-300 ease-out
+           data-[open=true]:opacity-100 data-[open=true]:translate-y-0"
+                id="validar-panel" data-open="true">
 
                 <!-- Encabezado -->
-                <h3 id="validar-title" class="text-lg font-semibold mb-4 flex items-center gap-2">
-                    <i class="fa-solid fa-clipboard-check text-emerald-600"></i>
-                    Validar: <span id="val-nombre" class="font-normal text-gray-700"></span>
-                </h3>
-                <p id="validar-desc" class="sr-only">Selecciona el resultado de validación y agrega comentario si
-                    corresponde.</p>
+                <div class="text-center mb-6">
+                    <div class="flex justify-center mb-4">
+                        <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-100 to-emerald-50 border-2 border-emerald-200">
+                            <i class="fa-solid fa-clipboard-check text-emerald-600 text-2xl"></i>
+                        </div>
+                    </div>
+                    <h3 id="validar-title" class="text-2xl font-bold text-gray-900 mb-2">Validar Postulante</h3>
+                    <p id="validar-desc" class="text-base text-gray-700 leading-relaxed"><span id="val-nombre" class="font-semibold text-emerald-700"></span></p>
+                </div>
+
+                <!-- LÃ­nea separadora -->
+                <div class="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent my-6"></div>
 
                 <!-- Formulario -->
-                <form id="form-validar" method="POST" class="space-y-4" autocomplete="off">
+                <form id="form-validar" method="POST" class="space-y-5" autocomplete="off">
                     @csrf
 
                     <!-- Opciones de radio -->
-                    <fieldset class="space-y-2">
-                        <legend class="sr-only">Resultado</legend>
-                        <label
-                            class="flex items-center gap-2 p-2 rounded-lg border hover:bg-gray-50 cursor-pointer transition">
-                            <input type="radio" name="decision" value="apto" class="accent-emerald-600" checked>
-                            <span class="text-gray-800 font-medium">Apto</span>
+                    <fieldset class="space-y-3">
+                        <legend class="text-sm font-semibold text-gray-900 mb-3">Resultado de validación</legend>
+                        
+                        <label class="flex items-center gap-3 p-4 rounded-xl border-2 border-gray-200 hover:border-emerald-300 hover:bg-emerald-50 cursor-pointer transition-all">
+                            <input type="radio" name="decision" value="apto" class="w-5 h-5 accent-emerald-600" checked>
+                            <span class="flex-1">
+                                <span class="text-gray-900 font-semibold">Apto</span>
+                                <span class="text-xs text-gray-500 block">Postulante cumple los requisitos</span>
+                            </span>
+                            <i class="fas fa-check-circle text-emerald-600 text-lg"></i>
                         </label>
-                        <label
-                            class="flex items-center gap-2 p-2 rounded-lg border hover:bg-gray-50 cursor-pointer transition">
-                            <input type="radio" name="decision" value="no_apto" class="accent-red-600">
-                            <span class="text-gray-800 font-medium">No apto</span>
+                        
+                        <label class="flex items-center gap-3 p-4 rounded-xl border-2 border-gray-200 hover:border-red-300 hover:bg-red-50 cursor-pointer transition-all">
+                            <input type="radio" name="decision" value="no_apto" class="w-5 h-5 accent-red-600">
+                            <span class="flex-1">
+                                <span class="text-gray-900 font-semibold">No apto</span>
+                                <span class="text-xs text-gray-500 block">Postulante no cumple requisitos</span>
+                            </span>
+                            <i class="fas fa-times-circle text-red-600 text-lg"></i>
                         </label>
                     </fieldset>
 
                     <!-- Comentario -->
                     <div>
-                        <label for="comentario-no-apto" class="block text-sm font-medium text-gray-600 mb-1">
-                            Comentario <span class="text-gray-400">(obligatorio si es No apto)</span>
+                        <label for="comentario-no-apto" class="block text-sm font-semibold text-gray-900 mb-2">
+                            Comentario o Notas
+                            <span class="text-gray-500 font-normal">(obligatorio si es No apto)</span>
                         </label>
-                        <textarea name="comentario" id="comentario-no-apto" rows="3" maxlength="300"
-                            class="w-full border border-gray-300 rounded-lg p-2 placeholder:text-gray-400 focus:border-emerald-500 focus:ring focus:ring-emerald-200 transition resize-none"
+                        <textarea name="comentario" id="comentario-no-apto" rows="4" maxlength="300"
+                            class="w-full bg-white border-2 border-gray-200 rounded-xl p-3 text-gray-900 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all resize-none"
                             placeholder="Motivo o notas (máx. 300 caracteres)"></textarea>
+                        <div class="text-xs text-gray-500 mt-1">
+                            <span id="char-count">0</span>/300 caracteres
+                        </div>
                     </div>
 
                     <!-- Botones -->
-                    <div class="flex justify-end gap-3 pt-3 border-t border-gray-100">
+                    <div class="flex justify-center gap-3 pt-2 mt-6">
                         <button type="button" onclick="cerrarValidar()"
-                            class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700 focus:outline-none focus:ring focus:ring-gray-300 transition">
-                            Cancelar
+                            class="px-6 py-3 rounded-lg font-semibold text-gray-800 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 transition-all duration-200 min-w-[120px]">
+                            <i class="fas fa-times mr-2"></i>Cancelar
                         </button>
                         <button type="submit"
-                            class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white focus:outline-none focus:ring focus:ring-emerald-300 transition">
-                            Guardar
+                            class="px-6 py-3 rounded-lg font-semibold text-white bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-all duration-200 min-w-[120px]">
+                            <i class="fas fa-save mr-2"></i>Guardar
                         </button>
                     </div>
                 </form>
@@ -531,11 +555,11 @@
             // Bloquear scroll del fondo
             document.body.style.overflow = 'hidden';
 
-            // Forzar reflow para que la transición se aplique
+            // Forzar reflow para que la transiciÃ³n se aplique
             void panel.offsetWidth;
             panel.setAttribute('data-open', 'true');
 
-            // Foco al botón más seguro (Cancelar)
+            // Foco al botÃ³n mÃ¡s seguro (Cancelar)
             setTimeout(() => {
                 btnCancelar?.focus();
             }, 0);
@@ -553,7 +577,7 @@
         function closeDeleteModal() {
             deletePostulanteId = null;
 
-            // Animación de salida
+            // AnimaciÃ³n de salida
             panel.setAttribute('data-open', 'false');
 
             // Habilitar de nuevo botones y texto original si estaba cargando
@@ -566,7 +590,7 @@
             // Devolver scroll
             document.body.style.overflow = '';
 
-            // Ocultar después de la duración de la transición (200ms)
+            // Ocultar despuÃ©s de la duraciÃ³n de la transiciÃ³n (200ms)
             setTimeout(() => {
                 modal.classList.add('hidden');
                 modal.classList.remove('flex');
@@ -595,11 +619,11 @@
                 return;
             }
 
-            // Estado de carga
             const prevEliminarText = btnEliminar?.textContent;
             btnEliminar.disabled = true;
             btnCancelar.disabled = true;
-            btnEliminar.textContent = 'Eliminando…';
+            btnEliminar.textContent = 'Eliminando...';
+            let deleted = false;
 
             try {
                 const res = await fetch(`/postulantes/${deletePostulanteId}`, {
@@ -612,7 +636,6 @@
                     },
                 });
 
-                // Si tu backend devuelve 204 No Content, evita .json()
                 let data = null;
                 const contentType = res.headers.get('Content-Type') || '';
                 if (contentType.includes('application/json')) {
@@ -620,17 +643,32 @@
                 }
 
                 if (res.ok && (!data || data.success !== false)) {
-                    // éxito: recarga o elimina fila de la tabla si quieres hacerlo sin recargar
-                    window.location.reload();
+                    deleted = true;
+                    closeDeleteModal();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Postulante eliminado',
+                        text: 'Se elimino el postulante correctamente.',
+                        timer: 1600,
+                        timerProgressBar: true,
+                        showConfirmButton: false,
+                    }).then(() => window.location.reload());
                     return;
-                } else {
-                    alert((data && data.message) ? data.message : 'Error al eliminar');
                 }
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error al eliminar',
+                    text: (data && data.message) ? data.message : 'No se pudo eliminar el postulante.',
+                });
             } catch (err) {
-                alert('Error al eliminar');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error al eliminar',
+                    text: 'No se pudo eliminar el postulante.',
+                });
             } finally {
-                // Si no recargó (hubo error), restauro y cierro
-                if (!document.hidden) {
+                if (!document.hidden && !deleted) {
                     if (prevEliminarText) btnEliminar.textContent = prevEliminarText;
                     btnEliminar.disabled = false;
                     btnCancelar.disabled = false;
@@ -648,7 +686,7 @@
             }
         }
 
-        // Filtrar cargos dinámicamente en el filtro principal
+        // Filtrar cargos dinÃ¡micamente en el filtro principal
         document.getElementById('tipo_cargo').addEventListener('change', function() {
             const tipoCargoId = this.value;
             const cargoSelect = document.getElementById('cargo');
@@ -754,7 +792,7 @@
 
 
         function closeEditModal() {
-            // Animación de salida
+            // AnimaciÃ³n de salida
             if (editPanel) editPanel.setAttribute('data-open', 'false');
 
             // Quitar listeners y devolver scroll
@@ -762,7 +800,7 @@
             editModal.removeEventListener('mousedown', onEditBackdropClick);
             document.body.style.overflow = '';
 
-            // Ocultar tras la duración de la animación (200ms)
+            // Ocultar tras la duraciÃ³n de la animaciÃ³n (200ms)
             setTimeout(() => {
                 editModal.classList.add('hidden');
                 editModal.classList.remove('flex');
@@ -780,7 +818,7 @@
             if (!editPanel?.contains(e.target)) closeEditModal();
         }
 
-        // Conectar los botones "Editar" a la nueva función
+        // Conectar los botones "Editar" a la nueva funciÃ³n
         document.querySelectorAll('.btn-edit').forEach(btn => {
             btn.addEventListener('click', () => {
                 const id = btn.dataset.id;
@@ -810,8 +848,8 @@
                         if (data.success) {
                             Swal.fire({
                                 icon: 'success',
-                                title: '¡Éxito!',
-                                text: '¡Postulante actualizado correctamente!',
+                                title: 'Â¡Ã‰xito!',
+                                text: 'Â¡Postulante actualizado correctamente!',
                                 confirmButtonColor: '#3085d6',
                                 timer: 1800,
                                 timerProgressBar: true,
@@ -831,17 +869,17 @@
                         }
                     })
                     .catch(err => {
-                        let mensaje = 'Ocurrió un error inesperado.';
+                        let mensaje = 'OcurriÃ³ un error inesperado.';
                         if (err.errors) {
                             mensaje = Object.values(err.errors).flat().join('\n');
                         }
                         Swal.fire({
                             icon: 'error',
-                            title: 'Error de validación',
+                            title: 'Error de validaciÃ³n',
                             text: mensaje,
                             confirmButtonColor: '#d33'
                         });
-                        console.error('Errores de validación:', err.errors || err);
+                        console.error('Errores de validaciÃ³n:', err.errors || err);
                     });
             }
         });
@@ -863,18 +901,51 @@
                 form.reset();
                 document.querySelector('input[name="decision"][value="apto"]').checked = true;
                 document.getElementById('comentario-no-apto').removeAttribute('required');
+                document.getElementById('char-count').textContent = '0';
 
                 // abrir modal
                 const m = document.getElementById('validar-modal');
+                const panel = document.getElementById('validar-panel');
                 m.classList.remove('hidden');
                 m.classList.add('flex');
+                document.body.style.overflow = 'hidden';
+                
+                void panel.offsetWidth;
+                panel.setAttribute('data-open', 'true');
+                
+                setTimeout(() => {
+                    document.querySelector('input[name="decision"]')?.focus();
+                }, 0);
+                
+                m.addEventListener('mousedown', onValidarBackdropClick);
+                document.addEventListener('keydown', onValidarEsc);
             });
         });
 
         function cerrarValidar() {
             const m = document.getElementById('validar-modal');
-            m.classList.add('hidden');
-            m.classList.remove('flex');
+            const panel = document.getElementById('validar-panel');
+            
+            panel.setAttribute('data-open', 'false');
+            
+            document.removeEventListener('keydown', onValidarEsc);
+            m.removeEventListener('mousedown', onValidarBackdropClick);
+            document.body.style.overflow = '';
+            
+            setTimeout(() => {
+                m.classList.add('hidden');
+                m.classList.remove('flex');
+            }, 300);
+        }
+
+        function onValidarEsc(e) {
+            if (e.key === 'Escape') cerrarValidar();
+        }
+
+        function onValidarBackdropClick(e) {
+            const m = document.getElementById('validar-modal');
+            const panel = document.getElementById('validar-panel');
+            if (!panel?.contains(e.target)) cerrarValidar();
         }
 
         // Requerir comentario si "no_apto"
@@ -886,6 +957,14 @@
                 else txt.removeAttribute('required');
             }
         });
+
+        // Contador de caracteres
+        const comentarioTextarea = document.getElementById('comentario-no-apto');
+        if (comentarioTextarea) {
+            comentarioTextarea.addEventListener('input', function() {
+                document.getElementById('char-count').textContent = this.value.length;
+            });
+        }
 
 
         function handleFileUpload(input, previewId) {
@@ -900,13 +979,13 @@
             input.classList.remove("border-red-500");
             if (fileName) fileName.textContent = "";
 
-            if (!file) return; // usuario canceló
+            if (!file) return; // usuario cancelÃ³
 
             if (file.size > maxBytes) {
                 Swal.fire({
                     icon: "error",
                     title: "Archivo demasiado grande",
-                    text: `El archivo supera el límite de ${maxMB} MB. Por favor elige otro.`,
+                    text: `El archivo supera el lÃ­mite de ${maxMB} MB. Por favor elige otro.`,
                     width: 500,
                     padding: '2rem',
                     confirmButtonColor: "#d33",
@@ -921,7 +1000,6 @@
             if (preview) preview.classList.remove("hidden");
         }
 
-
         function initEditForm(root) {
             // Elementos del modal
             const tipoSel = root.querySelector('#tipo_cargo_edit');
@@ -932,71 +1010,94 @@
             if (!tipoSel || !cargoSel || !depaSel || !provSel || !distSel) return;
 
             // Helpers
-            const pad = (v, l) => (v == null ? '' : String(v).replace(/\D+/g, '').padStart(l, '0', ));
-            const setOptions = (select, items, valueKey, labelKey, placeholder) => {
+            const pad = (v, l) =>
+                (v == null || v === '') ? '' : String(v).replace(/\D+/g, '').padStart(l, '0');
+
+            const setOptions = (select, list, placeholder = 'Seleccionaâ€¦') => {
                 select.innerHTML = `<option value="">${placeholder}</option>`;
-                items.forEach(it => {
+                list.forEach(it => {
                     const opt = document.createElement('option');
-                    opt.value = it[valueKey];
-                    opt.textContent = it[labelKey];
+                    opt.value = String(it.value ?? '');
+                    opt.textContent = String(it.label ?? '');
                     select.appendChild(opt);
                 });
             };
 
+            // âœ… CLAVE: cargo (CODI_CARG) siempre a 4 dÃ­gitos, igual que data-value del blade
             const fillCargos = (tipo, preselect = null) => {
                 const t = pad(tipo, 2);
+
                 const list = cargos
                     .filter(c => pad(c.TIPO_CARG, 2) === t)
                     .map(c => ({
-                        value: c.CODI_CARG,
+                        value: pad(c.CODI_CARG, 4),
                         label: c.DESC_CARGO
                     }));
-                setOptions(cargoSel, list, 'value', 'label', 'Selecciona el cargo');
-                if (preselect) cargoSel.value = String(preselect);
+
+                setOptions(cargoSel, list, 'Selecciona el cargo');
+
+                // preselect: primero data-value, sino el value actual
+                const v = pad(preselect, 4);
+                if (v) cargoSel.value = v;
             };
 
             const fillProvs = (depa, preselect = null) => {
                 const d = pad(depa, 2);
+
                 const list = provincias
                     .filter(p => pad(p.DEPA_CODIGO, 2) === d)
                     .map(p => ({
                         value: pad(p.PROVI_CODIGO, 4),
                         label: p.PROVI_DESCRIPCION
                     }));
-                setOptions(provSel, list, 'value', 'label', 'Selecciona…');
-                if (preselect) provSel.value = pad(preselect, 4);
+
+                setOptions(provSel, list, 'Seleccionaâ€¦');
+
+                const v = pad(preselect, 4);
+                if (v) provSel.value = v;
             };
 
             const fillDists = (prov, preselect = null) => {
                 const p = pad(prov, 4);
+
                 const list = distritos
                     .filter(d => pad(d.PROVI_CODIGO, 4) === p)
                     .map(d => ({
                         value: pad(d.DIST_CODIGO, 6),
                         label: d.DIST_DESCRIPCION
                     }));
-                setOptions(distSel, list, 'value', 'label', 'Selecciona…');
-                if (preselect) distSel.value = pad(preselect, 6);
+
+                setOptions(distSel, list, 'Seleccionaâ€¦');
+
+                const v = pad(preselect, 6);
+                if (v) distSel.value = v;
             };
 
-            // Estado inicial usando los data-value del parcial
-            fillCargos(tipoSel.value, cargoSel.dataset.value || null);
-            fillProvs(depaSel.value, provSel.dataset.value || null);
-            fillDists(provSel.value, distSel.dataset.value || null);
+            // Estado inicial usando data-value del parcial (o value actual como fallback)
+            fillCargos(tipoSel.value, cargoSel.dataset.value || cargoSel.value || '');
+            fillProvs(depaSel.value, provSel.dataset.value || provSel.value || '');
+            fillDists(provSel.value, distSel.dataset.value || distSel.value || '');
 
             // Listeners en el modal
             tipoSel.addEventListener('change', () => {
-                fillCargos(tipoSel.value, null); // recarga cargos y limpia selección
+                fillCargos(tipoSel.value, ''); // recarga cargos y limpia selecciÃ³n
             });
+
             depaSel.addEventListener('change', () => {
-                fillProvs(depaSel.value, null); // recarga provincias
-                setOptions(distSel, [], 'value', 'label', 'Selecciona…'); // limpia distritos
+                fillProvs(depaSel.value, ''); // recarga provincias
+                setOptions(distSel, [], 'Seleccionaâ€¦'); // limpia distritos
             });
+
             provSel.addEventListener('change', () => {
-                fillDists(provSel.value, null); // recarga distritos
+                fillDists(provSel.value, ''); // recarga distritos
             });
         }
     </script>
-
-
 @endsection
+
+
+
+
+
+
+

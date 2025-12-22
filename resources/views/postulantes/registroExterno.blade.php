@@ -485,6 +485,47 @@
             let currentStep = 1;
             const totalSteps = 3;
 
+            function showStep(stepNumber) {
+                for (let i = 1; i <= totalSteps; i++) {
+                    const stepEl = document.getElementById(`step-${i}`);
+                    if (!stepEl) continue;
+                    stepEl.classList.toggle('hidden', i !== stepNumber);
+                }
+                currentStep = stepNumber;
+                updateProgressBar();
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+                const form = document.getElementById('postulanteForm');
+                if (!form) return;
+
+                form.addEventListener('submit', function(e) {
+                    if (form.checkValidity()) return;
+
+                    e.preventDefault();
+                    const firstInvalid = form.querySelector(':invalid');
+                    if (firstInvalid) {
+                        const stepEl = firstInvalid.closest('.form-step');
+                        if (stepEl?.id) {
+                            const stepNum = parseInt(stepEl.id.replace('step-', ''), 10);
+                            if (!Number.isNaN(stepNum)) {
+                                showStep(stepNum);
+                            }
+                        }
+                        firstInvalid.focus({
+                            preventScroll: true
+                        });
+                        if (typeof firstInvalid.reportValidity === 'function') {
+                            firstInvalid.reportValidity();
+                        }
+                    }
+                });
+            });
+
             // ========== VERIFICAR ERROR DE DUPLICADO AL CARGAR ==========
             document.addEventListener('DOMContentLoaded', function() {
                 @if (session('duplicate_entry'))
@@ -723,22 +764,14 @@
             function nextStep() {
                 if (validateCurrentStep()) {
                     if (currentStep < totalSteps) {
-                        document.getElementById(`step-${currentStep}`).classList.add('hidden');
-                        currentStep++;
-                        document.getElementById(`step-${currentStep}`).classList.remove('hidden');
-                        updateProgressBar();
-                        window.scrollTo(0, 0);
+                        showStep(currentStep + 1);
                     }
                 }
             }
 
             function prevStep() {
                 if (currentStep > 1) {
-                    document.getElementById(`step-${currentStep}`).classList.add('hidden');
-                    currentStep--;
-                    document.getElementById(`step-${currentStep}`).classList.remove('hidden');
-                    updateProgressBar();
-                    window.scrollTo(0, 0);
+                    showStep(currentStep - 1);
                 }
             }
 
@@ -865,3 +898,4 @@
         }
     </style>
 @endsection
+

@@ -227,6 +227,10 @@ class PostulanteController extends Controller
             'cul'               => 'Certificado Único Laboral (PDF)',
         ]);
 
+        // Evita registros duplicados en una misma peticion antes de guardar archivos
+        if (Postulante::where('dni', $validated['dni'])->exists()) {
+            return back()->withInput()->with('duplicate_entry', true);
+        }
         /* ================= NORMALIZAR CAMPOS OPERATIVOS ================= */
 
         if ($esOperativo) {
@@ -271,8 +275,6 @@ class PostulanteController extends Controller
             'licencia_arma'       => $validated['licencia_arma'],
             'licencia_conducir'   => $validated['licencia_conducir'],
         ]);
-
-        DB::transaction(fn() => Postulante::create($validated));
 
         //return back()->with('success', 'Información guardada');
         $postulante = DB::transaction(function () use ($validated) {
@@ -752,6 +754,10 @@ class PostulanteController extends Controller
             'cul'               => 'Certificado Único Laboral (PDF)',
         ]);
 
+        // Evita registros duplicados en una misma peticion antes de guardar archivos
+        if (Postulante::where('dni', $validated['dni'])->exists()) {
+            return back()->withInput()->with('duplicate_entry', true);
+        }
         /* ================= NORMALIZAR CAMPOS OPERATIVOS ================= */
 
         if ($esOperativo) {
@@ -779,7 +785,7 @@ class PostulanteController extends Controller
 
         $validated['requerimiento_id']     = $requerimiento->id;
         $validated['tipo_cargo']           = $requerimiento->tipo_cargo;
-        $validated['cargo']                = $requerimiento->cargo;
+        $validated['cargo']                = $requerimiento->cargo_solicitado;
         $validated['tipo_personal_codigo'] = $tipoCodigo;            // ya corregido
         $validated['tipo_personal']        = $requerimiento->tipo_personal;
 
@@ -997,10 +1003,7 @@ class PostulanteController extends Controller
         $tipoCargos    = TipoCargo::forSelect();      // [CODI_TIPO_CARG => DESC_TIPO_CARG]
 
         // Cargos vigentes (si ya tiene tipo_cargo, los filtramos para el select)
-        $cargos = Cargo::vigentes()
-            ->when($postulante->tipo_cargo, fn($q) => $q->porTipo($postulante->tipo_cargo))
-            ->get(['CODI_CARG', 'DESC_CARGO', 'TIPO_CARG'])
-            ->keyBy('CODI_CARG');
+        $cargos = Cargo::forSelectByTipo($postulante->tipo_cargo); // [CODI_CARG => DESC_CARGO]
 
         // Normalizador para códigos numéricos (rellena con ceros)
         $pad = function ($val, int $len) {
@@ -1031,6 +1034,10 @@ class PostulanteController extends Controller
             })
             ->keyBy('DIST_CODIGO');
 
+        $cargoCod = $postulante->cargo; // o $postulante->cargo_id según tu campo real
+        $carneSucamec = $postulante->carne_sucamec;
+
+
         // IMPORTANTe: devolvemos también los catálogos que el partial usa
         return view('postulantes.partials.form-edit', compact(
             'postulante',
@@ -1038,7 +1045,9 @@ class PostulanteController extends Controller
             'tipoCargos',
             'cargos',
             'provincias',
-            'distritos'
+            'distritos',
+            'cargoCod',
+            'carneSucamec'
         ));
     }
 
@@ -1806,3 +1815,4 @@ class PostulanteController extends Controller
         ]);
     }
 }
+

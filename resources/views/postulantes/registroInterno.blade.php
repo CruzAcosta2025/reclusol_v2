@@ -63,7 +63,7 @@
         @endif
 
         <form method="POST" action="{{ route('postulantes.storeInterno') }}" enctype="multipart/form-data"
-            class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" id="postulanteForm">
+            class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" id="postulanteForm" novalidate>
             @csrf
             <!-- Step 1: Información Personal -->
             <div id="step-1" class="form-step">
@@ -342,7 +342,7 @@
 
                         <!-- SUCAMEC -->
                         <div class="space-y-2">
-                            <label for="sucamec" class="block text-xs sm:text-sm font-semibold text-gray-700">
+                            <label for="carne_sucamec" class="block text-xs sm:text-sm font-semibold text-gray-700">
                                 <i class="fas fa-shield-alt mr-2 text-green-500"></i>
                                 Carné SUCAMEC vigente *
                             </label>
@@ -385,16 +385,16 @@
                                 class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all duration-300">
                                 <option value="">Seleccione...</option>
                                 <option value="NO">NO</option>
-                                <option value="A_I">A-I</option>
+                                <option value="A-I">A-I</option>
                                 <option value="A-IIa">A-IIa</option>
                                 <option value="A-IIb">A-IIb</option>
                                 <option value="A-IIIa">A-IIIa</option>
-                                <option value="A-IIIB">A-IIIb</option>
-                                <option value="A-IIc">A-IIC</option>
+                                <option value="A-IIIb">A-IIIb</option>
+                                <option value="A-IIc">A-IIc</option>
                                 <option value="B-I">B-I</option>
                                 <option value="B-IIa">B-IIa</option>
                                 <option value="B-IIb">B-IIb</option>
-                                <option value="B-IIC">B-IIC</option>
+                                <option value="B-IIc">B-IIc</option>
                             </select>
                             <span class="error-message text-red-500 text-sm hidden"></span>
                         </div>
@@ -517,6 +517,55 @@
     <script>
         let currentStep = 1;
         const totalSteps = 3;
+
+        function showStep(stepNumber) {
+            for (let i = 1; i <= totalSteps; i++) {
+                const stepEl = document.getElementById(`step-${i}`);
+                if (!stepEl) continue;
+                stepEl.classList.toggle('hidden', i !== stepNumber);
+            }
+            currentStep = stepNumber;
+            updateProgressBar();
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('postulanteForm');
+            if (!form) return;
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault(); // siempre
+
+                // Si todo está OK, envía de verdad
+                if (form.checkValidity()) {
+                    document.getElementById('loading-overlay')?.classList.remove('hidden');
+                    form.submit(); // OJO: submit() NO dispara validación nativa
+                    return;
+                }
+
+                // Si hay inválidos, vamos al paso correspondiente
+                const firstInvalid = form.querySelector(':invalid');
+                if (!firstInvalid) return;
+
+                const stepEl = firstInvalid.closest('.form-step');
+                if (stepEl?.id) {
+                    const stepNum = parseInt(stepEl.id.replace('step-', ''), 10);
+                    if (!Number.isNaN(stepNum)) showStep(stepNum);
+                }
+
+                // Espera un frame para que se quite el hidden y recién enfoca
+                requestAnimationFrame(() => {
+                    firstInvalid.focus({
+                        preventScroll: true
+                    });
+                    firstInvalid.reportValidity?.();
+                });
+            });
+        });
+
 
         // ========== VERIFICAR ERROR DE DUPLICADO AL CARGAR ==========
         document.addEventListener('DOMContentLoaded', function() {
@@ -770,14 +819,7 @@
             if (validateCurrentStep()) {
                 if (currentStep < totalSteps) {
                     console.log('Validación OK. Ocultando step-', currentStep, 'Mostrando step-', currentStep + 1);
-                    document.getElementById(`step-${currentStep}`).classList.add('hidden');
-                    currentStep++;
-                    document.getElementById(`step-${currentStep}`).classList.remove('hidden');
-                    updateProgressBar();
-                    window.scrollTo({
-                        top: 0,
-                        behavior: 'smooth'
-                    });
+                    showStep(currentStep + 1);
 
                 }
             } else {
@@ -787,11 +829,7 @@
 
         function prevStep() {
             if (currentStep > 1) {
-                document.getElementById(`step-${currentStep}`).classList.add('hidden');
-                currentStep--;
-                document.getElementById(`step-${currentStep}`).classList.remove('hidden');
-                updateProgressBar();
-                window.scrollTo(0, 0);
+                showStep(currentStep - 1);
             }
         }
 
