@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use App\Models\Requerimiento;
 use App\Models\EstadoRequerimiento;
@@ -25,7 +26,7 @@ class RequerimientosRepository implements RequerimientosRepositoryInterface
         $this->modelo = $modelo;
     }
 
-    public function getAll(): Collection
+        public function getAll(): Collection
     {
         return Requerimiento::all();
     }
@@ -34,6 +35,41 @@ class RequerimientosRepository implements RequerimientosRepositoryInterface
     {
         return $this->modelo->find($id);
     }
+
+     /**
+     * Listar requerimientos
+     */
+    /* public function all(): Collection
+    {
+        return $this->model
+            ->with(['usuario', 'estado'])
+            ->orderBy('id', 'desc')
+            ->get();
+    }
+
+
+    public function find(int $id): ?Requerimiento
+    {
+        return $this->model
+            ->with(['usuario', 'estado'])
+            ->find($id);
+    }
+
+    public function create(array $data): Requerimiento
+    {
+        return $this->model->create($data);
+    }
+
+    public function update(int $id, array $data): bool
+    {
+        return $this->model->whereKey($id)->update($data) > 0;
+    }
+
+    public function delete(int $id): bool
+    {
+        return $this->model->whereKey($id)->delete() > 0;
+    } */
+
 
     public function getByIdWithRelations(mixed $id): ?array
     {
@@ -202,7 +238,7 @@ class RequerimientosRepository implements RequerimientosRepositoryInterface
     {
         return DB::connection('sqlsrv')->table('CARGOS')
             ->where('CODI_CARG', $codiCarg)
-            ->value('CA RGO_TIPO');
+            ->value('CARGO_TIPO');
     }
 
     public function getDepartamentos(): array

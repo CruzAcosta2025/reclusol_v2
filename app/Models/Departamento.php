@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Departamento extends Model
 {
-    protected $table = 'ADMI_DEPARTAMENTO';
+    protected $connection = 'si_solmar';
+    protected $table = 'dbo.ADMI_DEPARTAMENTO';
     protected $primaryKey = 'DEPA_CODIGO';
     public $timestamps = false;
     protected $fillable = ['DEPA_CODIGO', 'DEPA_DESCRIPCION', 'DEPA_VIGENCIA'];

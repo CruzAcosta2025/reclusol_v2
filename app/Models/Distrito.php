@@ -6,7 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Distrito extends Model
 {
-    protected $table = 'ADMI_DISTRITO';
+    // Modelo en SQL Server (conexión separada)
+    protected $connection = 'si_solmar';
+    protected $table = 'dbo.ADMI_DISTRITO';
     protected $primaryKey = 'DIST_CODIGO';
     public $timestamps = false;
     protected $fillable = ['DIST_CODIGO', 'DIST_DESCRIPCION', 'PROVI_CODIGO', 'DIST_VIGENCIA'];

@@ -16,7 +16,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'sqlite'),
+    'default' => env('DB_CONNECTION', 'sqlsrv'),
 
     /*
     |--------------------------------------------------------------------------
@@ -97,7 +97,7 @@ return [
             'sslmode' => 'prefer',
         ],
 
-        'sqlsrv' => [
+       /*  'sqlsrv' => [
             'driver' => 'sqlsrv',
             'url' => env('DATABASE_URL'),
             'host' => env('DB_HOST', 'localhost'),
@@ -108,26 +108,25 @@ return [
             'charset' => 'utf8',
             'prefix' => '',
             'prefix_indexes' => true,
-        ],
+        ], */
 
-        /* 'sqlsrv' => [
+        'sqlsrv' => [
             'driver' => 'sqlsrv',
             'url' => env('DB_URL'),
             'host' => env('DB_HOST', 'localhost'),
-            'port' => env('DB_PORT', '1433'),
-            'database' => env('DB_DATABASE', 'reclusol'),
-            'username' => env('DB_USERNAME', 'root'),
-            'password' => env('DB_PASSWORD', ''),
+            'port' => env('DB_PORT'),
+            'database' => env('DB_DATABASE'),
+            'username' => env('DB_USERNAME'),
+            'password' => env('DB_PASSWORD'),
             'charset' => env('DB_CHARSET', 'utf8'),
             'prefix' => '',
             'prefix_indexes' => true,
             // 'encrypt' => env('DB_ENCRYPT', 'yes'),
-            // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
-        ], */
+            //'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
+        ],
 
 
         /*
-
         'sqlsrv' => [
             'driver' => 'sqlsrv',
             'host' => env('DB_HOST', 'localhost'),
@@ -138,30 +137,31 @@ return [
             'charset' => 'utf8',
             'prefix' => '',
         ],
+        */
 
         'si_solmar' => [
             'driver'   => 'sqlsrv',
-            'host'     => env('SI_SOLMAR_HOST', '192.168.10.21'),
+            'host'     => env('SI_SOLMAR_HOST'),
             'port'     => env('SI_SOLMAR_PORT', '1433'),
-            'database' => env('SI_SOLMAR_DB',  'si_solm'),
-            'username' => env('SI_SOLMAR_USER', 'usr_solmar_vb'),
-            'password' => env('SI_SOLMAR_PASS', '11hotelbravo'),
+            'database' => env('SI_SOLMAR_DB'),
+            'username' => env('SI_SOLMAR_USER'),
+            'password' => env('SI_SOLMAR_PASS'),
             'charset'  => 'utf8',
             'prefix'   => '',
+            'trust_server_certificate' => true,
         ],
 
         'sqlsrv_control' => [
             'driver'   => 'sqlsrv',
-            'host'     => env('DB_HOST_CONTROL', '192.168.10.20'),
-            'port'     => env('DB_PORT_CONTROL', '1433'),
-            'database' => env('DB_DATABASE_CONTROL', 'CONTROLCLIENTES2018'),
-            'username' => env('DB_USERNAME_CONTROL', 'usr_solmar_vb'),
-            'password' => env('DB_PASSWORD_CONTROL', '11hotelbravo'),
+            'host'     => env('CONTROL_HOST'),
+            'port'     => env('CONTROL_PORT', '1433'),
+            'database' => env('CONTROL_DATABASE'),
+            'username' => env('CONTROL_USERNAME'),
+            'password' => env('CONTROL_PASSWORD'),
             'charset'  => 'utf8',
             'prefix'   => '',
+            'trust_server_certificate' => true,
         ],
-        */
-
     ],
 
     /*

@@ -6,7 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class TipoCargo extends Model
 {
-    protected $table = 'TIPO_CARGO';
+    protected $connection = 'si_solmar';
+    protected $table = 'dbo.TIPO_CARGO';
     protected $primaryKey = 'CODI_TIPO_CARG';
     public $timestamps = false;
     protected $fillable = ['CODI_TIPO_CARG', 'DESC_TIPO_CARG'];

@@ -8,8 +8,10 @@ use App\Models\EstadoRequerimiento;
 use App\Models\Sucursal;
 use App\Models\TipoCargo;
 use App\Models\Cargo;
+use App\Models\Distrito;
 use App\Models\TipoPersonal;
 use App\Models\PrioridadRequerimiento;
+use App\Models\Provincia;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\Departamento;
@@ -451,10 +453,8 @@ class RequerimientoController extends Controller
 
         /* === Provincias y Distritos desde SQL Server (tablas reales) === */
         // PROVINCIAS
-        $provinciasList = DB::connection('sqlsrv')->table('ADMI_PROVINCIA')
-            ->select('PROVI_CODIGO', 'PROVI_DESCRIPCION', 'DEPA_CODIGO')
-            ->where('PROVI_VIGENCIA', 'SI')
-            ->get()
+        $provinciasList = Provincia::vigentes()
+            ->get(['PROVI_CODIGO', 'PROVI_DESCRIPCION', 'DEPA_CODIGO'])
             ->map(function ($p) use ($normDigits) {
                 $p->PROVI_CODIGO = $normDigits($p->PROVI_CODIGO, 4);
                 $p->DEPA_CODIGO  = $normDigits($p->DEPA_CODIGO,  2);
@@ -464,10 +464,8 @@ class RequerimientoController extends Controller
         $provinciasNum = $provinciasList->keyBy(fn($p) => (int)$p->PROVI_CODIGO); // 608
 
         // DISTRITOS
-        $distritosList = DB::connection('sqlsrv')->table('ADMI_DISTRITO')
-            ->select('DIST_CODIGO', 'DIST_DESCRIPCION', 'PROVI_CODIGO')
-            ->where('DIST_VIGENCIA', 'SI')
-            ->get()
+        $distritosList = Distrito::vigentes()
+            ->get(['DIST_CODIGO', 'DIST_DESCRIPCION', 'PROVI_CODIGO'])
             ->map(function ($d) use ($normDigits) {
                 $d->DIST_CODIGO  = $normDigits($d->DIST_CODIGO,  6);
                 $d->PROVI_CODIGO = $normDigits($d->PROVI_CODIGO, 4);
@@ -537,7 +535,7 @@ class RequerimientoController extends Controller
         // Exponer catálogos que usan los partials del modal
         $estados = EstadoRequerimiento::all();
         
-        $nivelEducativo = DB::connection('sqlsrv')
+        $nivelEducativo = DB::connection('si_solmar')
             ->table('SUNAT_NIVEL_EDUCATIVO')
             ->select('NIED_CODIGO', 'NIED_DESCRIPCION')
             ->get();

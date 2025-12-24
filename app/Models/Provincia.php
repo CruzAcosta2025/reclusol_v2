@@ -6,7 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Provincia extends Model
 {
-    protected $table = 'ADMI_PROVINCIA';
+    protected $connection = 'si_solmar';
+    protected $table = 'dbo.ADMI_PROVINCIA';
     protected $primaryKey = 'PROVI_CODIGO';
     public $timestamps = false;
     protected $fillable = ['PROVI_CODIGO', 'PROVI_DESCRIPCION', 'DEPA_CODIGO', 'PROVI_VIGENCIA'];

@@ -6,7 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Cargo extends Model
 {
-    protected $table = 'CARGOS';
+    protected $connection = 'si_solmar';
+    protected $table = 'dbo.CARGOS';
     protected $primaryKey = 'CODI_CARG';
     public $incrementing = false; // si no es int autoincrement
     public $timestamps = false;   // si la tabla no tiene created_at/updated_at
@@ -23,7 +24,6 @@ class Cargo extends Model
         return $query->where('CARG_VIGENCIA', 'SI')->orderBy('DESC_CARGO');
     }
 
-    // Scope por tipo
     public function scopePorTipo($query, $tipoCodigo)
     {
         return $tipoCodigo ? $query->where('TIPO_CARG', $tipoCodigo) : $query;

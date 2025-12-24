@@ -24,6 +24,22 @@ Route::get('/dashboard', [HomeController::class, 'index'])
   ->middleware(['auth', 'verified'])
   ->name('dashboard');
 
+// RUTA TEMPORAL DE DIAGNÓSTICO
+Route::get('/debug-roles', function () {
+  $user = auth()->user();
+  if (!$user) {
+    return response()->json(['error' => 'No authenticated user'], 401);
+  }
+  return response()->json([
+    'user_id' => $user->id,
+    'user_name' => $user->name,
+    'roles' => $user->getRoleNames()->toArray(),
+    'has_admin' => $user->hasRole('ADMINISTRADOR'),
+    'guard' => config('auth.defaults.guard'),
+    'model' => config('auth.providers.users.model'),
+  ]);
+})->middleware('auth');
+
 // Registro externo (publico)
 Route::get('/postulantes/registro', [PostulanteController::class, 'formExterno'])->name('postulantes.formExterno');
 Route::get('/public/dni-decolecta/{dni}', [PostulanteController::class, 'buscarDniDecolecta'])->middleware(['throttle:20,1'])->name('public.dni.decolecta');

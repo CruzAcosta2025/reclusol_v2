@@ -2,37 +2,30 @@
 
 namespace App\Repositories;
 
-use Illuminate\Support\Facades\DB;
+use App\Models\Sucursal;
+use App\Models\Departamento;
+use App\Models\Cargo;
 
 class Repositorio
 {
     public function obtenerDepartamentos()
     {
-        return DB::connection('si_solmar')
-            ->table('ADMI_DEPARTAMENTO')
-            ->select('DEPA_CODIGO', 'DEPA_DESCRIPCION')
-            ->where('DEPA_VIGENCIA', 'SI')
+        return Departamento::where('DEPA_VIGENCIA', 'SI')
             ->orderBy('DEPA_DESCRIPCION')
-            ->get();
+            ->get(['DEPA_CODIGO', 'DEPA_DESCRIPCION']);
     }
 
     public function obtenerSucursales()
     {
-        return DB::connection('si_solmar')
-            ->table('SISO_SUCURSAL')
-            ->select('SUCU_CODIGO', 'SUCU_DESCRIPCION')
-            ->where('SUCU_VIGENCIA', 'SI')
+        return Sucursal::where('SUCU_VIGENCIA', 'SI')
             ->orderBy('SUCU_DESCRIPCION')
-            ->get();
+            ->get(['SUCU_CODIGO', 'SUCU_DESCRIPCION']);
     }
 
     public function obtenerCargos()
     {
-        return DB::connection('si_solmar')
-            ->table('CARGOS')
-            ->select('CODI_CARG', 'DESC_CARGO')
-            ->where('CARG_VIGENCIA', 'SI')
+        return Cargo::where('CARG_VIGENCIA', 'SI')
             ->orderBy('DESC_CARGO')
-            ->get();
+            ->get(['CODI_CARG', 'DESC_CARGO']);
     }
 }

@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Sucursal extends Model
 {
-    protected $table = 'SISO_SUCURSAL';
+    protected $connection = 'si_solmar';
+    protected $table = 'dbo.SISO_SUCURSAL';
     protected $primaryKey = 'SUCU_CODIGO';
     public $timestamps = false;
     protected $fillable = ['SUCU_CODIGO', 'SUCU_DESCRIPCION', 'SUCU_VIGENCIA'];

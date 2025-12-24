@@ -73,12 +73,4 @@ class Requerimiento extends Model
     {
         return $this->belongsTo(EstadoRequerimiento::class, 'estado');
     }
-
-    public function getEstadoAttribute($value)
-    {
-        if ($this->relationLoaded('estado') && $this->getRelation('estado')) {
-            return $this->getRelation('estado');
-        }
-        return $value;
-    }
 }

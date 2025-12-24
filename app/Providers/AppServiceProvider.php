@@ -8,9 +8,11 @@ use App\Http\View\Composers\SidebarComposer;
 use App\Repositories\BaseRepository;
 use App\Repositories\RequerimientosRepository;
 use App\Repositories\EntrevistaRepository;
+use App\Repositories\Implementations\CargoRepository;
 use App\Repositories\Interfaces\BaseRepositoryInterface;
 use App\Repositories\Interfaces\RequerimientosRepositoryInterface;
 use App\Repositories\Interfaces\EntrevistaRepositoryInterface;
+use App\Repositories\Interfaces\CargoRepositoryInterface;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -22,6 +24,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(RequerimientosRepositoryInterface::class, RequerimientosRepository::class);
         $this->app->bind(BaseRepositoryInterface::class, BaseRepository::class);
         $this->app->bind(EntrevistaRepositoryInterface::class, EntrevistaRepository::class);
+        $this->app->bind(CargoRepositoryInterface::class, CargoRepository::class);
     }
 
     /**

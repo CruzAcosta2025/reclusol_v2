@@ -7,6 +7,13 @@ use Illuminate\Database\Eloquent\Collection;
 
 interface RequerimientosRepositoryInterface
 {
+    /* public function all(): Collection;
+    public function find(int $id): ?Requerimiento;
+    public function create(array $data): Requerimiento;
+    public function update(int $id, array $data): bool;
+    public function delete(int $id): bool;
+ */
+    
     public function getAll(): Collection;
     public function getById(mixed $id): ?Requerimiento;
     public function getByIdWithRelations(mixed $id): ?array;
