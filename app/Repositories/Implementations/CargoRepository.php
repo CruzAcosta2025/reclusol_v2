@@ -2,19 +2,22 @@
 
 namespace App\Repositories\Implementations;
 
+use Illuminate\Support\Facades\DB;
 use App\Models\Cargo;
+use App\Repositories\Implementations\BaseRepository;
 use App\Repositories\Interfaces\CargoRepositoryInterface;
 
-class CargoRepository implements CargoRepositoryInterface
+class CargoRepository extends BaseRepository implements CargoRepositoryInterface
 {
-    public function forSelectByTipo($tipoCodigo)
+
+    public function __construct(Cargo $model)
     {
-        return Cargo::forSelectByTipo($tipoCodigo);
+        parent::__construct($model);
     }
 
-    public function forSelectByTipo(string $tipoCodigo): array
+    public function forSelectByTipo(?string $tipoCodigo): array
     {
-        return Cargo::vigentes()
+        return $this->model->vigentes()
             ->porTipo($tipoCodigo)
             ->pluck('DESC_CARGO', 'CODI_CARG')
             ->toArray();
@@ -22,6 +25,22 @@ class CargoRepository implements CargoRepositoryInterface
 
     public function forSelect(): array
     {
-        return Cargo::vigentes()->pluck('DESC_CARGO', 'CODI_CARG')->toArray();
+        return $this->model->vigentes()->pluck('DESC_CARGO', 'CODI_CARG')->toArray();
+    }
+
+    public function obtenerPorTipoPersonalYTipoCargo(string $tipoPersonal, string $tipoCargo): array
+    {
+        if (!$tipoPersonal || !$tipoCargo)
+            return [];
+
+        return DB::connection('sqlsrv')->select(
+            'EXEC dbo.REC_CARGOS_POR_TIPO ?, ?',
+            [$tipoPersonal, $tipoCargo]
+        );
+    }
+
+    public function obtenerTipoCargo(string $codigoCargo): ?string
+    {
+        return $this->model->where('CODI_CARG', $codigoCargo)->value('CARGO_TIPO');
     }
 }

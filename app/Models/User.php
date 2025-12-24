@@ -11,9 +11,10 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable, HasRoles;
 
-    /* ---------- Config básicos ---------- */
-    protected $table      = 'users';
+    protected $table = 'users';
+
     protected $primaryKey = 'id';
+
     public    $timestamps = true;
 
     protected $fillable = [
@@ -25,7 +26,6 @@ class User extends Authenticatable
         'contrasena',
         'habilitado',
     ];
-
 
     protected $hidden = [
         'password',
@@ -47,48 +47,23 @@ class User extends Authenticatable
         return $this->password ?? $this->contrasena;
     }
 
-    /**
-     * Relación con TipoCargo (tabla TIPO_CARGO).
-     * Asume que el campo `cargo` contiene CODI_TIPO_CARG cuando corresponde.
-     * withDefault evita que $this->tipoCargo sea null y facilita el accessor.
-     */
     public function tipoCargo()
     {
         return $this->belongsTo(TipoCargo::class, 'cargo', 'CODI_TIPO_CARG')->withDefault();
     }
 
-    /**
-     * Relación con Cargo (tabla CARGOS).
-     * Asume que el campo `cargo` contiene CODI_CARG cuando corresponde.
-     */
     public function cargoRelation()
     {
         return $this->belongsTo(Cargo::class, 'cargo', 'CODI_CARG')->withDefault();
     }
 
-    /**
-     * Relación con postulantes creados por este usuario.
-     */
     public function postulantesCreados()
     {
         return $this->hasMany(Postulante::class, 'created_by');
     }
 
-    /* -------------------------------
-       Accessor simple para descripción del cargo
-       ------------------------------- */
-
-    /**
-     * Devuelve una descripción legible del cargo:
-     * - Prioriza DESC_TIPO_CARG (TipoCargo)
-     * - Si no existe, usa DESC_CARGO (Cargo)
-     * - Si ninguno existe, devuelve 'Sin rol'
-     *
-     * Uso en Blade: {{ $user->cargo_descripcion }}
-     */
     public function getCargoDescripcionAttribute(): string
     {
-        // Si las relaciones están eager-loaded, no hará queries adicionales.
         if ($this->relationLoaded('tipoCargo') && $this->tipoCargo && $this->tipoCargo->DESC_TIPO_CARG) {
             return $this->tipoCargo->DESC_TIPO_CARG;
         }
@@ -97,19 +72,11 @@ class User extends Authenticatable
             return $this->cargoRelation->DESC_CARGO;
         }
 
-        // Fallback: acceder a la relación (esto ejecutará una consulta sólo si no se hizo eager loading)
         return $this->tipoCargo->DESC_TIPO_CARG
             ?? $this->cargoRelation->DESC_CARGO
             ?? 'Sin rol';
     }
 
-    /* -------------------------------
-       Utilitarios
-       ------------------------------- */
-
-    /**
-     * Comprueba si el usuario tiene un cargo específico (compara códigos).
-     */
     public function tieneCargo(string $codigo): bool
     {
         return (string) $this->cargo === (string) $codigo;

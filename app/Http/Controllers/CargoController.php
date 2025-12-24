@@ -2,17 +2,36 @@
 
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
-use App\Models\Cargo;
+use App\Services\CargoService;
 
 class CargoController extends Controller
 {
-     public function index()
+
+    protected CargoService $service;
+
+    public function __construct(CargoService $service)
     {
-        return Cargo::all(); // o usar ->select('CODI_TIPO_CARG', 'DESC_TIPO_CARG')->get()
+        $this->service = $service;
     }
 
-    public function show($id)
+     public function index()
     {
-        return Cargo::findOrFail($id);
+        return $this->service->getAll();
+    }
+
+    public function show(int $id)
+    {
+        return $this->service->find($id);
+    }
+    
+     public function forSelect()
+    {
+        return $this->service->forSelect();
+    }
+
+    public function forSelectByTipo(Request $request)
+    {
+        $tipoCodigo = $request->query('tipo_codigo');
+        return $this->service->forSelectByTipo($tipoCodigo);
     }
 }

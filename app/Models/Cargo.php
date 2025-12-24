@@ -35,7 +35,7 @@ class Cargo extends Model
         return self::vigentes()->porTipo($tipoCodigo)->pluck('DESC_CARGO', 'CODI_CARG');
     }
 
-        public static function forSelect()
+    public static function forSelect()
     {
         return self::vigentes()->pluck('DESC_CARGO', 'CODI_CARG');
     }

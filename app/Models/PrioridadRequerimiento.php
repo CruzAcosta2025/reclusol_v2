@@ -6,23 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class PrioridadRequerimiento extends Model
 {
-    // Nombre de la tabla
     protected $table = 'prioridad_requerimiento';
 
-    // Clave primaria
     protected $primaryKey = 'id';
 
-    // Si NO usas timestamps en la tabla
     public $timestamps = false;
 
-    // Campos que se pueden asignar en masa (opcional)
     protected $fillable = [
         'nombre',
     ];
 
-    /**
-     * Relación inversa con Requerimiento
-     */
     public function prioridades()
     {
         return $this->hasMany(Requerimiento::class, 'prioridad');

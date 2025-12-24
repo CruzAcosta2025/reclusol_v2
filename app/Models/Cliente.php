@@ -4,14 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-
 class Cliente extends Model
 {
     protected $table = 'CABECERA_SERVICIO_2014';
-    protected $primaryKey = 'codigo_servicio';
-    public $timestamps = false;
-    protected $fillable = ['codigo_cliente', 'codigo_sucursal', 'estado_servicio', 'nombre_sucursal', 'nombre_cliente'];
 
+    protected $primaryKey = 'codigo_servicio';
+
+    public $timestamps = false;
+
+    protected $fillable = ['codigo_cliente', 'codigo_sucursal', 'estado_servicio', 'nombre_sucursal', 'nombre_cliente'];
 
     public const EXCLUIR_CODIGOS = ['11', '18', '25']; // ej.
 
@@ -19,7 +20,6 @@ class Cliente extends Model
     {
         return $q->whereNotIn('codigo_sucursal', self::EXCLUIR_CODIGOS);
     }
-
 
     public function scopeVigentes($q)
     {
@@ -33,7 +33,6 @@ class Cliente extends Model
             ->sinEspeciales()
             ->pluck('nombre_cliente', 'codigo_cliente');
     }
-
 
     public static function forSelectPadded()
     {

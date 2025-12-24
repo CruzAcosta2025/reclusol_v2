@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
 use App\Models\Entrevista;
 use App\Models\Postulante;
+use App\Repositories\Implementations\BaseRepository;
 use App\Repositories\Interfaces\EntrevistaRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
 

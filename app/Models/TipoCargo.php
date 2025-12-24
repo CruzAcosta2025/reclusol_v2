@@ -18,8 +18,8 @@ class TipoCargo extends Model
     }
 
     // Para selects: [CODI_TIPO_CARG => DESC_TIPO_CARG]
-    public static function forSelect()
+    /* public static function forSelect()
     {
         return self::orderBy('DESC_TIPO_CARG')->pluck('DESC_TIPO_CARG', 'CODI_TIPO_CARG');
-    }
+    } */
 }

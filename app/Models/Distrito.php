@@ -28,7 +28,6 @@ class Distrito extends Model
         return self::vigentes()->pluck('DIST_DESCRIPCION', 'DIST_CODIGO');
     }
 
-
     public static function forSelectByProvincia($provCodigo)
     {
         return self::vigentes()

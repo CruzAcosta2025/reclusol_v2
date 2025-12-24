@@ -40,7 +40,7 @@ class PosterController extends Controller
 
             // $codigoDepartamento = ltrim((string)$r->departamento, '0');
             // $codigoProvincia = ltrim((string)$r->provincia, '0');
-            //$codigoDistrito = ltrim((string)$r->distrito, '0');
+            // $codigoDistrito = ltrim((string)$r->distrito, '0');
 
             $r->cargo_nombre = $cargos->get($codigoCargo) ?? $r->cargo_solicitado;
             $r->sucursal_nombre = $sucursales->get($codigoSucursal) ?? $r->sucursal;

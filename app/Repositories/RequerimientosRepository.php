@@ -15,9 +15,10 @@ use App\Models\TipoPersonal;
 use App\Models\Departamento;
 use App\Models\Provincia;
 use App\Models\Distrito;
+use App\Repositories\Implementations\BaseRepository;
 use App\Repositories\Interfaces\RequerimientosRepositoryInterface;
 
-class RequerimientosRepository implements RequerimientosRepositoryInterface
+class RequerimientosRepository extends BaseRepository implements RequerimientosRepositoryInterface
 {
     protected Requerimiento $modelo;
 
@@ -25,17 +26,7 @@ class RequerimientosRepository implements RequerimientosRepositoryInterface
     {
         $this->modelo = $modelo;
     }
-
-        public function getAll(): Collection
-    {
-        return Requerimiento::all();
-    }
-
-    public function getById(mixed $id): ?Requerimiento
-    {
-        return $this->modelo->find($id);
-    }
-
+    
      /**
      * Listar requerimientos
      */
@@ -99,7 +90,7 @@ class RequerimientosRepository implements RequerimientosRepositoryInterface
                 ->table('CARGOS')
                 ->where('CODI_CARG', $requerimiento->cargo_solicitado)
                 ->value('DESC_CARGO');
-            $data['cargo_nombre'] = $cargo ?? $requerimiento->cargo_solicitado;
+            $data['cargo_solicitado_nombre'] = $cargo ?? $requerimiento->cargo_solicitado;
         }
 
         // Cargar sucursal desde SQL Server

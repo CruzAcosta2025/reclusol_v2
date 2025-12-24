@@ -62,7 +62,7 @@
                         </div>
                         <span class="text-blue-500 text-sm font-medium">Total</span>
                     </div>
-                    <h3 class="text-3xl font-bold text-gray-800 mb-1">{{ $totalUsers }}</h3>
+                    <h3 class="text-3xl font-bold text-gray-800 mb-1">{{ $estadisticas['total'] ?? 0 }}</h3>
                     <p class="text-gray-600 text-sm">Usuarios registrados</p>
                 </x-block>
 
@@ -74,7 +74,7 @@
                         </div>
                         <span class="text-green-500 text-sm font-medium">Habilitados</span>
                     </div>
-                    <h3 class="text-3xl font-bold text-gray-800 mb-1">{{ $activeUsers }}</h3>
+                    <h3 class="text-3xl font-bold text-gray-800 mb-1">{{ $estadisticas['active'] ?? 0 }}</h3>
                     <p class="text-gray-600 text-sm">Usuarios Habilitados</p>
                 </x-block>
 
@@ -86,7 +86,7 @@
                         </div>
                         <span class="text-red-500 text-sm font-medium">Inhabilitados</span>
                     </div>
-                    <h3 class="text-3xl font-bold text-gray-800 mb-1">{{ $inactiveUsers }}</h3>
+                    <h3 class="text-3xl font-bold text-gray-800 mb-1">{{ $estadisticas['inactive'] ?? 0 }}</h3>
                     <p class="text-gray-600 text-sm">Usuarios Inhabilitados</p>
                 </x-block>
 
@@ -98,7 +98,7 @@
                         </div>
                         <span class="text-purple-500 text-sm font-medium">Nuevos</span>
                     </div>
-                    <h3 class="text-3xl font-bold text-gray-800 mb-1">{{ $newUsersThisMonth }}</h3>
+                    <h3 class="text-3xl font-bold text-gray-800 mb-1">{{ $estadisticas['newThisMonth'] ?? 0 }}</h3>
                     <p class="text-gray-600 text-sm">Este mes</p>
                 </x-block>
             </div>

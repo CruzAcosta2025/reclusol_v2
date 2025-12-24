@@ -11,7 +11,7 @@ use App\Services\UserService;
 use App\Services\CargoService;
 use App\Services\CatalogoService;
 
-class UserController extends Controller
+class UserController1 extends Controller
 {
 
     protected UserService $userService;

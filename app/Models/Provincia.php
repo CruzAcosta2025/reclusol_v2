@@ -12,7 +12,6 @@ class Provincia extends Model
     public $timestamps = false;
     protected $fillable = ['PROVI_CODIGO', 'PROVI_DESCRIPCION', 'DEPA_CODIGO', 'PROVI_VIGENCIA'];
 
-
     public function departamento()
     {
         return $this->belongsTo(Departamento::class, 'DEPA_CODIGO', 'DEPA_CODIGO');

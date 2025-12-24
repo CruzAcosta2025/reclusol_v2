@@ -35,8 +35,6 @@ class Entrevista extends Model
         'competencias' => 'array',
     ];
 
-
-    // Relaciones
     public function postulante()
     {
         return $this->belongsTo(Postulante::class);
