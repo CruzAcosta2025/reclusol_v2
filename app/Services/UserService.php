@@ -64,11 +64,6 @@ class UserService
         return $this->repository->buscarParaSelect($q, $limit);
     }
 
-    public function obtenerPorIds(array $ids): Collection
-    {
-        return $this->repository->buscarPorIdsConRelaciones($ids);
-    }
-
     public function obtenerPorId(int|string $id): ?User
     {
         return $this->repository->buscarPorIdConRelaciones($id);
@@ -77,10 +72,5 @@ class UserService
     public function obtenerEstadisticas(): array
     {
         return $this->repository->estadisticas();
-    }
-
-    public function esAdministrador(User $user): bool
-    {
-        return $user->tieneCargo('ADM');
     }
 }
