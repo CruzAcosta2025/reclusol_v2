@@ -26,43 +26,8 @@ class RequerimientosRepository extends BaseRepository implements RequerimientosR
     {
         $this->modelo = $modelo;
     }
-    
-     /**
-     * Listar requerimientos
-     */
-    /* public function all(): Collection
-    {
-        return $this->model
-            ->with(['usuario', 'estado'])
-            ->orderBy('id', 'desc')
-            ->get();
-    }
 
-
-    public function find(int $id): ?Requerimiento
-    {
-        return $this->model
-            ->with(['usuario', 'estado'])
-            ->find($id);
-    }
-
-    public function create(array $data): Requerimiento
-    {
-        return $this->model->create($data);
-    }
-
-    public function update(int $id, array $data): bool
-    {
-        return $this->model->whereKey($id)->update($data) > 0;
-    }
-
-    public function delete(int $id): bool
-    {
-        return $this->model->whereKey($id)->delete() > 0;
-    } */
-
-
-    public function getByIdWithRelations(mixed $id): ?array
+    public function getByIdWithRelations(int|string $id, array $relations = [], $columns = ['*'])
     {
         $requerimiento = $this->getById($id);
 
@@ -109,21 +74,6 @@ class RequerimientosRepository extends BaseRepository implements RequerimientosR
             $data['cliente_nombre'] = $cliente ? $cliente->NOMBRE_CLIENTE : $requerimiento->cliente;
         }
         return $data;
-    }
-
-    public function store(array $data)
-    { 
-        return Requerimiento::create($data);
-    }
-
-    public function update($id, $data)
-    {
-        return Requerimiento::where('id', $id)->update($data);
-    }
-
-    public function destroy($id)
-    {
-        return Requerimiento::where('id', $id)->delete();
     }
 
     public function getEstados(): array

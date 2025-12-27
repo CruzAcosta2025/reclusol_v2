@@ -102,9 +102,7 @@ Route::middleware('auth')->group(function () {
   Route::middleware('role:ADMINISTRADOR|USUARIO OPERATIVO')->group(function () {
     Route::get('/afiches', [PosterController::class, 'index'])->name('afiches.index');
     //Route::get('/afiches/agregarRecursos', [PosterController::class, 'mostrarFormularioRecursos'])->name('afiches.recursos');
-    // Formulario para cargar recursos (la vista que ya hiciste)
     Route::get('/afiches/recursos', [PosterController::class, 'assetsForm'])->name('afiches.assets.form');
-    // Procesar el formulario (SUBIR archivo)
     Route::post('/afiches/recursos', [PosterController::class, 'assetsUpload'])->name('afiches.assets.upload');
     Route::post('/afiches/recursos/eliminar', [PosterController::class, 'assetsDelete'])->name('afiches.assets.delete');
     Route::get('/poster/{req}/{template}', [PosterController::class, 'show'])->name('poster.show');

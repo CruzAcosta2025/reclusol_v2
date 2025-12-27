@@ -3,23 +3,13 @@
 namespace App\Repositories\Interfaces;
 
 use App\Models\Requerimiento;
+use App\Repositories\Interfaces\BaseRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 
-interface RequerimientosRepositoryInterface
+interface RequerimientosRepositoryInterface extends BaseRepositoryInterface
 {
-    /* public function all(): Collection;
-    public function find(int $id): ?Requerimiento;
-    public function create(array $data): Requerimiento;
-    public function update(int $id, array $data): bool;
-    public function delete(int $id): bool;
- */
-    
-    public function getAll(): Collection;
-    public function getById(mixed $id): ?Requerimiento;
-    public function getByIdWithRelations(mixed $id): ?array;
-    public function store(array $data);
-    public function update($id, $data);
-    public function destroy($id); //cambiar
+    public function getByIdWithRelations(int|string $id, array $relations = [], $columns = ['*']);
     public function getEstados(): array;
     public function getPrioridades(): array;
     public function getSucursales(): array;
