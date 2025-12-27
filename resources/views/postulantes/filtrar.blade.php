@@ -372,37 +372,32 @@
         {{-- Modales (eliminaciÃ³n, ediciÃ³n, validaciÃ³n) --}}
         {{-- Modal de EliminaciÃ³n --}}
         <div id="delete-modal"
-            class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md"
-            role="dialog" aria-modal="true" aria-labelledby="delete-title" aria-describedby="delete-desc">
+            class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" role="dialog"
+            aria-modal="true" aria-labelledby="delete-title" aria-describedby="delete-desc">
             <!-- Panel -->
-            <div class="bg-white w-full max-w-md mx-4 rounded-2xl shadow-2xl border-2 border-red-100 p-8
-       opacity-0 translate-y-2 transition-all duration-300 ease-out
-       data-[open=true]:opacity-100 data-[open=true]:translate-y-0"
+            <div class="bg-white w-full max-w-md mx-4 rounded-2xl shadow-2xl border border-gray-100 p-6 opacity-0 translate-y-2 transition-all duration-200 ease-out data-[open=true]:opacity-100 data-[open=true]:translate-y-0"
                 id="delete-panel" data-open="true">
                 <!-- Encabezado -->
-                <div class="text-center mb-6">
-                    <div class="flex justify-center mb-4">
-                        <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-red-100 to-red-50 border-2 border-red-200">
-                            <i class="fa-solid fa-triangle-exclamation text-red-600 text-2xl"></i>
-                        </div>
+                <div class="flex items-start gap-3 mb-4">
+                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-50">
+                        <i class="fa-solid fa-triangle-exclamation text-red-600"></i>
                     </div>
-                    <h3 id="delete-title" class="text-2xl font-bold text-gray-900 mb-2">¿Eliminar postulante?</h3>
-                    <p id="delete-desc" class="text-base text-gray-700 leading-relaxed">Esta accion no se puede deshacer. Confirma que deseas eliminar este postulante.</p>
+                    <div>
+                        <h3 id="delete-title" class="text-xl font-semibold">Eliminar postulante</h3>
+                        <p id="delete-desc" class="text-sm text-gray-600 mt-1">Esta accion no se puede deshacer.</p>
+                    </div>
                 </div>
 
-                <!-- LÃ­nea separadora -->
-                <div class="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent my-6"></div>
-
                 <!-- Botones -->
-                <div class="flex justify-center gap-3 pt-2">
+                <div class="mt-5 flex justify-end gap-3 pt-4 border-t border-gray-100">
                     <button type="button" onclick="closeDeleteModal()"
-                        class="px-6 py-3 rounded-lg font-semibold text-gray-800 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 transition-all duration-200 min-w-[120px]">
-                        <i class="fas fa-times mr-2"></i>Cancelar
+                        class="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 focus:outline-none focus:ring focus:ring-gray-300 transition">
+                        Cancelar
                     </button>
 
                     <button type="button" onclick="confirmDelete()"
-                        class="px-6 py-3 rounded-lg font-semibold text-white bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-200 min-w-[120px]">
-                        <i class="fas fa-trash-alt mr-2"></i>Eliminar
+                        class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white focus:outline-none focus:ring focus:ring-red-300 transition">
+                        Eliminar
                     </button>
                 </div>
             </div>
@@ -418,78 +413,56 @@
 
         {{-- Modal de ValidaciÃ³n --}}
         <div id="validar-modal"
-            class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md" role="dialog"
+            class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" role="dialog"
             aria-modal="true" aria-labelledby="validar-title" aria-describedby="validar-desc">
             <div
-                class="bg-white w-full max-w-md mx-4 rounded-2xl shadow-2xl border-2 border-emerald-100 p-8
-           opacity-0 translate-y-2 transition-all duration-300 ease-out
-           data-[open=true]:opacity-100 data-[open=true]:translate-y-0"
-                id="validar-panel" data-open="true">
+                class="panel-light p-6 rounded-2xl w-full max-w-md shadow-2xl border border-gray-100 mx-4 focus:outline-none focus-visible:ring focus-visible:ring-emerald-200">
 
                 <!-- Encabezado -->
-                <div class="text-center mb-6">
-                    <div class="flex justify-center mb-4">
-                        <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-100 to-emerald-50 border-2 border-emerald-200">
-                            <i class="fa-solid fa-clipboard-check text-emerald-600 text-2xl"></i>
-                        </div>
-                    </div>
-                    <h3 id="validar-title" class="text-2xl font-bold text-gray-900 mb-2">Validar Postulante</h3>
-                    <p id="validar-desc" class="text-base text-gray-700 leading-relaxed"><span id="val-nombre" class="font-semibold text-emerald-700"></span></p>
-                </div>
-
-                <!-- LÃ­nea separadora -->
-                <div class="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent my-6"></div>
+                <h3 id="validar-title" class="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-clipboard-check text-emerald-600"></i>
+                    Validar: <span id="val-nombre" class="font-normal text-gray-700"></span>
+                </h3>
+                <p id="validar-desc" class="text-sm text-gray-600 mb-3">Selecciona el resultado de validacion y agrega comentario si corresponde.</p>
 
                 <!-- Formulario -->
-                <form id="form-validar" method="POST" class="space-y-5" autocomplete="off">
+                <form id="form-validar" method="POST" class="space-y-4" autocomplete="off">
                     @csrf
 
                     <!-- Opciones de radio -->
-                    <fieldset class="space-y-3">
-                        <legend class="text-sm font-semibold text-gray-900 mb-3">Resultado de validación</legend>
-                        
-                        <label class="flex items-center gap-3 p-4 rounded-xl border-2 border-gray-200 hover:border-emerald-300 hover:bg-emerald-50 cursor-pointer transition-all">
-                            <input type="radio" name="decision" value="apto" class="w-5 h-5 accent-emerald-600" checked>
-                            <span class="flex-1">
-                                <span class="text-gray-900 font-semibold">Apto</span>
-                                <span class="text-xs text-gray-500 block">Postulante cumple los requisitos</span>
-                            </span>
-                            <i class="fas fa-check-circle text-emerald-600 text-lg"></i>
+                    <fieldset class="space-y-2">
+                        <legend class="sr-only">Resultado</legend>
+                        <label
+                            class="flex items-center gap-2 p-2 rounded-lg border hover:bg-gray-50 cursor-pointer transition">
+                            <input type="radio" name="decision" value="apto" class="accent-emerald-600" checked>
+                            <span class="text-gray-800 font-medium">Apto</span>
                         </label>
-                        
-                        <label class="flex items-center gap-3 p-4 rounded-xl border-2 border-gray-200 hover:border-red-300 hover:bg-red-50 cursor-pointer transition-all">
-                            <input type="radio" name="decision" value="no_apto" class="w-5 h-5 accent-red-600">
-                            <span class="flex-1">
-                                <span class="text-gray-900 font-semibold">No apto</span>
-                                <span class="text-xs text-gray-500 block">Postulante no cumple requisitos</span>
-                            </span>
-                            <i class="fas fa-times-circle text-red-600 text-lg"></i>
+                        <label
+                            class="flex items-center gap-2 p-2 rounded-lg border hover:bg-gray-50 cursor-pointer transition">
+                            <input type="radio" name="decision" value="no_apto" class="accent-red-600">
+                            <span class="text-gray-800 font-medium">No apto</span>
                         </label>
                     </fieldset>
 
                     <!-- Comentario -->
                     <div>
-                        <label for="comentario-no-apto" class="block text-sm font-semibold text-gray-900 mb-2">
-                            Comentario o Notas
-                            <span class="text-gray-500 font-normal">(obligatorio si es No apto)</span>
+                        <label for="comentario-no-apto" class="block text-sm font-medium text-gray-600 mb-1">
+                            Comentario <span class="text-gray-400">(obligatorio si es No apto)</span>
                         </label>
-                        <textarea name="comentario" id="comentario-no-apto" rows="4" maxlength="300"
-                            class="w-full bg-white border-2 border-gray-200 rounded-xl p-3 text-gray-900 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all resize-none"
-                            placeholder="Motivo o notas (máx. 300 caracteres)"></textarea>
-                        <div class="text-xs text-gray-500 mt-1">
-                            <span id="char-count">0</span>/300 caracteres
-                        </div>
+                        <textarea name="comentario" id="comentario-no-apto" rows="3" maxlength="300"
+                            class="w-full border border-gray-300 rounded-lg p-2 placeholder:text-gray-400 focus:border-emerald-500 focus:ring focus:ring-emerald-200 transition resize-none"
+                            placeholder="Motivo o notas (mÃ¡x. 300 caracteres)"></textarea>
                     </div>
 
                     <!-- Botones -->
-                    <div class="flex justify-center gap-3 pt-2 mt-6">
+                    <div class="flex justify-end gap-3 pt-3 border-t border-gray-100">
                         <button type="button" onclick="cerrarValidar()"
-                            class="px-6 py-3 rounded-lg font-semibold text-gray-800 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 transition-all duration-200 min-w-[120px]">
-                            <i class="fas fa-times mr-2"></i>Cancelar
+                            class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700 focus:outline-none focus:ring focus:ring-gray-300 transition">
+                            Cancelar
                         </button>
                         <button type="submit"
-                            class="px-6 py-3 rounded-lg font-semibold text-white bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-all duration-200 min-w-[120px]">
-                            <i class="fas fa-save mr-2"></i>Guardar
+                            class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white focus:outline-none focus:ring focus:ring-emerald-300 transition">
+                            Guardar
                         </button>
                     </div>
                 </form>
@@ -901,51 +874,18 @@
                 form.reset();
                 document.querySelector('input[name="decision"][value="apto"]').checked = true;
                 document.getElementById('comentario-no-apto').removeAttribute('required');
-                document.getElementById('char-count').textContent = '0';
 
                 // abrir modal
                 const m = document.getElementById('validar-modal');
-                const panel = document.getElementById('validar-panel');
                 m.classList.remove('hidden');
                 m.classList.add('flex');
-                document.body.style.overflow = 'hidden';
-                
-                void panel.offsetWidth;
-                panel.setAttribute('data-open', 'true');
-                
-                setTimeout(() => {
-                    document.querySelector('input[name="decision"]')?.focus();
-                }, 0);
-                
-                m.addEventListener('mousedown', onValidarBackdropClick);
-                document.addEventListener('keydown', onValidarEsc);
             });
         });
 
         function cerrarValidar() {
             const m = document.getElementById('validar-modal');
-            const panel = document.getElementById('validar-panel');
-            
-            panel.setAttribute('data-open', 'false');
-            
-            document.removeEventListener('keydown', onValidarEsc);
-            m.removeEventListener('mousedown', onValidarBackdropClick);
-            document.body.style.overflow = '';
-            
-            setTimeout(() => {
-                m.classList.add('hidden');
-                m.classList.remove('flex');
-            }, 300);
-        }
-
-        function onValidarEsc(e) {
-            if (e.key === 'Escape') cerrarValidar();
-        }
-
-        function onValidarBackdropClick(e) {
-            const m = document.getElementById('validar-modal');
-            const panel = document.getElementById('validar-panel');
-            if (!panel?.contains(e.target)) cerrarValidar();
+            m.classList.add('hidden');
+            m.classList.remove('flex');
         }
 
         // Requerir comentario si "no_apto"
@@ -957,14 +897,6 @@
                 else txt.removeAttribute('required');
             }
         });
-
-        // Contador de caracteres
-        const comentarioTextarea = document.getElementById('comentario-no-apto');
-        if (comentarioTextarea) {
-            comentarioTextarea.addEventListener('input', function() {
-                document.getElementById('char-count').textContent = this.value.length;
-            });
-        }
 
 
         function handleFileUpload(input, previewId) {
