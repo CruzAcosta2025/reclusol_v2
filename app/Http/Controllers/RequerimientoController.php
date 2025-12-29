@@ -161,26 +161,24 @@ class RequerimientoController extends Controller
             'fecha_fin'            => 'required|date|after_or_equal:fecha_inicio',
             'urgencia'             => 'required|string|max:50',
             'cantidad_requerida'   => 'required|integer|min:1|max:255',
-            //'cantidad_masculino'   => 'required|integer|min:0|max:255',
-            //'cantidad_femenino'    => 'required|integer|min:0|max:255',
             'edad_minima'          => 'required|integer|min:18|max:65',
             'edad_maxima'          => 'required|integer|min:18|max:70',
             'experiencia_minima'   => 'required|string|max:50',
             'curso_sucamec_operativo'   => 'nullable|string|max:50',
             'carne_sucamec_operativo'   => 'nullable|string|max:50',
             'licencia_armas'            => 'nullable|string|max:50',
-            'servicio_acuartelado'      => 'nullable|string|max:50',
             'grado_academico'           => 'required|string|max:50',
             'formacion_adicional'       => 'nullable|string|max:50',
             'requiere_licencia_conducir' => 'nullable|string|max:50',
             'validado_rrhh'             => 'boolean',
             'sueldo_basico'             => 'required|string|max:50',
-            'beneficios'                => 'required|string|max:50',
-            //'prioridad'                 => 'nullable|exists:prioridad_requerimiento,id',
             'estado'                    => 'required|exists:estado_requerimiento,id',
-            //'fecha_limite'              => 'nullable|date|after_or_equal:today',
-            //'requiere_sucamec'          => 'boolean',
-            //'requisitos_adicionales'    => 'nullable|string',
+            'servicio_acuartelado'      => 'nullable|array',
+            'servicio_acuartelado.*'    => 'string|max:80',
+            'beneficios'                => 'required|array|min:1',
+            'beneficios.*'              => 'string|max:80',
+
+
         ]);
 
         /* ---------- 2. CAMPOS AUTOMÁTICOS ---------- */
@@ -191,6 +189,13 @@ class RequerimientoController extends Controller
         /* ---------- 3. TRANSFORMAR CHECKBOX ---------- */
         $validated['requiere_sucamec'] = $request->boolean('requiere_sucamec');
         $validated['validado_rrhh'] = $request->boolean('validado_rrhh');
+        $validated['beneficios'] = json_encode($validated['beneficios'] ?? [], JSON_UNESCAPED_UNICODE);
+
+        if (empty($validated['servicio_acuartelado'])) {
+            $validated['servicio_acuartelado'] = null;
+        } else {
+            $validated['servicio_acuartelado'] = json_encode($validated['servicio_acuartelado'], JSON_UNESCAPED_UNICODE);
+        }
 
         try {
             $requerimiento = DB::transaction(
@@ -586,7 +591,6 @@ class RequerimientoController extends Controller
     public function update(Request $request, Requerimiento $requerimiento)
     {
         $rules = [
-            // SECCIÓN 1: Datos de la solicitud
             'sucursal'           => 'required|string|max:10',
             'cliente'            => 'required|string|max:10',
             'tipo_personal'      => 'required|string|max:2',
@@ -596,30 +600,30 @@ class RequerimientoController extends Controller
             'fecha_inicio'       => 'required|date',
             'fecha_fin'          => 'required|date|after_or_equal:fecha_inicio',
 
-            // urgencia se setea automáticamente en el JS, pero se valida aquí
             'urgencia'           => 'required|in:Alta,Media,Baja,Mayor',
-
             'cantidad_requerida' => 'required|integer|min:1|max:255',
 
-            // SECCIÓN 2: Perfil y requisitos (comunes)
             'edad_minima'        => 'required|integer|min:18|max:65',
             'edad_maxima'        => 'required|integer|min:18|max:70|gte:edad_minima',
 
             'experiencia_minima' => 'required|string|max:50',
             'grado_academico'    => 'required|string|max:50',
 
-            // CAMPOS SOLO PARA OPERATIVO (se validan como nullable y se limpian si no es 01)
-            'curso_sucamec_operativo'    => 'nullable|in:si,no',
-            'carne_sucamec_operativo'    => 'nullable|in:si,no',
-            'licencia_armas'             => 'nullable|in:si,no',
-            'requiere_licencia_conducir' => 'nullable|in:si,no',
-            'servicio_acuartelado'       => 'nullable|in:no,con_habitabilidad,con_alimentacion,con_movilidad',
+            'curso_sucamec_operativo'    => 'nullable|in:Sí,No',
+            'carne_sucamec_operativo'    => 'nullable|in:Sí,No',
+            'licencia_armas'             => 'nullable|in:Sí,No',
+            'requiere_licencia_conducir' => 'nullable|in:Sí,No',
 
-            // SECCIÓN 4: Remuneración y beneficios
+            // ✅ multiselect
+            'servicio_acuartelado'   => 'nullable|array',
+            'servicio_acuartelado.*' => 'string|max:80',
+
             'sueldo_basico'      => 'required|numeric|min:0',
-            'beneficios'         => 'required|string|max:50',
 
-            // SECCIÓN 5: Estado
+            // ✅ multiselect obligatorio
+            'beneficios'         => 'required|array|min:1',
+            'beneficios.*'       => 'string|max:80',
+
             'estado'             => 'required|exists:estado_requerimiento,id',
         ];
 
@@ -634,9 +638,17 @@ class RequerimientoController extends Controller
             $data['servicio_acuartelado']       = null;
         }
 
+        // ✅ Guardar JSON en NVARCHAR(MAX)
+        $data['beneficios'] = json_encode($data['beneficios'], JSON_UNESCAPED_UNICODE);
+
+        if (empty($data['servicio_acuartelado'])) {
+            $data['servicio_acuartelado'] = null;
+        } else {
+            $data['servicio_acuartelado'] = json_encode($data['servicio_acuartelado'], JSON_UNESCAPED_UNICODE);
+        }
+
         try {
             $requerimiento->update($data);
-
             return response()->json(['success' => true]);
         } catch (\Throwable $e) {
             Log::error('Error al actualizar requerimiento', [
@@ -650,8 +662,6 @@ class RequerimientoController extends Controller
             ], 500);
         }
     }
-
-
 
 
     /**

@@ -12,10 +12,10 @@
 
         <div class="relative z-10">
             <!-- Header -->
-            <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 mb-8">
-                <div class="text-center">
-                    <h1 class="text-3xl sm:text-5xl font-black mb-3 text-white tracking-tight">Formulario de Postulación</h1>
-                    <p class="text-lg sm:text-xl text-slate-200 font-medium">Completa todos los campos para enviar tu postulación</p>
+            <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 mb-6">
+                <div class="text-center text-white">
+                    <h1 class="text-2xl sm:text-4xl font-bold mb-2">Formulario de Postulación</h1>
+                    <p class="text-xl text-slate-300">Completa todos los campos para enviar tu postulación</p>
                 </div>
             </div>
 
@@ -63,95 +63,95 @@
                 <!-- Step 1: Información Personal -->
                 <div id="step-1" class="form-step">
                     <div class="bg-white rounded-3xl shadow-2xl p-8 mb-8">
-                        <div class="flex items-center mb-10 pb-6 border-b-2 border-blue-100">
-                            <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mr-5 shadow-lg">
-                                <i class="fas fa-user text-white text-2xl"></i>
+                        <div class="flex items-center mb-8">
+                            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                                <i class="fas fa-user text-blue-600 text-xl"></i>
                             </div>
                             <div>
-                                <h2 class="text-3xl font-black text-gray-900">Información Personal</h2>
-                                <p class="text-gray-600 font-medium">Ingresa tus datos personales básicos</p>
+                                <h2 class="text-2xl font-bold text-gray-800">Información Personal</h2>
+                                <p class="text-gray-600">Ingresa tus datos personales básicos</p>
                             </div>
                         </div>
 
                         <div class="grid md:grid-cols-2 gap-6">
                             <!-- Fecha que postula -->
-                            <div class="space-y-3">
-                                <label for="fecha_postula" class="block text-sm font-bold text-gray-800">
+                            <div class="space-y-2">
+                                <label for="fecha_postula" class="block text-xs sm:text-sm font-semibold text-gray-700">
                                     <i class="fas fa-calendar-alt mr-2 text-blue-500"></i>
-                                    Fecha que postula <span class="text-red-600">*</span>
+                                    Fecha que postula *
                                 </label>
                                 <input type="date" id="fecha_postula" name="fecha_postula" readonly
                                     value="{{ date('Y-m-d') }}"
-                                    class="form-input w-full px-4 py-3 border-2 border-gray-300 bg-white text-gray-900 rounded-lg focus:outline-none cursor-not-allowed font-bold">
+                                    class="form-input w-full px-4 py-3 border border-gray-300 bg-gray-100 text-gray-800 rounded-lg focus:outline-none cursor-not-allowed">
                                 <span class="error-message text-red-500 text-sm hidden"></span>
                             </div>
                             <!-- DNI -->
-                            <div class="space-y-3">
-                                <label for="dni" class="block text-sm font-bold text-gray-800">
-                                    <i class="fas fa-id-card mr-2 text-blue-500"></i>
-                                    DNI <span class="text-red-600">*</span>
+                            <div class="space-y-2">
+                                <label for="dni" class="block text-sm font-semibold text-gray-700">
+                                    <i class="block text-sm font-semibold text-slate-200"></i>
+                                    DNI *
                                 </label>
                                 <input type="text" id="dni" name="dni" maxlength="8" pattern="[0-9]{8}"
-                                    class="form-input w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-300 font-bold text-gray-900"
+                                    class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300"
                                     placeholder="12345678">
                                 <span class="error-message text-red-500 text-sm hidden"></span>
                             </div>
 
                             <!-- Nombres -->
-                            <div class="space-y-3">
-                                <label for="nombres" class="block text-sm font-bold text-gray-800">
+                            <div class="space-y-2">
+                                <label for="nombres" class="block text-sm font-semibold text-gray-700">
                                     <i class="fas fa-user mr-2 text-blue-500"></i>
-                                    Nombres <span class="text-red-600">*</span>
+                                    Nombres *
                                 </label>
                                 <input type="text" id="nombres" name="nombres"
-                                    class="form-input w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-300 font-bold text-gray-900"
+                                    class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300"
                                     placeholder="Ingresa tus nombres">
                                 <span class="error-message text-red-500 text-sm hidden"></span>
                             </div>
 
                             <!-- Apellidos -->
-                            <div class="space-y-3">
-                                <label for="apellidos" class="block text-sm font-bold text-gray-800">
+                            <div class="space-y-2">
+                                <label for="apellidos" class="block text-sm font-semibold text-gray-700">
                                     <i class="fas fa-user mr-2 text-blue-500"></i>
-                                    Apellidos <span class="text-red-600">*</span>
+                                    Apellidos *
                                 </label>
                                 <input type="text" id="apellidos" name="apellidos"
-                                    class="form-input w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-300 font-bold text-gray-900"
+                                    class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300"
                                     placeholder="Ingresa tus apellidos">
                                 <span class="error-message text-red-500 text-sm hidden"></span>
                             </div>
 
-                            <!-- Fecha de Nacimiento -->
-                            <div class="space-y-3">
-                                <label for="fecha_nacimiento" class="block text-sm font-bold text-gray-800">
+                            <!-- Fecha que postula -->
+                            <div class="space-y-2">
+                                <label for="fecha_postula" class="block text-xs sm:text-sm font-semibold text-gray-700">
                                     <i class="fas fa-calendar-alt mr-2 text-blue-500"></i>
-                                    Fecha de Nacimiento <span class="text-red-600">*</span>
+                                    Fecha de Nacimiento *
                                 </label>
                                 <input type="date" id="fecha_nacimiento" name="fecha_nacimiento"
-                                    class="form-input w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all duration-300 font-bold text-gray-900">
+                                    class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all duration-300">
                                 <span class="error-message text-red-500 text-sm hidden"></span>
                             </div>
 
                             <!-- Edad -->
-                            <div class="space-y-3">
-                                <label for="edad" class="block text-sm font-bold text-gray-800">
+                            <div class="space-y-2">
+                                <label for="edad" class="block text-sm font-semibold text-gray-700">
                                     <i class="fas fa-calendar mr-2 text-blue-500"></i>
-                                    Edad <span class="text-red-600">*</span>
+                                    Edad *
                                 </label>
                                 <input type="number" id="edad" name="edad" min="18" max="45"
-                                    class="form-input w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-300 font-bold text-gray-900"
+                                    class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300"
                                     placeholder="25">
                                 <span class="error-message text-red-500 text-sm hidden"></span>
                             </div>
 
                             <!-- Departamento -->
-                            <div class="space-y-3">
-                                <label for="departamento" class="block text-sm font-bold text-gray-800">
+                            <div class="space-y-2">
+                                <label for="departamento" class="block text-sm font-semibold text-gray-700">
                                     <i class="fas fa-city mr-2 text-blue-500"></i>
-                                    Departamento <span class="text-red-600">*</span>
+                                    Departamento *
                                 </label>
                                 <select id="departamento" name="departamento"
-                                    class="form-input w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-300 font-bold text-gray-900">
+                                    class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300">
                                     <option value="">Selecciona un departamento</option>
                                     @foreach ($departamentos as $codigo => $descripcion)
                                         <option value="{{ $codigo }}">{{ $descripcion }}</option>
@@ -161,39 +161,39 @@
                             </div>
 
                             <!-- Provincia -->
-                            <div class="space-y-3">
-                                <label for="provincia" class="block text-sm font-bold text-gray-800">
+                            <div class="space-y-2">
+                                <label for="provincia" class="block text-sm font-semibold text-gray-700">
                                     <i class="fas fa-map-marker-alt mr-2 text-blue-500"></i>
-                                    Provincia <span class="text-red-600">*</span>
+                                    Provincia *
                                 </label>
                                 <select id="provincia" name="provincia"
-                                    class="form-input w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-300 font-bold text-gray-900">
+                                    class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300">
                                     <option value="">Selecciona una provincia</option>
                                 </select>
                                 <span class="error-message text-red-500 text-sm hidden"></span>
                             </div>
 
                             <!-- Distrito -->
-                            <div class="space-y-3">
-                                <label for="distrito" class="block text-sm font-bold text-gray-800">
+                            <div class="space-y-2">
+                                <label for="distrito" class="block text-sm font-semibold text-gray-700">
                                     <i class="fas fa-map-marker-alt mr-2 text-blue-500"></i>
-                                    Distrito <span class="text-red-600">*</span>
+                                    Distrito *
                                 </label>
                                 <select id="distrito" name="distrito"
-                                    class="form-input w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-300 font-bold text-gray-900">
+                                    class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300">
                                     <option value="">Selecciona un distrito</option>
                                 </select>
                                 <span class="error-message text-red-500 text-sm hidden"></span>
                             </div>
 
                             <!-- Nacionalidad -->
-                            <div class="space-y-3">
-                                <label for="nacionalidad" class="block text-sm font-bold text-gray-800">
+                            <div class="space-y-2">
+                                <label for="nacionalidad" class="block text-xs sm:text-sm font-semibold text-gray-700">
                                     <i class="fas fa-flag mr-2 text-blue-500"></i>
-                                    Nacionalidad <span class="text-red-600">*</span>
+                                    Nacionalidad *
                                 </label>
                                 <select id="nacionalidad" name="nacionalidad"
-                                    class="form-input w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-300 font-bold text-gray-900">
+                                    class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300">
                                     <option value="">Selecciona tu nacionalidad</option>
                                     <option value="PERUANA">PERUANA</option>
                                     <option value="EXTRANJERA">EXTRANJERA</option>
@@ -201,14 +201,14 @@
                                 <span class="error-message text-red-500 text-sm hidden"></span>
                             </div>
 
-                            <div class="space-y-3">
-                                <label for="grado_instruccion" class="block text-sm font-bold text-gray-800">
-                                    <i class="fas fa-graduation-cap mr-2 text-blue-500"></i>
-                                    Grado de instrucción <span class="text-red-600">*</span>
+                            <div class="space-y-2">
+                                <label for="estado_civil" class="block text-xs sm:text-sm font-semibold text-gray-700">
+                                    <i class="fas fa-heart mr-2 text-blue-500"></i>
+                                    Grado de instrucción *
                                 </label>
                                 <select id="grado_instruccion" name="grado_instruccion"
-                                    class="form-input w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-300 font-bold text-gray-900">
-                                    <option value="">Selecciona el grado de instrucción</option>
+                                    class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300">
+                                    <option value="">Selecciona el cargo</option>
                                     <option value="Universitaria">Universitaria</option>
                                     <option value="Carrera Técnica">Carrera Técnica</option>
                                     <option value="Egresado de las FFAA / FFPP">Egresado de las FFAA / FFPP</option>
@@ -218,20 +218,20 @@
                             </div>
 
                             <!-- Celular -->
-                            <div class="space-y-3">
-                                <label for="celular" class="block text-sm font-bold text-gray-800">
+                            <div class="space-y-2">
+                                <label for="celular" class="block text-sm font-semibold text-gray-700">
                                     <i class="fas fa-phone mr-2 text-blue-500"></i>
-                                    Celular <span class="text-red-600">*</span>
+                                    Celular *
                                 </label>
                                 <input type="tel" id="celular" name="celular" pattern="[0-9]{9}"
-                                    class="form-input w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-300 font-bold text-gray-900"
+                                    class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300"
                                     placeholder="987654321">
                                 <span class="error-message text-red-500 text-sm hidden"></span>
                             </div>
 
-                            <div class="flex justify-end mt-10">
+                            <div class="flex justify-end mt-8">
                                 <button type="button" onclick="nextStep()"
-                                    class="btn-primary px-10 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center space-x-2">
+                                    class="btn-primary px-8 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center space-x-2">
                                     <span>Siguiente</span>
                                     <i class="fas fa-arrow-right"></i>
                                 </button>
@@ -243,25 +243,25 @@
                 <!-- Step 2: Información Profesional -->
                 <div id="step-2" class="form-step hidden">
                     <div class="bg-white rounded-3xl shadow-2xl p-8 mb-8">
-                        <div class="flex items-center mb-10 pb-6 border-b-2 border-green-100">
-                            <div class="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mr-5 shadow-lg">
-                                <i class="fas fa-briefcase text-white text-2xl"></i>
+                        <div class="flex items-center mb-8">
+                            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4">
+                                <i class="fas fa-briefcase text-green-600 text-xl"></i>
                             </div>
                             <div>
-                                <h2 class="text-3xl font-black text-gray-900">Información Profesional</h2>
-                                <p class="text-gray-600 font-medium">Completa tu información laboral y educativa</p>
+                                <h2 class="text-2xl font-bold text-gray-800">Información Profesional</h2>
+                                <p class="text-gray-600">Completa tu información laboral y educativa</p>
                             </div>
                         </div>
 
                         <div class="grid md:grid-cols-2 gap-6">
                             {{-- Vacante / Requerimiento --}}
-                            <div class="space-y-3 md:col-span-2">
-                                <label for="requerimiento_id" class="block text-sm font-bold text-gray-800">
+                            <div class="space-y-2 md:col-span-2">
+                                <label for="requerimiento_id" class="block text-sm font-semibold text-gray-700">
                                     <i class="fas fa-bullseye mr-2 text-green-500"></i>
-                                    Puesto al que postula <span class="text-red-600">*</span>
+                                    Puesto al que postula
                                 </label>
                                 <select id="requerimiento_id" name="requerimiento_id"
-                                    class="form-input w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all duration-300 font-bold text-gray-900">
+                                    class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300">
                                     <option value="">Selecciona una vacante</option>
                                     @foreach ($requerimientos as $req)
                                         <option value="{{ $req->id }}"
@@ -274,13 +274,13 @@
                             </div>
 
                             <!-- Tiempo de experiencia -->
-                            <div class="space-y-3">
-                                <label for="experiencia_rubro" class="block text-sm font-bold text-gray-800">
+                            <div class="space-y-2">
+                                <label for="experiencia_rubro" class="block text-sm font-semibold text-gray-700">
                                     <i class="fas fa-clock mr-2 text-green-500"></i>
-                                    Tiempo de experiencia en el cargo <span class="text-red-600">*</span>
+                                    Tiempo de experiencia en el cargo *
                                 </label>
                                 <select id="experiencia_rubro" name="experiencia_rubro"
-                                    class="form-input w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all duration-300 font-bold text-gray-900">
+                                    class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all duration-300">
                                     <option value="">Selecciona tu experiencia</option>
                                     <option value="Sin experiencia">Sin experiencia</option>
                                     <option value="Menos de 1 año">Menos de 1 año</option>
@@ -292,13 +292,13 @@
                             </div>
 
                             <!-- SUCAMEC -->
-                            <div class="space-y-3">
-                                <label for="sucamec" class="block text-sm font-bold text-gray-800">
+                            <div class="space-y-2">
+                                <label for="sucamec" class="block text-xs sm:text-sm font-semibold text-gray-700">
                                     <i class="fas fa-shield-alt mr-2 text-green-500"></i>
-                                    Curso SUCAMEC vigente <span class="text-red-600">*</span>
+                                    Curso SUCAMEC vigente *
                                 </label>
                                 <select id="sucamec" name="sucamec"
-                                    class="form-input w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all duration-300 font-bold text-gray-900">
+                                    class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all duration-300">
                                     <option value="">Seleccione...</option>
                                     <option value="SI">SI</option>
                                     <option value="NO">NO</option>
@@ -306,14 +306,14 @@
                                 <x-input-error :messages="$errors->get('sucamec')" class="mt-2" />
                             </div>
 
-                            <!-- Carné SUCAMEC -->
-                            <div class="space-y-3">
-                                <label for="carne_sucamec" class="block text-sm font-bold text-gray-800">
+                            <!-- SUCAMEC -->
+                            <div class="space-y-2">
+                                <label for="sucamec" class="block text-xs sm:text-sm font-semibold text-gray-700">
                                     <i class="fas fa-shield-alt mr-2 text-green-500"></i>
-                                    Carné SUCAMEC vigente <span class="text-red-600">*</span>
+                                    Carné SUCAMEC vigente *
                                 </label>
                                 <select id="carne_sucamec" name="carne_sucamec"
-                                    class="form-input w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all duration-300 font-bold text-gray-900">
+                                    class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all duration-300">
                                     <option value="">Seleccione...</option>
                                     <option value="SI">SI</option>
                                     <option value="NO">NO</option>
@@ -322,13 +322,13 @@
                             </div>
 
                             <!-- Licencia de arma -->
-                            <div class="space-y-3">
-                                <label for="licencia_arma" class="block text-sm font-bold text-gray-800">
+                            <div class="space-y-2">
+                                <label for="licencia_arma" class="block text-xs sm:text-sm font-semibold text-gray-700">
                                     <i class="fas fa-certificate mr-2 text-green-500"></i>
-                                    Licencia de arma <span class="text-red-600">*</span>
+                                    Licencia de arma*
                                 </label>
                                 <select id="licencia_arma" name="licencia_arma"
-                                    class="form-input w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all duration-300 font-bold text-gray-900">
+                                    class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all duration-300">
                                     <option value="">Seleccione...</option>
                                     <option value="NO">NO</option>
                                     <option value="L1">L1</option>
@@ -342,14 +342,14 @@
                             </div>
 
                             <!-- Licencia de conducir -->
-                            <div class="space-y-3">
+                            <div class="space-y-2">
                                 <label for="licencia_conducir"
-                                    class="block text-sm font-bold text-gray-800">
+                                    class="block text-xs sm:text-sm font-semibold text-gray-700">
                                     <i class="fas fa-id-card-alt mr-2 text-green-500"></i>
-                                    Licencia de conducir A1 <span class="text-red-600">*</span>
+                                    Licencia de conducir A1 *
                                 </label>
                                 <select id="licencia_conducir" name="licencia_conducir"
-                                    class="form-input w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all duration-300 font-bold text-gray-900">
+                                    class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all duration-300">
                                     <option value="">Seleccione...</option>
                                     <option value="NO">NO</option>
                                     <option value="A_I">A-I</option>
@@ -367,14 +367,14 @@
                             </div>
                         </div>
 
-                        <div class="flex justify-between mt-10 gap-4">
+                        <div class="flex justify-between mt-8">
                             <button type="button" onclick="prevStep()"
-                                class="px-8 py-3 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-bold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center space-x-2">
+                                class="px-8 py-3 bg-gray-500 text-white rounded-lg font-semibold hover:bg-gray-600 transition-colors flex items-center space-x-2">
                                 <i class="fas fa-arrow-left"></i>
                                 <span>Anterior</span>
                             </button>
                             <button type="button" onclick="nextStep()"
-                                class="btn-primary px-8 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center space-x-2">
+                                class="btn-primary px-8 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center space-x-2">
                                 <span>Siguiente</span>
                                 <i class="fas fa-arrow-right"></i>
                             </button>
@@ -385,13 +385,13 @@
                 <!-- Step 3: Documentos -->
                 <div id="step-3" class="form-step hidden">
                     <div class="bg-white rounded-3xl shadow-2xl p-8 mb-8">
-                        <div class="flex items-center mb-10 pb-6 border-b-2 border-purple-100">
-                            <div class="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center mr-5 shadow-lg">
-                                <i class="fas fa-file-upload text-white text-2xl"></i>
+                        <div class="flex items-center mb-8">
+                            <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mr-4">
+                                <i class="fas fa-file-upload text-purple-600 text-xl"></i>
                             </div>
                             <div>
-                                <h2 class="text-3xl font-black text-gray-900">Documentos</h2>
-                                <p class="text-gray-600 font-medium">Sube los documentos requeridos para tu postulación</p>
+                                <h2 class="text-2xl font-bold text-gray-800">Documentos</h2>
+                                <p class="text-gray-600">Sube los documentos requeridos para tu postulación</p>
                             </div>
                         </div>
 
@@ -454,14 +454,14 @@
                             </div>
                         </div>
 
-                        <div class="flex justify-between mt-10 gap-4">
+                        <div class="flex justify-between mt-8">
                             <button type="button" onclick="prevStep()"
-                                class="px-8 py-3 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-bold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center space-x-2">
+                                class="px-8 py-3 bg-gray-500 text-white rounded-lg font-semibold hover:bg-gray-600 transition-colors flex items-center space-x-2">
                                 <i class="fas fa-arrow-left"></i>
                                 <span>Anterior</span>
                             </button>
                             <button type="submit"
-                                class="btn-primary px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-bold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center space-x-2">
+                                class="btn-primary px-8 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors flex items-center space-x-2">
                                 <i class="fas fa-paper-plane"></i>
                                 <span>Enviar Postulación</span>
                             </button>
@@ -484,75 +484,6 @@
         <script>
             let currentStep = 1;
             const totalSteps = 3;
-
-            function showStep(stepNumber) {
-                for (let i = 1; i <= totalSteps; i++) {
-                    const stepEl = document.getElementById(`step-${i}`);
-                    if (!stepEl) continue;
-                    stepEl.classList.toggle('hidden', i !== stepNumber);
-                }
-                currentStep = stepNumber;
-                updateProgressBar();
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
-            }
-
-            document.addEventListener('DOMContentLoaded', function() {
-                const form = document.getElementById('postulanteForm');
-                if (!form) return;
-
-                form.addEventListener('submit', function(e) {
-                    if (form.checkValidity()) return;
-
-                    e.preventDefault();
-                    const firstInvalid = form.querySelector(':invalid');
-                    if (firstInvalid) {
-                        const stepEl = firstInvalid.closest('.form-step');
-                        if (stepEl?.id) {
-                            const stepNum = parseInt(stepEl.id.replace('step-', ''), 10);
-                            if (!Number.isNaN(stepNum)) {
-                                showStep(stepNum);
-                            }
-                        }
-                        firstInvalid.focus({
-                            preventScroll: true
-                        });
-                        if (typeof firstInvalid.reportValidity === 'function') {
-                            firstInvalid.reportValidity();
-                        }
-                    }
-                });
-            });
-
-            // ========== VERIFICAR ERROR DE DUPLICADO AL CARGAR ==========
-            document.addEventListener('DOMContentLoaded', function() {
-                @if (session('duplicate_entry'))
-                    Swal.fire({
-                        icon: 'error',
-                        title: '❌ Postulación Duplicada',
-                        html: `
-                            <div class="text-left">
-                                <p class="mb-3 font-bold text-lg">
-                                    Ya existe una postulación registrada con este DNI.
-                                </p>
-                                <p class="text-sm text-gray-700 mb-2">
-                                    Solo se permite una postulación por persona en el sistema.
-                                </p>
-                            </div>
-                        `,
-                        confirmButtonColor: '#dc2626',
-                        confirmButtonText: 'Entendido',
-                        width: 450,
-                        padding: '2.5rem',
-                        backdrop: true,
-                    }).then(() => {
-                        // Solo recargar la página
-                        location.reload();
-                    });
-                @endif
-            });
 
             document.addEventListener('DOMContentLoaded', function() {
                 const depSelect = document.getElementById('departamento');
@@ -764,14 +695,22 @@
             function nextStep() {
                 if (validateCurrentStep()) {
                     if (currentStep < totalSteps) {
-                        showStep(currentStep + 1);
+                        document.getElementById(`step-${currentStep}`).classList.add('hidden');
+                        currentStep++;
+                        document.getElementById(`step-${currentStep}`).classList.remove('hidden');
+                        updateProgressBar();
+                        window.scrollTo(0, 0);
                     }
                 }
             }
 
             function prevStep() {
                 if (currentStep > 1) {
-                    showStep(currentStep - 1);
+                    document.getElementById(`step-${currentStep}`).classList.add('hidden');
+                    currentStep--;
+                    document.getElementById(`step-${currentStep}`).classList.remove('hidden');
+                    updateProgressBar();
+                    window.scrollTo(0, 0);
                 }
             }
 
@@ -857,35 +796,12 @@
         }
 
         .form-input {
-            background-color: #ffffff !important;
-            color: #000000 !important;
-            border: 2px solid #d1d5db !important;
-            font-weight: 700 !important;
             transition: all 0.3s ease;
         }
 
-        .form-input::placeholder {
-            color: #6b7280 !important;
-            opacity: 1 !important;
-        }
-
         .form-input:focus {
-            background-color: #ffffff !important;
-            color: #000000 !important;
             transform: translateY(-2px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-        }
-
-        .form-input option {
-            color: #000000 !important;
-            background-color: #ffffff !important;
-            font-weight: 600 !important;
-        }
-
-        .form-input:disabled {
-            background-color: #f3f4f6 !important;
-            color: #9ca3af !important;
-            cursor: not-allowed;
+            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.35);
         }
 
         .btn-primary {
@@ -893,9 +809,8 @@
         }
 
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            transform: translateY(-1px);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
         }
     </style>
 @endsection
-

@@ -240,14 +240,11 @@
                         <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Nacionalidad</th>
                         <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Experiencia</th>
                         <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Curso SUCAMEC</th>
-                        <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">CarnÃ© SUCAMEC</th>
-                        <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Grado de InstrucciÃ³n
-                        </th>
+                        <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Carne SUCAMEC</th>
+                        <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Grado de Instrucción</th>
                         <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Celular</th>
-                        <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Licencia de Arma L4
-                        </th>
-                        <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Licencia de Conducir A1
-                        </th>
+                        <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Licencia de Arma L4</th>
+                        <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Licencia de Conducir A1</th>
                         <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">CV</th>
                         <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">CUL</th>
                         <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Acciones</th>
@@ -273,7 +270,7 @@
                             </td>
 
                             <td class="px-6 py-4">
-                                <p class="text-gray-700 text-center">{{ ucfirst($postulante->edad) }} aÃ±os</p>
+                                <p class="text-gray-700 text-center">{{ ucfirst($postulante->edad) }} años</p>
                             </td>
 
                             <td class="px-6 py-4">
@@ -362,7 +359,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-4 py-6 text-center text-gray-500">No se encontraron resultados.</td>
+                            <td colspan="9" class="px-4 py-6 text-center text-gray-500">No hay postulantes registrados</td>
                         </tr>
                     @endforelse
                 </tbody>

@@ -39,12 +39,11 @@ class Requerimiento extends Model
         'curso_sucamec_operativo',
         'carne_sucamec_operativo',
         'licencia_armas',
-        'servicio_acuartelado',
+       'servicio_acuartelado',
         'grado_academico',
         'formacion_adicional',
         'validado_rrhh',
         'escala_remunerativa',
-        'beneficios',
         'prioridad',
         'estado',
         'fecha_limite',
@@ -63,6 +62,8 @@ class Requerimiento extends Model
         'validado_rrhh' => 'boolean',
         'requiere_licencia_conducir' => 'boolean',
         'requiere_sucamec' => 'boolean',
+        'beneficios' => 'array',
+        'servicio_acuartelado' => 'array',
     ];
 
 

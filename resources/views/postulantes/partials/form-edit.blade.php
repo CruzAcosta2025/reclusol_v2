@@ -271,6 +271,8 @@
                     class="block text-sm font-semibold text-gray-900 flex items-center gap-2">
                     <i class="fas fa-briefcase-clock text-blue-600"></i> Experiencia en el rubro
                 </label>
+
+
                 <select id="experiencia_rubro_edit" name="experiencia_rubro" required
                     class="mt-1 block w-full border border-gray-400 text-gray-900 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
                     data-value="{{ old('experiencia_rubro', $postulante->experiencia_rubro) }}">

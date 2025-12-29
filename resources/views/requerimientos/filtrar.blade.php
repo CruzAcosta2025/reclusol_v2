@@ -206,22 +206,29 @@
                 <table class="w-full">
                     <thead class="bg-gradient-to-r from-blue-50 to-blue-100">
                         <tr class="text-left">
-                            <th class="px-6 py-4 text-center font-bold text-gray-800 uppercase text-center">Tipo de Personal</th>
-                            <th class="px-6 py-4 text-center font-bold text-gray-800 uppercase text-center">Cargo Solicitado</th>
+                            <th class="px-6 py-4 text-center font-bold text-gray-800 uppercase text-center">Tipo de Personal
+                            </th>
+                            <th class="px-6 py-4 text-center font-bold text-gray-800 uppercase text-center">Cargo Solicitado
+                            </th>
                             <th class="px-6 py-4 text-center font-bold text-gray-800 uppercase text-center">Sucursal</th>
                             <th class="px-6 py-4 text-center font-bold text-gray-800 uppercase text-center">Cliente</th>
                             <th class="px-6 py-4 text-center font-bold text-gray-800 uppercase text-center"> Urgencia</th>
                             <th class="px-6 py-4 text-center font-bold text-gray-800 uppercase text-center">Estado </th>
-                            <th class="px-6 py-4 text-center font-bold text-gray-800 uppercase text-center">Fecha Inicio </th>
-                            <th class="px-6 py-4 text-center font-bold text-gray-800 uppercase text-center">Fecha Final </th>
-
-                            <th class="px-6 py-4 text-center font-bold text-gray-800 uppercase text-center">Edad Minima </th>
-                            <th class="px-6 py-4 text-center font-bold text-gray-800 uppercase text-center">Edad Maxima </th>
-                            <th class="px-6 py-4 text-center font-bold text-gray-800 uppercase text-center">Experiencia Minima </th>
-                            <th class="px-6 py-4 text-center font-bold text-gray-800 uppercase text-center">Grado Academico </th>
-
+                            <th class="px-6 py-4 text-center font-bold text-gray-800 uppercase text-center">Fecha Inicio
+                            </th>
+                            <th class="px-6 py-4 text-center font-bold text-gray-800 uppercase text-center">Fecha Final
+                            </th>
+                            <th class="px-6 py-4 text-center font-bold text-gray-800 uppercase text-center">Edad Minima
+                            </th>
+                            <th class="px-6 py-4 text-center font-bold text-gray-800 uppercase text-center">Edad Maxima
+                            </th>
+                            <th class="px-6 py-4 text-center font-bold text-gray-800 uppercase text-center">Experiencia
+                                Minima </th>
+                            <th class="px-6 py-4 text-center font-bold text-gray-800 uppercase text-center">Grado Academico
+                            </th>
                             <th class="px-6 py-4 text-center font-bold text-gray-800 uppercase text-center">Sueldo </th>
-                            <th class="px-6 py-4 text-center font-bold text-gray-800 uppercase text-center">Beneficios </th>
+                            <th class="px-6 py-4 text-center font-bold text-gray-800 uppercase text-center">Beneficios
+                            </th>
                             <th class="px-6 py-4 text-center font-bold text-gray-800 uppercase text-center">Acciones
                             </th>
                         </tr>
@@ -281,38 +288,53 @@
 
 
                                 <td class="px-6 py-4 text-gray-700 text-center">
-                                    {{ $requerimiento->fecha_inicio ? $requerimiento->fecha_inicio->format('d/m/Y') : 'â€”' }}
+                                    {{ $requerimiento->fecha_inicio ? $requerimiento->fecha_inicio->format('d/m/Y') : '-' }}
                                 </td>
 
                                 <td class="px-6 py-4 text-gray-700 text-center">
-                                    {{ $requerimiento->fecha_fin ? $requerimiento->fecha_fin->format('d/m/Y') : 'â€”' }}
+                                    {{ $requerimiento->fecha_fin ? $requerimiento->fecha_fin->format('d/m/Y') : '-' }}
                                 </td>
 
                                 <td class="px-6 py-4 text-gray-700 text-center">
-                                    {{ $requerimiento->edad_minima ? $requerimiento->edad_minima . ' aÃ±os' : 'â€”' }}
+                                    {{ $requerimiento->edad_minima ? $requerimiento->edad_minima . ' años' : '-' }}
                                 </td>
 
                                 <td class="px-6 py-4 text-gray-700 text-center">
-                                    {{ $requerimiento->edad_maxima ? $requerimiento->edad_maxima . ' aÃ±os' : 'â€”' }}
+                                    {{ $requerimiento->edad_maxima ? $requerimiento->edad_maxima . ' años' : '-' }}
                                 </td>
 
                                 <td class="px-6 py-4 text-gray-700 text-center">
-                                    {{ $requerimiento->experiencia_minima ? $requerimiento->experiencia_minima : 'â€”' }}
+                                    {{ $requerimiento->experiencia_minima ? $requerimiento->experiencia_minima : '-' }}
                                 </td>
 
                                 <td class="px-6 py-4 text-gray-700 text-center">
-                                    {{ $requerimiento->grado_academico ? $requerimiento->grado_academico : 'â€”' }}
-                                </td>
-                                
-                                <td class="px-6 py-4 text-gray-700 text-center">
-                                    {{ $requerimiento->sueldo_basico ? 'S/' . $requerimiento->sueldo_basico : 'â€”' }}
+                                    {{ $requerimiento->grado_academico ? $requerimiento->grado_academico : '-' }}
                                 </td>
 
                                 <td class="px-6 py-4 text-gray-700 text-center">
-                                    {{ $requerimiento->beneficios ? $requerimiento->beneficios: 'â€”' }}
+                                    {{ $requerimiento->sueldo_basico ? 'S/' . $requerimiento->sueldo_basico : '—' }}
                                 </td>
 
-                                <td class="px-4 py-3 flex space-x-2">
+                                <td class="px-6 py-4 text-gray-700 text-center">
+                                    @php
+                                        $beneficios = json_decode($requerimiento->beneficios ?? '[]', true) ?: [];
+                                    @endphp
+
+                                    @if (count($beneficios))
+                                        <div class="flex flex-wrap gap-1 justify-center">
+                                            @foreach ($beneficios as $b)
+                                                <span class="px-2 py-1 text-xs rounded-full bg-purple-100 text-purple-700">
+                                                    {{ $b }}
+                                                </span>
+                                            @endforeach
+                                        </div>
+                                    @else
+                                        —
+                                    @endif
+                                </td>
+
+
+                                <td class="px-4 py-3 align-middle">
                                     <button data-id="{{ $requerimiento->id }}"
                                         class="btn-edit inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-50 hover:bg-green-100 text-green-600 transition"
                                         title="Editar">
@@ -327,8 +349,8 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9" class="text-center py-6 text-gray-500">No hay requerimientos.
-                                </td>
+                                <td colspan="9" class="text-center py-6 text-gray-500">No hay requerimientos
+                                    registrados</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -360,12 +382,14 @@
                     <!-- Encabezado -->
                     <div class="text-center mb-6">
                         <div class="flex justify-center mb-4">
-                            <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-red-100 to-red-50 border-2 border-red-200">
+                            <div
+                                class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-red-100 to-red-50 border-2 border-red-200">
                                 <i class="fa-solid fa-triangle-exclamation text-red-600 text-2xl"></i>
                             </div>
                         </div>
                         <h3 id="delete-title" class="text-2xl font-bold text-gray-900 mb-2">¿Eliminar requerimiento?</h3>
-                        <p id="delete-desc" class="text-base text-gray-700 leading-relaxed">Esta accion no se puede deshacer. Confirma que deseas eliminar este requerimiento.</p>
+                        <p id="delete-desc" class="text-base text-gray-700 leading-relaxed">Esta accion no se puede
+                            deshacer. Confirma que deseas eliminar este requerimiento.</p>
                     </div>
 
                     <!-- LÃ­nea separadora -->
@@ -552,7 +576,8 @@
                 const res = await fetch(`/requerimientos/${deleteRequerimientoId}`, {
                     method: 'DELETE',
                     headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                            'content'),
                         'X-Requested-With': 'XMLHttpRequest',
                         'Accept': 'application/json',
                     },
@@ -964,8 +989,8 @@
                         if (data.success) {
                             Swal.fire({
                                 icon: 'success',
-                                title: 'Â¡Ã‰xito!',
-                                text: 'Â¡Requerimiento actualizado correctamente!',
+                                title: '¡Éxito!',
+                                text: '¡Requerimiento actualizado correctamente!',
                                 confirmButtonColor: '#3085d6',
                                 timer: 1800,
                                 timerProgressBar: true,
@@ -983,17 +1008,17 @@
                         }
                     })
                     .catch(err => {
-                        let mensaje = 'OcurriÃ³ un error inesperado.';
+                        let mensaje = 'Ocurrió un error inesperado.';
                         if (err.errors) {
                             mensaje = Object.values(err.errors).flat().join('\n');
                         }
                         Swal.fire({
                             icon: 'error',
-                            title: 'Error de validaciÃ³n',
                             text: mensaje,
+                            title: 'Error de validación',
                             confirmButtonColor: '#d33'
                         });
-                        console.error('Errores de validaciÃ³n:', err.errors || err);
+                        console.error('Errores de validación:', err.errors || err);
                     });
             }
         });
@@ -1207,7 +1232,6 @@
                 calcularUrgencia();
             }
         }
-
     </script>
 
     <style>
@@ -1347,7 +1371,3 @@
     </style>
 
 @endsection
-
-
-
-

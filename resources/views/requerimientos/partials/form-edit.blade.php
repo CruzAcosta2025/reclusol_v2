@@ -208,78 +208,117 @@
                 </div>
 
                 {{-- Experiencia Mínima --}}
+                @php
+                    $opExp = [
+                        'Sin experiencia',
+                        'Menos de 1 año',
+                        'Entre 1 y 2 años',
+                        'Entre 3 y 4 años',
+                        'Mas de 4 años',
+                    ];
+                @endphp
+
                 <div>
-                    <label for="experiencia_minima_edit" class="block text-sm font-medium text-gray-700">Experiencia
-                        Mínima</label>
-                    <select id="experiencia_minima_edit" name="experiencia_minima"
-                        class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                        <option value="">Selecciona experiencia</option>
-                        <option value="6_meses" @selected(old('experiencia_minima', $requerimiento->experiencia_minima) == '6_meses')>Sin experiencia</option>
-                        <option value="1_anio" @selected(old('experiencia_minima', $requerimiento->experiencia_minima) == '1_anio')>Menos de 1 año</option>
-                        <option value="2_anios" @selected(old('experiencia_minima', $requerimiento->experiencia_minima) == '2_anios')>Entre 1 y 2 años</option>
-                        <option value="3_4_anios" @selected(old('experiencia_minima', $requerimiento->experiencia_minima) == '3_4_anios')>Entre 3 y 4 años</option>
-                        <option value="4_anios" @selected(old('experiencia_minima', $requerimiento->experiencia_minima) == '4_anios')>Más de 4 años</option>
+                    <label for="experiencia_minima_edit"
+                        class="block text-sm font-semibold text-gray-900 flex items-center gap-2">
+                        <i class="fas fa-briefcase-clock text-blue-600"></i> Experiencia Mínima
+                    </label>
+                    <select id="experiencia_minima_edit" name="experiencia_minima" required
+                        class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        data-value = "{{ old('experiencia_minima', $requerimiento->experiencia_minima) }}">
+                        <option value="">Selecciona la experiencia</option>
+                        @foreach ($opExp as $exp)
+                            <option value="{{ $exp }}" @selected(old('experiencia_minima', $requerimiento->experiencia_minima) == $exp)>
+                                {{ $exp }}
+                            </option>
+                        @endforeach
                     </select>
                     @error('experiencia_minima')
                         <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
+                @php
+                    $gradosAcademicos = [
+                        '5to Grado de Secundaria',
+                        'Egresado de la FFAA/FFPP',
+                        'Carrera Técnica',
+                        'Carrera Universitaria',
+                    ];
+                @endphp
+
                 {{-- Grado Académico --}}
                 <div>
-                    <label for="grado_academico_edit" class="block text-sm font-medium text-gray-700">Grado
-                        Académico requerido</label>
-                    <select id="grado_academico_edit" name="grado_academico"
+                    <label for="grado_academico_edit"
+                        class="block text-sm font-semibold text-gray-900 flex items-center gap-2">
+                        <i class="fas fa-graduation-cap text-blue-600"></i> Grado Académico requerido
+                    </label>
+
+                    <select id="grado_academico_edit" name="grado_academico" required
                         class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                        <option value="">Selecciona grado</option>
-                        <option value="secundaria" @selected(old('grado_academico', $requerimiento->grado_academico) == 'secundaria')>5to Grado de Secundaria</option>
-                        <option value="ffaa_ffpp" @selected(old('grado_academico', $requerimiento->grado_academico) == 'ffaa_ffpp')>Egresado de la FFAA/FFPP</option>
-                        <option value="tecnica" @selected(old('grado_academico', $requerimiento->grado_academico) == 'tecnica')>Carrera Técnica</option>
-                        <option value="universitaria" @selected(old('grado_academico', $requerimiento->grado_academico) == 'universitaria')>Carrera Universitaria</option>
+                        <option value="">Selecciona el grado</option>
+                        @foreach ($gradosAcademicos as $gad)
+                            <option value="{{ $gad }}" @selected(old('grado_academico', $requerimiento->grado_academico) == $gad)>
+                                {{ $gad }}
+                            </option>
+                        @endforeach
                     </select>
                     @error('grado_academico')
                         <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
+
             </div>
 
             {{-- CAMPOS SOLO PARA OPERATIVO --}}
             <div id="campos-operativo-edit" class="mt-6 pt-6 border-t" style="display: none;">
                 <h4 class="text-md font-semibold text-gray-700 mb-4">Requisitos Especiales (Operativo)</h4>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
                     {{-- Curso SUCAMEC --}}
                     <div>
                         <label for="curso_sucamec_operativo_edit"
-                            class="block text-sm font-medium text-gray-700">Curso SUCAMEC vigente</label>
+                            class="block text-sm font-medium text-gray-700">Curso SUCAMEC vigente
+                        </label>
+
                         <select id="curso_sucamec_operativo_edit" name="curso_sucamec_operativo"
-                            class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">Selecciona</option>
-                            <option value="si" @selected(old('curso_sucamec_operativo', $requerimiento->curso_sucamec_operativo) == 'si')>Sí</option>
-                            <option value="no" @selected(old('curso_sucamec_operativo', $requerimiento->curso_sucamec_operativo) == 'no')>No</option>
+                            class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                            data-value="{{ old('curso_sucamec_operativo', $requerimiento->curso_sucamec_operativo) }}">
+                            @foreach (['Sí', 'No'] as $option)
+                                <option value="{{ $option }}" @selected(old('curso_sucamec_operativo', $requerimiento->curso_sucamec_operativo) == $option)>
+                                    {{ ucfirst($option) }}
+                                </option>
+                            @endforeach
                         </select>
                     </div>
 
                     {{-- Carné SUCAMEC --}}
                     <div>
                         <label for="carne_sucamec_operativo_edit"
-                            class="block text-sm font-medium text-gray-700">Carné SUCAMEC vigente</label>
+                            class="block text-sm font-medium text-gray-700">Carné SUCAMEC vigente
+                        </label>
                         <select id="carne_sucamec_operativo_edit" name="carne_sucamec_operativo"
                             class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">Selecciona</option>
-                            <option value="si" @selected(old('carne_sucamec_operativo', $requerimiento->carne_sucamec_operativo) == 'si')>Sí</option>
-                            <option value="no" @selected(old('carne_sucamec_operativo', $requerimiento->carne_sucamec_operativo) == 'no')>No</option>
+                            @foreach (['Sí', 'No'] as $option)
+                                <option value="{{ $option }}" @selected(old('carne_sucamec_operativo', $requerimiento->carne_sucamec_operativo) == $option)>
+                                    {{ ucfirst($option) }}
+                                </option>
+                            @endforeach
                         </select>
                     </div>
 
                     {{-- Licencia Armas --}}
                     <div>
-                        <label for="licencia_armas_edit" class="block text-sm font-medium text-gray-700">Licencia para
-                            portar armas (L4-L5)</label>
+                        <label for="licencia_armas_edit" class="block text-sm font-medium text-gray-700">
+                            Licencia para portar armas (L4-L5)
+                        </label>
                         <select id="licencia_armas_edit" name="licencia_armas"
                             class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">Selecciona</option>
-                            <option value="si" @selected(old('licencia_armas', $requerimiento->licencia_armas) == 'si')>Sí</option>
-                            <option value="no" @selected(old('licencia_armas', $requerimiento->licencia_armas) == 'no')>No</option>
+                            @foreach (['Sí', 'No'] as $option)
+                                <option value="{{ $option }}" @selected(old('licencia_armas', $requerimiento->licencia_armas) == $option)>
+                                    {{ ucfirst($option) }}
+                                </option>
+                            @endforeach
                         </select>
                     </div>
 
@@ -289,26 +328,80 @@
                             class="block text-sm font-medium text-gray-700">Licencia de conducir</label>
                         <select id="requiere_licencia_conducir_edit" name="requiere_licencia_conducir"
                             class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">Selecciona</option>
-                            <option value="si" @selected(old('requiere_licencia_conducir', $requerimiento->requiere_licencia_conducir) == 'si')>Sí</option>
-                            <option value="no" @selected(old('requiere_licencia_conducir', $requerimiento->requiere_licencia_conducir) == 'no')>No</option>
+                            @foreach (['Sí', 'No'] as $option)
+                                <option value="{{ $option }}" @selected(old('requiere_licencia_conducir', $requerimiento->requiere_licencia_conducir) == $option)>
+                                    {{ ucfirst($option) }}
+                                </option>
+                            @endforeach
                         </select>
                     </div>
 
                     {{-- Servicio Acuartelado --}}
+                    @php
+                        $servicioAcuarteladoSelected = old('servicio_acuartelado');
+                        if ($servicioAcuarteladoSelected === null) {
+                            $servicioAcuarteladoSelected =
+                                json_decode($requerimiento->servicio_acuartelado ?? '[]', true) ?: [];
+                        }
+                    @endphp
+
                     <div class="md:col-span-2">
-                        <label for="servicio_acuartelado_edit"
-                            class="block text-sm font-medium text-gray-700">Servicio acuartelado</label>
-                        <select id="servicio_acuartelado_edit" name="servicio_acuartelado"
-                            class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">Selecciona</option>
-                            <option value="no" @selected(old('servicio_acuartelado', $requerimiento->servicio_acuartelado) == 'no')>No</option>
-                            <option value="con_habitabilidad" @selected(old('servicio_acuartelado', $requerimiento->servicio_acuartelado) == 'con_habitabilidad')>Con habitabilidad</option>
-                            <option value="con_alimentacion" @selected(old('servicio_acuartelado', $requerimiento->servicio_acuartelado) == 'con_alimentacion')>Con alimentación</option>
-                            <option value="con_movilidad" @selected(old('servicio_acuartelado', $requerimiento->servicio_acuartelado) == 'con_movilidad')>Con movilidad de traslado
-                            </option>
-                        </select>
+                        <label class="block text-sm font-medium text-gray-700">Servicio acuartelado</label>
+
+                        <div class="mt-1" x-data="{
+                            open: false,
+                            options: ['No', 'Con habitabilidad', 'Con alimentación', 'Con movilidad de traslado'],
+                            selected: @js($servicioAcuarteladoSelected),
+                        }">
+                            <button type="button" @click="open=!open"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white text-left shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                <template x-if="selected.length === 0">
+                                    <span class="text-gray-400">Selecciona</span>
+                                </template>
+                                <template x-if="selected.length > 0">
+                                    <span class="text-gray-700" x-text="selected.join(', ')"></span>
+                                </template>
+                            </button>
+
+                            <div x-show="open" x-transition @click.outside="open=false"
+                                class="mt-2 w-full bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden"
+                                style="display:none;">
+                                <div class="max-h-56 overflow-auto p-2">
+                                    <template x-for="(opt,i) in options" :key="i">
+                                        <label
+                                            class="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-blue-50 cursor-pointer">
+                                            <input type="checkbox"
+                                                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                :value="opt" x-model="selected">
+                                            <span class="text-sm text-gray-700" x-text="opt"></span>
+                                        </label>
+                                    </template>
+                                </div>
+
+                                <div class="border-t px-3 py-2 flex items-center justify-between">
+                                    <button type="button" class="text-sm text-gray-500 hover:text-gray-700"
+                                        @click="selected=[]">
+                                        Limpiar
+                                    </button>
+                                    <button type="button"
+                                        class="text-sm text-blue-600 font-semibold hover:text-blue-700"
+                                        @click="open=false">
+                                        Listo
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Enviar como array -->
+                            <template x-for="(val,i) in selected" :key="i + '-' + val">
+                                <input type="hidden" name="servicio_acuartelado[]" :value="val">
+                            </template>
+                        </div>
+
+                        @error('servicio_acuartelado')
+                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
                     </div>
+
                 </div>
             </div>
         </div>
@@ -337,21 +430,67 @@
                 </div>
 
                 {{-- Beneficios --}}
+                @php
+                    $beneficiosSelected = old('beneficios');
+                    if ($beneficiosSelected === null) {
+                        $beneficiosSelected = json_decode($requerimiento->beneficios ?? '[]', true) ?: [];
+                    }
+                @endphp
                 <div>
-                    <label for="beneficios_edit" class="block text-sm font-medium text-gray-700">Beneficios
-                        Adicionales</label>
-                    <select id="beneficios_edit" name="beneficios" required
-                        class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                        <option value="">Selecciona</option>
-                        <option value="escala_a" @selected(old('beneficios', $requerimiento->beneficios) == 'escala_a')>Seguro de Salud</option>
-                        <option value="escala_b" @selected(old('beneficios', $requerimiento->beneficios) == 'escala_b')>CTS</option>
-                        <option value="escala_c" @selected(old('beneficios', $requerimiento->beneficios) == 'escala_c')>Vacaciones</option>
-                        <option value="escala_d" @selected(old('beneficios', $requerimiento->beneficios) == 'escala_d')>Asignación familiar</option>
-                    </select>
+                    <label class="block text-sm font-medium text-gray-700">Beneficios Adicionales</label>
+
+                    <div class="mt-1" x-data="{
+                        open: false,
+                        options: ['Seguro de Salud', 'CTS', 'Vacaciones', 'Asignación familiar', 'Utilidades', 'Gratificación'],
+                        selected: @js($beneficiosSelected), }">
+                        <button type="button" @click="open=!open"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white text-left shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <template x-if="selected.length === 0">
+                                <span class="text-gray-400">Selecciona</span>
+                            </template>
+                            <template x-if="selected.length > 0">
+                                <span class="text-gray-700" x-text="selected.join(', ')"></span>
+                            </template>
+                        </button>
+
+                        <div x-show="open" x-transition @click.outside="open=false"
+                            class="mt-2 w-full bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden"
+                            style="display:none;">
+                            <div class="max-h-56 overflow-auto p-2">
+                                <template x-for="(opt,i) in options" :key="i">
+                                    <label
+                                        class="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-blue-50 cursor-pointer">
+                                        <input type="checkbox"
+                                            class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                            :value="opt" x-model="selected">
+                                        <span class="text-sm text-gray-700" x-text="opt"></span>
+                                    </label>
+                                </template>
+                            </div>
+
+                            <div class="border-t px-3 py-2 flex items-center justify-between">
+                                <button type="button" class="text-sm text-gray-500 hover:text-gray-700"
+                                    @click="selected=[]">
+                                    Limpiar
+                                </button>
+                                <button type="button" class="text-sm text-blue-600 font-semibold hover:text-blue-700"
+                                    @click="open=false">
+                                    Listo
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Enviar como array -->
+                        <template x-for="(val,i) in selected" :key="i + '-' + val">
+                            <input type="hidden" name="beneficios[]" :value="val">
+                        </template>
+                    </div>
+
                     @error('beneficios')
                         <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
+
             </div>
         </div>
 
