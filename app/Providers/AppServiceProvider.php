@@ -6,8 +6,8 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
 use App\Http\View\Composers\SidebarComposer;
 use App\Repositories\Implementations\BaseRepository;
-use App\Repositories\RequerimientosRepository;
-use App\Repositories\EntrevistaRepository;
+use App\Repositories\Implementations\RequerimientosRepository;
+use App\Repositories\Implementations\EntrevistaRepository;
 use App\Repositories\Implementations\CargoRepository;
 use App\Repositories\Implementations\ClienteRepository;
 use App\Repositories\Implementations\TipoCargoRepository;
@@ -43,26 +43,5 @@ class AppServiceProvider extends ServiceProvider
     {
         // Register sidebar composer to dynamically build sidebar items
         View::composer('components.sidebar', SidebarComposer::class);
-        /*
-        View::composer('postulantes.registroPrimario', function ($view) {
-            $departamentos = Catalogo::obtenerDepartamentos();
-            $provincias = Catalogo::obtenerTodasProvincias();
-            $view->with(compact(
-                'departamentos',
-                'provincias',
-            ));
-        });
-
-        View::composer('requerimientos.requerimiento', function ($view) {
-            $sucursales = Catalogo::obtenerSucursal();
-            $tipoCargos = Catalogo::obtenerTipoCargo();
-            $cargos = Catalogo::obtenerCargo();
-            $niveles = Catalogo::obtenerNivelEducativo();
-            $departamentos = Catalogo::obtenerDepartamentos();
-            $provincias = Catalogo::obtenerTodasProvincias();
-            $distritos = Catalogo::obtenerDistritos();
-            $view->with(compact('sucursales', 'tipoCargos', 'cargos','niveles','departamentos','provincias','distritos'));
-        });
-        */
     }
 }

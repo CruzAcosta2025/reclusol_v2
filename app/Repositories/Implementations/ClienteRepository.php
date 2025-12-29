@@ -10,8 +10,14 @@ class ClienteRepository implements ClienteRepositoryInterface
 {
     public function getPorSucursal(string $sucursal, string|null $buscar = null): array
     {
+        $sucursal = trim($sucursal);
         if ($sucursal === '') {
             return [];
+        }
+
+        // Normaliza sucursal a 2 dígitos si es numérica (p.ej. "1" -> "01")
+        if (ctype_digit($sucursal)) {
+            $sucursal = str_pad(ltrim($sucursal, '0'), 2, '0', STR_PAD_LEFT);
         }
 
         $rows = DB::connection('sqlsrv')->select(

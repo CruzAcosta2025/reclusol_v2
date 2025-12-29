@@ -142,7 +142,7 @@
                 class="grid grid-cols-1 md:grid-cols-4 gap-4 bg-M6 rounded-lg border border-neutral shadow-sm p-5">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Sucursal</label>
-                    <x-select name="sucursal" id="sucursal">
+                    <x-select name="sucursal" id="sucursal_filter">
                         <option value="">Todos</option>
                         @foreach ($sucursales as $codigo => $desc)
                             {{-- $desc es STRING --}}
@@ -155,11 +155,11 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Cliente</label>
-                    <x-select name="cliente" id="cliente">
+                    <x-select name="cliente" id="cliente_filter">
                         <option value="">Todos</option>
                         @foreach ($clientes as $codigo => $desc)
                             {{-- $desc es STRING --}}
-                            <option value="{{ $codigo }}" @selected((string) request('sucursal') === (string) $codigo)>
+                            <option value="{{ $codigo }}" @selected((string) request('cliente') === (string) $codigo)>
                                 {{ $desc }}
                             </option>
                         @endforeach
@@ -169,7 +169,7 @@
                 <!-- Tipo de Cargo -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Cargo</label>
-                    <x-select name="tipo_cargo" id="tipo_cargo">
+                    <x-select name="tipo_cargo" id="tipo_cargo_filter">
                         <option value="">Todos</option>
                         @foreach ($tipoCargos as $codigo => $desc)
                             <option value="{{ $codigo }}"
@@ -186,7 +186,7 @@
                         <option value="">Todos</option>
                         @foreach ($cargos as $codigo => $cargo)
                             <option value="{{ $codigo }}" {{ request('cargo') == $codigo ? 'selected' : '' }}>
-                                {{ $cargo->DESC_CARGO }}
+                                {{ is_object($cargo) ? $cargo->DESC_CARGO : $cargo }}
                             </option>
                         @endforeach
                     </x-select>
@@ -195,7 +195,7 @@
                 {{-- Departamento --}}
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Departamento</label>
-                    <x-select name="departamento" id="departamento">
+                    <x-select name="departamento" id="departamento_filter">
                         <option value="">Todos</option>
                         @foreach ($departamentos as $codigo => $desc)
                             {{-- $desc es STRING --}}
@@ -209,11 +209,11 @@
                 {{-- Provincia --}}
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Provincia</label>
-                    <x-select name="provincia" id="provincia">
+                    <x-select name="provincia" id="provincia_filter">
                         <option value="">Todas</option>
                         @foreach ($provincias as $codigo => $provincia)
                             <option value="{{ $codigo }}" {{ request('provincia') == $codigo ? 'selected' : '' }}>
-                                {{ $provincia->PROVI_DESCRIPCION }}
+                                {{ is_object($provincia) ? ($provincia->PROVI_DESCRIPCION ?? $provincia->descripcion ?? $codigo) : $provincia }}
                             </option>
                         @endforeach
                     </x-select>
@@ -222,11 +222,11 @@
                 {{-- Distrito --}}
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Distrito</label>
-                    <x-select name="distrito" id="distrito">
+                    <x-select name="distrito" id="distrito_filter">
                         <option value="">Todos</option>
                         @foreach ($distritos as $codigo => $distrito)
                             <option value="{{ $codigo }}" {{ request('distrito') == $codigo ? 'selected' : '' }}>
-                                {{ $distrito->DIST_DESCRIPCION }}
+                                {{ is_object($distrito) ? ($distrito->DIST_DESCRIPCION ?? $distrito->descripcion ?? $codigo) : $distrito }}
                             </option>
                         @endforeach
                     </x-select>
@@ -734,7 +734,7 @@
         }
 
         // Filtrar cargos dinámicamente en el filtro principal
-        const tipoCargoFiltro = document.getElementById('tipo_cargo');
+        const tipoCargoFiltro = document.getElementById('tipo_cargo_filter');
         if (tipoCargoFiltro) {
             tipoCargoFiltro.addEventListener('change', function() {
                 const tipoCargoId = this.value;
@@ -764,11 +764,11 @@
         }
 
         // Filtrar provincias al cambiar departamento
-        const departamentoFiltro = document.getElementById('departamento');
+        const departamentoFiltro = document.getElementById('departamento_filter');
         if (departamentoFiltro) {
             departamentoFiltro.addEventListener('change', function() {
                 const depaId = this.value.padStart(2, '0');
-                const provinciaSelect = document.getElementById('provincia');
+            const provinciaSelect = document.getElementById('provincia_filter');
 
                 // Solo ejecutar si existe el elemento provincia (filtro principal)
                 if (!provinciaSelect) return;
@@ -789,11 +789,11 @@
         }
 
         // Filtrar distritos al cambiar provincia
-        const provinciaFiltro = document.getElementById('provincia');
+        const provinciaFiltro = document.getElementById('provincia_filter');
         if (provinciaFiltro) {
             provinciaFiltro.addEventListener('change', function() {
                 const provId = this.value.padStart(4, '0');
-                const distritoSelect = document.getElementById('distrito');
+            const distritoSelect = document.getElementById('distrito_filter');
 
                 // Solo ejecutar si existe el elemento distrito (filtro principal)
                 if (!distritoSelect) return;
@@ -1040,10 +1040,16 @@
             toggleCamposOperativo(); // inicial (por si vienes de "editar")
         });
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const selSucursal = document.getElementById('sucursal');
-            const selCliente = document.getElementById('cliente');
-            const URL_CLIENTES = "{{ route('requerimientos.clientes_por_sucursal') }}"; // usa tu ruta al SP
+        function initClientesPorSucursal(rootEl) {
+            if (!rootEl) return;
+            if (rootEl.dataset?.clientesInit === '1') return;
+
+            const selSucursal = rootEl.querySelector('select[name="sucursal"]');
+            const selCliente = rootEl.querySelector('select[name="cliente"]');
+            const URL_CLIENTES = "{{ route('requerimientos.clientes_por_sucursal') }}";
+
+            if (!selSucursal || !selCliente) return;
+            rootEl.dataset.clientesInit = '1';
 
             function setOptions(select, items, placeholder) {
                 select.innerHTML = '';
@@ -1075,7 +1081,8 @@
 
                     const res = await fetch(u, {
                         headers: {
-                            'X-Requested-With': 'XMLHttpRequest'
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
                         }
                     });
                     const data = await res.json();
@@ -1086,19 +1093,23 @@
                     }
                     setOptions(selCliente, data, 'Selecciona un cliente');
                 } catch (e) {
-                    console.error(e);
+                    console.error('Error cargando clientes por sucursal', e);
                     setOptions(selCliente, [], 'Error al cargar');
                 }
             }
 
-            if (selSucursal) {
-                selSucursal.addEventListener('change', () => {
-                    cargarClientesPorSucursal(selSucursal.value || '');
-                });
+            selSucursal.addEventListener('change', () => {
+                cargarClientesPorSucursal(selSucursal.value || '');
+            });
 
-                // Si ya viene seleccionada (editar / volver con old inputs)
-                if (selSucursal.value) selSucursal.dispatchEvent(new Event('change'));
-            }
+            // Precarga inicial
+            if (selSucursal.value) cargarClientesPorSucursal(selSucursal.value);
+            else setOptions(selCliente, [], 'Selecciona un cliente');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initClientesPorSucursal(document.getElementById('filter-form'));
+            initClientesPorSucursal(document.getElementById('requerimiento-wizard-form'));
         });
 
         //METODO PARA CALCULAR LA URGENCIA AUTOMÁTICA ----**
@@ -1173,19 +1184,27 @@
             });
         });
 
-        const clienteSelect = document.getElementById('cliente');
-        if (clienteSelect) {
+        function initSedesPorCliente(rootEl) {
+            if (!rootEl) return;
+            if (rootEl.dataset?.sedesInit === '1') return;
+
+            const clienteSelect = rootEl.querySelector('select[name="cliente"]');
+            const sedeSelect = rootEl.querySelector('select[name="sede"]');
+            if (!clienteSelect || !sedeSelect) return;
+
+            rootEl.dataset.sedesInit = '1';
+
             clienteSelect.addEventListener('change', function() {
-                let clienteId = this.value;
-                let sedeSelect = document.getElementById('sede');
-
-                // Solo ejecutar si existe el elemento sede
-                if (!sedeSelect) return;
-
+                const clienteId = this.value;
                 sedeSelect.innerHTML = '<option value="">Cargando...</option>';
 
                 if (clienteId) {
-                    fetch('/requerimientos/sedes-por-cliente?codigo_cliente=' + clienteId)
+                    fetch('/requerimientos/sedes-por-cliente?codigo_cliente=' + encodeURIComponent(clienteId), {
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Accept': 'application/json'
+                            }
+                        })
                         .then(response => response.json())
                         .then(sedes => {
                             sedeSelect.innerHTML = '<option value="">Selecciona una sede</option>';
@@ -1194,7 +1213,8 @@
                                     `<option value="${sede.CODIGO}">${sede.SEDE}</option>`;
                             });
                         })
-                        .catch(() => {
+                        .catch((e) => {
+                            console.error('Error cargando sedes por cliente', e);
                             sedeSelect.innerHTML = '<option value="">Error al cargar</option>';
                         });
                 } else {
@@ -1203,10 +1223,20 @@
             });
         }
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            const selTipoPersonal = document.getElementById('tipo_personal');
-            const selTipoCargo = document.getElementById('tipo_cargo');
-            const selCargoSolicitado = document.getElementById('cargo_solicitado');
+        document.addEventListener('DOMContentLoaded', () => {
+            initSedesPorCliente(document.getElementById('requerimiento-wizard-form'));
+        });
+
+        async function initTiposYCargos(rootEl) {
+            if (!rootEl) return;
+            if (rootEl.dataset?.cargosInit === '1') return;
+
+            const selTipoPersonal = rootEl.querySelector('select[name="tipo_personal"]');
+            const selTipoCargo = rootEl.querySelector('select[name="tipo_cargo"]');
+            const selCargoSolicitado = rootEl.querySelector('select[name="cargo_solicitado"]');
+
+            if (!selTipoPersonal || !selTipoCargo || !selCargoSolicitado) return;
+            rootEl.dataset.cargosInit = '1';
 
             const URL_TIPOS = "{{ route('api.tipos_cargo') }}";
             const URL_CARGOS = "{{ route('api.cargos') }}";
@@ -1223,13 +1253,13 @@
 
             function fillSelect(select, data, placeholder = 'Seleccione...') {
                 select.innerHTML = `<option value="">${placeholder}</option>`;
-                data.forEach(it => {
+                (data || []).forEach(it => {
                     const o = document.createElement('option');
                     o.value = String(it.value).trim();
                     o.textContent = it.label;
                     select.appendChild(o);
                 });
-                select.disabled = data.length === 0;
+                select.disabled = !(Array.isArray(data) && data.length > 0);
             }
 
             async function cargarTiposCargo(tipoPersonal, preselect = null) {
@@ -1241,15 +1271,20 @@
                 setLoading(selTipoCargo);
                 setEmpty(selCargoSolicitado, 'Seleccione el cargo');
                 try {
-                    const res = await fetch(
-                        `${URL_TIPOS}?tipo_personal=${encodeURIComponent(tipoPersonal)}`);
-                    const data = await res.json(); // [{value,label}]
+                    const res = await fetch(`${URL_TIPOS}?tipo_personal=${encodeURIComponent(tipoPersonal)}`, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        }
+                    });
+                    const data = await res.json();
                     fillSelect(selTipoCargo, data, 'Seleccione el tipo de cargo');
                     if (preselect) {
                         selTipoCargo.value = preselect;
                         selTipoCargo.dispatchEvent(new Event('change'));
                     }
-                } catch {
+                } catch (e) {
+                    console.error('Error cargando tipos de cargo', e);
                     setEmpty(selTipoCargo, 'Error al cargar');
                 }
             }
@@ -1262,26 +1297,28 @@
                 setLoading(selCargoSolicitado);
                 try {
                     const res = await fetch(
-                        `${URL_CARGOS}?tipo_personal=${encodeURIComponent(tipoPersonal)}&tipo_cargo=${encodeURIComponent(tipoCargo)}`
+                        `${URL_CARGOS}?tipo_personal=${encodeURIComponent(tipoPersonal)}&tipo_cargo=${encodeURIComponent(tipoCargo)}`, {
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Accept': 'application/json'
+                            }
+                        }
                     );
-                    const data = await res.json(); // [{value,label}]
+                    const data = await res.json();
                     fillSelect(selCargoSolicitado, data, 'Seleccione el cargo');
                     if (preselect) selCargoSolicitado.value = preselect;
-                } catch {
+                } catch (e) {
+                    console.error('Error cargando cargos', e);
                     setEmpty(selCargoSolicitado, 'Error al cargar');
                 }
             }
 
-            // Eventos
             selTipoPersonal.addEventListener('change', () => cargarTiposCargo(selTipoPersonal.value));
-            selTipoCargo.addEventListener('change', () => cargarCargos(selTipoPersonal.value, selTipoCargo
-                .value));
+            selTipoCargo.addEventListener('change', () => cargarCargos(selTipoPersonal.value, selTipoCargo.value));
 
-            // Estado inicial
             setEmpty(selTipoCargo, 'Seleccione el tipo de cargo');
             setEmpty(selCargoSolicitado, 'Seleccione el cargo');
 
-            // Precarga por old()
             const oldTipoPersonal = "{{ old('tipo_personal') }}";
             const oldTipoCargo = "{{ old('tipo_cargo') }}";
             const oldCargoSolicitado = "{{ old('cargo_solicitado') }}";
@@ -1292,6 +1329,11 @@
                     await cargarCargos(oldTipoPersonal, oldTipoCargo, oldCargoSolicitado);
                 }
             }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const wizardForm = document.getElementById('requerimiento-wizard-form');
+            await initTiposYCargos(wizardForm);
         });
 
         // Update scale info based on selection
@@ -1507,6 +1549,14 @@
             const modalName = e.detail?.name;
             const id = e.detail?.id;
 
+            // Modal de Crear Requerimiento (wizard)
+            if (modalName === 'crearRequerimiento') {
+                const wizardForm = document.getElementById('requerimiento-wizard-form');
+                initClientesPorSucursal(wizardForm);
+                initSedesPorCliente(wizardForm);
+                initTiposYCargos(wizardForm);
+            }
+
             // Modal de Ver Requerimiento
             if (modalName === 'verRequerimiento') {
                 // Función auxiliar para asignar valor solo si el elemento existe
@@ -1518,8 +1568,24 @@
                 }
 
                 // Cargar datos desde tu ruta JSON
-                fetch(`/requerimientos/${id}/detalle`)
-                    .then(res => res.json())
+                fetch(`/requerimientos/${id}/detalle`, {
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(async (res) => {
+                        const contentType = res.headers.get('content-type') || '';
+                        if (!res.ok) {
+                            const body = await res.text();
+                            throw new Error(`HTTP ${res.status} al cargar detalle. ${body}`);
+                        }
+                        if (!contentType.includes('application/json')) {
+                            const body = await res.text();
+                            throw new Error(`Respuesta no JSON al cargar detalle. ${body}`);
+                        }
+                        return res.json();
+                    })
                     .then(data => {
                         // SECCIÓN 1: INFORMACIÓN GENERAL
                         setValueIfExists('requerimiento-fecha-solicitud', data.fecha_solicitud);

@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Distrito extends Model
 {
-    // Modelo en SQL Server (conexión separada)
     protected $connection = 'si_solmar';
     protected $table = 'dbo.ADMI_DISTRITO';
     protected $primaryKey = 'DIST_CODIGO';
@@ -23,7 +22,7 @@ class Distrito extends Model
         return $q->where('DIST_VIGENCIA', 'SI')->orderBy('DIST_DESCRIPCION');
     }
 
-        public static function forSelect()
+    public static function forSelect()
     {
         return self::vigentes()->pluck('DIST_DESCRIPCION', 'DIST_CODIGO');
     }

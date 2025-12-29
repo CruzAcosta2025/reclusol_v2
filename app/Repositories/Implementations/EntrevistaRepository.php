@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Repositories\Implementations;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;

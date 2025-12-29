@@ -32,4 +32,9 @@ class CargoService
         return $this->repository->forSelect();
     }
 
+    public function obtenerPorTipoPersonalYTipoCargo(string $tipoPersonal, string $tipoCargo): array
+    {
+        return $this->repository->obtenerPorTipoPersonalYTipoCargo($tipoPersonal, $tipoCargo);
+    }
+
 }

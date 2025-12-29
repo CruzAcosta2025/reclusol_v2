@@ -26,10 +26,18 @@
             <select id="sucursal" name="sucursal" required
                 class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500 text-xs">
                 <option value="">Selecciona la sucursal</option>
-                @foreach ($sucursales as $sucursal)
-                    <option value="{{ $sucursal->SUCU_CODIGO }}"
-                        {{ old('sucursal', $requerimiento->sucursal) === $sucursal->SUCU_CODIGO ? 'selected' : '' }}>
-                        {{ $sucursal->SUCU_DESCRIPCION }}
+                @foreach ($sucursales as $key => $sucursal)
+                    @php
+                        $sucuCodigo = is_object($sucursal)
+                            ? ($sucursal->SUCU_CODIGO ?? $key)
+                            : (is_array($sucursal) ? ($sucursal['SUCU_CODIGO'] ?? $key) : $key);
+                        $sucuDescripcion = is_object($sucursal)
+                            ? ($sucursal->SUCU_DESCRIPCION ?? $sucursal->descripcion ?? $sucuCodigo)
+                            : (is_array($sucursal) ? ($sucursal['SUCU_DESCRIPCION'] ?? $sucursal['descripcion'] ?? $sucuCodigo) : $sucursal);
+                    @endphp
+                    <option value="{{ $sucuCodigo }}"
+                        {{ old('sucursal', $requerimiento->sucursal) == $sucuCodigo ? 'selected' : '' }}>
+                        {{ $sucuDescripcion }}
                     </option>
                 @endforeach
             </select>
@@ -55,10 +63,18 @@
             <select id="departamento" name="departamento" required
                 class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500 text-xs">
                 <option value="">Selecciona el departamento</option>
-                @foreach ($departamentos as $departamento)
-                    <option value="{{ $departamento->DEPA_CODIGO }}"
-                        {{ old('departamento', $requerimiento->departamento) === $departamento->DEPA_CODIGO ? 'selected' : '' }}>
-                        {{ $departamento->DEPA_DESCRIPCION }}
+                @foreach ($departamentos as $key => $departamento)
+                    @php
+                        $depaCodigo = is_object($departamento)
+                            ? ($departamento->DEPA_CODIGO ?? $key)
+                            : (is_array($departamento) ? ($departamento['DEPA_CODIGO'] ?? $key) : $key);
+                        $depaDescripcion = is_object($departamento)
+                            ? ($departamento->DEPA_DESCRIPCION ?? $departamento->descripcion ?? $depaCodigo)
+                            : (is_array($departamento) ? ($departamento['DEPA_DESCRIPCION'] ?? $departamento['descripcion'] ?? $depaCodigo) : $departamento);
+                    @endphp
+                    <option value="{{ $depaCodigo }}"
+                        {{ old('departamento', $requerimiento->departamento) == $depaCodigo ? 'selected' : '' }}>
+                        {{ $depaDescripcion }}
                     </option>
                 @endforeach
             </select>
@@ -73,10 +89,18 @@
                 data-selected="{{ old('provincia', $requerimiento->provincia) }}"
                 class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500 text-xs">
                 <option value="">Selecciona la provincia</option>
-                @foreach ($provincias as $provincia)
-                    <option value="{{ $provincia->PROVI_CODIGO }}"
-                        {{ old('provincia', $requerimiento->provincia) === $provincia->PROVI_CODIGO ? 'selected' : '' }}>
-                        {{ $provincia->PROVI_DESCRIPCION }}
+                @foreach ($provincias as $key => $provincia)
+                    @php
+                        $proviCodigo = is_object($provincia)
+                            ? ($provincia->PROVI_CODIGO ?? $key)
+                            : (is_array($provincia) ? ($provincia['PROVI_CODIGO'] ?? $key) : $key);
+                        $proviDescripcion = is_object($provincia)
+                            ? ($provincia->PROVI_DESCRIPCION ?? $provincia->descripcion ?? $proviCodigo)
+                            : (is_array($provincia) ? ($provincia['PROVI_DESCRIPCION'] ?? $provincia['descripcion'] ?? $proviCodigo) : $provincia);
+                    @endphp
+                    <option value="{{ $proviCodigo }}"
+                        {{ old('provincia', $requerimiento->provincia) == $proviCodigo ? 'selected' : '' }}>
+                        {{ $proviDescripcion }}
                     </option>
                 @endforeach
             </select>
@@ -91,10 +115,18 @@
                 data-selected="{{ old('distrito', $requerimiento->distrito) }}"
                 class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500 text-xs">
                 <option value="">Selecciona el distrito</option>
-                @foreach ($distritos as $distrito)
-                    <option value="{{ $distrito->DIST_CODIGO }}"
-                        {{ old('distrito', $requerimiento->distrito) === $distrito->DIST_CODIGO ? 'selected' : '' }}>
-                        {{ $distrito->DIST_DESCRIPCION }}
+                @foreach ($distritos as $key => $distrito)
+                    @php
+                        $distCodigo = is_object($distrito)
+                            ? ($distrito->DIST_CODIGO ?? $key)
+                            : (is_array($distrito) ? ($distrito['DIST_CODIGO'] ?? $key) : $key);
+                        $distDescripcion = is_object($distrito)
+                            ? ($distrito->DIST_DESCRIPCION ?? $distrito->descripcion ?? $distCodigo)
+                            : (is_array($distrito) ? ($distrito['DIST_DESCRIPCION'] ?? $distrito['descripcion'] ?? $distCodigo) : $distrito);
+                    @endphp
+                    <option value="{{ $distCodigo }}"
+                        {{ old('distrito', $requerimiento->distrito) == $distCodigo ? 'selected' : '' }}>
+                        {{ $distDescripcion }}
                     </option>
                 @endforeach
             </select>
@@ -111,10 +143,18 @@
             <select id="tipo_cargo" name="tipo_cargo" required
                 class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500 text-xs">
                 <option value="">Selecciona el tipo de cargo</option>
-                @foreach ($tipoCargos as $tipo)
-                    <option value="{{ $tipo->CODI_TIPO_CARG }}"
-                        {{ old('tipo_cargo', $requerimiento->tipo_cargo) === $tipo->CODI_TIPO_CARG ? 'selected' : '' }}>
-                        {{ $tipo->DESC_TIPO_CARG }}
+                @foreach ($tipoCargos as $key => $tipo)
+                    @php
+                        $tipoCodigo = is_object($tipo)
+                            ? ($tipo->CODI_TIPO_CARG ?? $key)
+                            : (is_array($tipo) ? ($tipo['CODI_TIPO_CARG'] ?? $key) : $key);
+                        $tipoDescripcion = is_object($tipo)
+                            ? ($tipo->DESC_TIPO_CARG ?? $tipo->descripcion ?? $tipoCodigo)
+                            : (is_array($tipo) ? ($tipo['DESC_TIPO_CARG'] ?? $tipo['descripcion'] ?? $tipoCodigo) : $tipo);
+                    @endphp
+                    <option value="{{ $tipoCodigo }}"
+                        {{ old('tipo_cargo', $requerimiento->tipo_cargo) == $tipoCodigo ? 'selected' : '' }}>
+                        {{ $tipoDescripcion }}
                     </option>
                 @endforeach
             </select>

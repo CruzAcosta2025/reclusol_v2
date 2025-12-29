@@ -15,7 +15,6 @@ class TipoPersonal extends Model
 
     protected $fillable = ['TIPE_CODIGO', 'TIPE_DESCRIPCION', 'TIPE_PARA_VER'];
 
-
     public static function forSelect()
     {
         return self::whereIn('TIPE_CODIGO', ['01', '02'])

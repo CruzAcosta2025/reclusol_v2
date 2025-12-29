@@ -193,13 +193,23 @@ class PosterService
         // Cargar catálogos
         $cargos = Cargo::forSelect();
         $sucursales = Sucursal::forSelect();
+        $departamentos = Departamento::forSelect();
+        $provincias = Provincia::forSelect();
+        $distritos = Distrito::forSelect();
 
-        // Mapear nombres legibles
+        // Mapear nombres legibles para cargo y sucursal
         $codigoCargo = str_pad($req->cargo_solicitado, 4, '0', STR_PAD_LEFT);
         $codigoSucursal = str_pad($req->sucursal, 2, '0', STR_PAD_LEFT);
 
         $req->cargo_nombre = $cargos->get($codigoCargo) ?? $req->cargo_solicitado;
         $req->sucursal_nombre = $sucursales->get($codigoSucursal) ?? $req->sucursal;
+
+        // Mapear nombres legibles para provincia y distrito
+        $codigoProvincia = ltrim((string)$req->provincia, '0');
+        $codigoDistrito = ltrim((string)$req->distrito, '0');
+
+        $req->nombre_provincia = $provincias->get($codigoProvincia) ?? $req->provincia;
+        $req->nombre_distrito = $distritos->get($codigoDistrito) ?? $req->distrito;
 
         // Procesar rutas de recursos con fallbacks
         $recursos = $this->procesarRecursos($recursos);
@@ -265,6 +275,13 @@ class PosterService
             $candidate = "{$base}.{$ext}";
             if (file_exists($candidate)) {
                 return $candidate;
+            }
+        }
+        // Fallback a una plantilla por defecto para no romper la generación
+        foreach ($exts as $ext) {
+            $fallback = public_path("assets/plantillas/modern.{$ext}");
+            if (file_exists($fallback)) {
+                return $fallback;
             }
         }
 

@@ -2,47 +2,41 @@
 
 namespace App\Services;
 
-use App\Models\Departamento;
-use App\Models\Distrito;
-use App\Models\Provincia;
+use App\Services\UbigeoService;
 use App\Models\Sucursal;
-use App\Repositories\Implementations\ClienteRepository;
-use App\Repositories\Implementations\CargoRepository;
 use App\Repositories\Implementations\TipoCargoRepository;
 
 class CatalogoService
 {
    public function __construct(
-        protected CargoRepository $cargoRepository,
+        protected CargoService $cargoService,
         protected TipoCargoRepository $tipoCargoRepository,
-        protected ClienteRepository $clienteRepository,
-        protected Departamento $departamentoModel,
-        protected Provincia $provinciaModel,
-        protected Distrito $distritoModel,
+        protected ClienteService $clienteService,
+        protected UbigeoService $ubigeoService,
         protected Sucursal $sucursalModel,
     ) {}
 
     public function requerimiento(): array
     {
         return [
-            'cargos'        => $this->cargoRepository->forSelect(),
+            'cargos'        => $this->cargoService->forSelect(),
             'tipos_cargo'   => $this->tipoCargoRepository->forSelect(),
-            'departamentos' => $this->departamentoModel->forSelect(),
-            'provincias'    => $this->provinciaModel->forSelect(),
-            'distritos'     => $this->distritoModel->forSelect(),
-            'clientes'      => $this->clienteRepository->getPorSucursal(''),
+            'departamentos' => $this->ubigeoService->getDepartamentos(),
+            'provincias'    => $this->ubigeoService->getProvincias(),
+            'distritos'     => $this->ubigeoService->getDistritos(),
+            'clientes'      => $this->clienteService->obtenerClientesPorSucursal(''),
             'sucursales'    => $this->sucursalModel->forSelect(),
         ];
     }
 
     public function obtenerCargos(): array
     {
-        return $this->cargoRepository->forSelect();
+        return $this->cargoService->forSelect();
     }
 
     public function obtenerPorTipoPersonalYTipoCargo(string $tipoPersonal, string $tipoCargo): array
     {
-        return $this->cargoRepository->obtenerPorTipoPersonalYTipoCargo($tipoPersonal, $tipoCargo);
+        return $this->cargoService->obtenerPorTipoPersonalYTipoCargo($tipoPersonal, $tipoCargo);
     }
 
     public function obtenerTiposCargo(): array
@@ -57,26 +51,26 @@ class CatalogoService
 
     public function obtenerDepartamentos()
     {
-        return $this->departamentoModel->forSelect();
+        return $this->ubigeoService->getDepartamentos();
     }
 
     public function obtenerProvincias()
     {
-        return $this->provinciaModel->forSelect();
+        return $this->ubigeoService->getProvincias();
     }
 
     public function obtenerDistritos()
     {
-        return $this->distritoModel->forSelect();
+        return $this->ubigeoService->getDistritos();
     }
 
     public function obtenerClientesPorSucursal(string $sucursal, ?string $buscar = null): array
     {
-        return $this->clienteRepository->getPorSucursal($sucursal, $buscar);
+        return $this->clienteService->obtenerClientesPorSucursal($sucursal, $buscar);
     }
 
     public function obtenerSedesPorCliente(string $codigo): array
     {
-        return $this->clienteRepository->getSedesPorCliente($codigo);
+        return $this->clienteService->obtenerSedesPorCliente($codigo);
     }
 }

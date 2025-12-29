@@ -6,7 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Requerimiento extends Model
 {
-    protected $table = 'requerimientos';
+    protected $connection = 'sqlsrv';
+    protected $table = 'dbo.requerimientos';
     protected $primaryKey = 'id';
     public $timestamps = true;
 

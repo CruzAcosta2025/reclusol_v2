@@ -73,6 +73,9 @@ class PosterController extends Controller
 
     public function show(Request $request, Requerimiento $req, string $template)
     {
+        // Si no llega template, usar 'modern' como fallback para evitar 404
+        $template = trim($template) !== '' ? $template : 'modern';
+
         // Preparar recursos desde el request
         $recursos = [
             'iconG'     => $request->input('iconG'),
