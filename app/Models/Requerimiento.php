@@ -39,7 +39,7 @@ class Requerimiento extends Model
         'curso_sucamec_operativo',
         'carne_sucamec_operativo',
         'licencia_armas',
-       'servicio_acuartelado',
+        'servicio_acuartelado',
         'grado_academico',
         'formacion_adicional',
         'validado_rrhh',
@@ -72,9 +72,16 @@ class Requerimiento extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    /*
     public function estado()
     {
         return $this->belongsTo(EstadoRequerimiento::class, 'estado'); // 'estado' es la FK en tu tabla requerimientos
+    }
+     */
+
+    public function estadoRequerimiento()
+    {
+        return $this->belongsTo(EstadoRequerimiento::class, 'estado', 'id');
     }
 
 

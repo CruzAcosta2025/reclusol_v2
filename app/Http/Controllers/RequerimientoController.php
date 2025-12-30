@@ -425,6 +425,7 @@ class RequerimientoController extends Controller
         ];
 
         $query->orderBy('created_at', 'desc');
+        $query->with('estadoRequerimiento');
         $requerimientos = $query->paginate(15)->withQueryString();
 
 
@@ -507,11 +508,15 @@ class RequerimientoController extends Controller
             $r->distrito_nombre     = $label2($distritosStr,  $distritosNum,  $dist, 'DIST_DESCRIPCION');
             $cod = $normDigits($r->tipo_personal ?? '', 2);
             $r->tipo_personal_nombre = $tiposPersonal[$cod] ?? $r->tipo_personal;
-            // Mapear estado numérico -> etiqueta
-            $estadoMap = [1 => 'En proceso', 2 => 'Cubierto', 3 => 'Cancelado', 4 => 'Vencido'];
-            $r->estado_nombre = $estadoMap[(int)$r->estado] ?? null;
-        }
 
+            // ✅ Tomar el nombre desde estado_requerimiento
+            $r->estado_nombre = $r->estadoRequerimiento?->nombre;   // opcional si quieres seguir usando estado_nombre
+            $r->estado_codigo = $r->estadoRequerimiento?->codigo;   // opcional si te sirve para colores por codigo
+
+            // Mapear estado numérico -> etiqueta
+            //$estadoMap = [1 => 'En proceso', 2 => 'Cubierto', 3 => 'Cancelado', 4 => 'Vencido'];
+            //$r->estado_nombre = $estadoMap[(int)$r->estado] ?? null;
+        }
 
         // Para la vista/JS seguimos exponiendo $provincias y $distritos
         $provincias = $provinciasStr;

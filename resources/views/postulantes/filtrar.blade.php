@@ -158,7 +158,7 @@
                         <i class="fas fa-filter mr-2"></i> Filtrar
                     </button>
                     <button type="button" onclick="limpiarFiltros()"
-                        class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 transition">
+                        class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
                         <i class="fas fa-times"></i> Limpiar filtros
                     </button>
                 </div>

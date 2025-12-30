@@ -136,7 +136,7 @@
                         <i class="fas fa-filter mr-2"></i> Filtrar
                     </button>
                     <button type="button" onclick="limpiarFiltros()"
-                        class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 transition">
+                        class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
                         <i class="fas fa-times"></i> Limpiar filtros
                     </button>
                 </div>
@@ -152,7 +152,7 @@
                         <i class="fas fa-hourglass-half text-green-600 text-lg"></i>
                     </div>
                     <div class="min-w-0">
-                        <div class="text-xs font-semibold text-gray-500">En Proceso</div>
+                        <div class="text-xs font-semibold text-gray-500">En Validación</div>
                         <div class="text-2xl font-extrabold text-gray-900">{{ $stats['en_validacion'] ?? 0 }}</div>
                     </div>
                 </div>
@@ -162,7 +162,7 @@
                         <i class="fas fa-check-circle text-red-600 text-lg"></i>
                     </div>
                     <div class="min-w-0">
-                        <div class="text-xs font-semibold text-gray-500">Cubiertos</div>
+                        <div class="text-xs font-semibold text-gray-500">Aprobado</div>
                         <div class="text-2xl font-extrabold text-gray-900">{{ $stats['aprobado'] ?? 0 }}</div>
                     </div>
                 </div>
@@ -182,7 +182,7 @@
                         <i class="fas fa-clock text-yellow-600 text-lg"></i>
                     </div>
                     <div class="min-w-0">
-                        <div class="text-xs font-semibold text-gray-500">Vencidos</div>
+                        <div class="text-xs font-semibold text-gray-500">Cerrados</div>
                         <div class="text-2xl font-extrabold text-gray-900">{{ $stats['cerrado'] ?? 0 }}</div>
                     </div>
                 </div>
@@ -264,27 +264,31 @@
                                         class="inline-flex items-center px-3 py-1 rounded-full text-sm {{ $priorityClass }}">
                                         {{ ucfirst($requerimiento->urgencia ?? 'N/A') }}
                                     </span>
-
                                 </td>
 
                                 <td class="px-6 py-4 text-gray-700 text-center">
                                     @php
-                                        $estadoNombre = $requerimiento->estado_nombre; // ya viene del controller
+                                        $estado = $requerimiento->estadoRequerimiento;
+
+                                        $estadoId = (int) ($estado?->id ?? 0); // “código” real (1..4)
+                                        $estadoNombre = $estado?->nombre; // texto real
+
                                         $statusColors = [
-                                            'en proceso' => 'bg-yellow-100 text-yellow-800',
-                                            'aprobado' => 'bg-green-100 text-green-800',
-                                            'cancelado' => 'bg-red-100 text-red-800',
-                                            'cerrado' => 'bg-gray-200 text-gray-700',
+                                            1 => 'bg-yellow-100 text-yellow-800', // En validación
+                                            2 => 'bg-green-100 text-green-800', // Aprobado
+                                            3 => 'bg-red-100 text-red-800', // Cancelado
+                                            4 => 'bg-gray-200 text-gray-700', // Cerrado
                                         ];
-                                        $statusClass =
-                                            $statusColors[strtolower($estadoNombre ?? '')] ??
-                                            'bg-gray-100 text-gray-600';
+
+                                        $statusClass = $statusColors[$estadoId] ?? 'bg-gray-100 text-gray-600';
                                     @endphp
+
                                     <span
                                         class="inline-flex items-center px-3 py-1 rounded-full text-sm {{ $statusClass }}">
                                         {{ $estadoNombre ?? 'N/A' }}
                                     </span>
                                 </td>
+
 
 
                                 <td class="px-6 py-4 text-gray-700 text-center">

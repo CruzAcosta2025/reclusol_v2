@@ -62,6 +62,7 @@
                 </label>
                 <input type="text" id="nombres_edit" name="nombres"
                     value="{{ old('nombres', $postulante->nombres) }}" required
+                    @if(!$esOperativo) readonly @endif
                     class="mt-1 block w-full border border-gray-400 text-gray-900 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
                 @error('nombres')
                     <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
@@ -75,6 +76,7 @@
                 </label>
                 <input type="text" id="apellidos_edit" name="apellidos"
                     value="{{ old('apellidos', $postulante->apellidos) }}" required
+                    @if(!$esOperativo) readonly @endif
                     class="mt-1 block w-full border border-gray-400 text-gray-900 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
                 @error('apellidos')
                     <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
@@ -88,6 +90,7 @@
                     <i class="fas fa-birthday-cake text-blue-600"></i> Fecha de nacimiento
                 </label>
                 <input type="date" id="fecha_nacimiento_edit" name="fecha_nacimiento" value="{{ $fechaN }}"
+                    @if(!$esOperativo) readonly @endif
                     class="mt-1 block w-full border border-gray-400 text-gray-900 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
                 @error('fecha_nacimiento')
                     <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
@@ -101,6 +104,7 @@
                 </label>
                 <input type="number" id="edad_edit" name="edad" value="{{ old('edad', $postulante->edad) }}"
                     min="18" max="120" required
+                    @if(!$esOperativo) readonly @endif
                     class="mt-1 block w-full border border-gray-400 text-gray-900 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
                 @error('edad')
                     <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
@@ -114,6 +118,7 @@
                     <i class="fas fa-flag text-blue-600"></i> Nacionalidad
                 </label>
                 <select id="nacionalidad_edit" name="nacionalidad" required
+                    @if(!$esOperativo) disabled @endif
                     class="mt-1 block w-full border border-gray-400 text-gray-900 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
                     data-value="{{ old('nacionalidad', $postulante->nacionalidad) }}">
                     @foreach (['PERUANA', 'EXTRANJERA'] as $nat)
@@ -201,6 +206,7 @@
                 </label>
                 <input type="tel" id="celular_edit" name="celular"
                     value="{{ old('celular', $postulante->celular) }}" pattern="[0-9]{9}" required
+                    @if(!$esOperativo) readonly @endif
                     class="mt-1 block w-full border border-gray-400 text-gray-900 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
 
                 @error('celular')
@@ -218,6 +224,7 @@
                     <i class="fas fa-briefcase text-blue-600"></i> Tipo de cargo
                 </label>
                 <select id="tipo_cargo_edit" name="tipo_cargo" required
+                    @if(!$esOperativo) disabled @endif
                     class="mt-1 block w-full border border-gray-400 text-gray-900 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
                     data-value="{{ str_pad(old('tipo_cargo', $postulante->tipo_cargo), 2, '0', STR_PAD_LEFT) }}">
                     <option value="">Selecciona...</option>
@@ -246,6 +253,7 @@
                 </label>
 
                 <select id="cargo_edit" name="cargo" data-value="{{ $cargoSel }}"
+                    @if(!$esOperativo) disabled @endif
                     class="mt-1 block w-full border border-gray-400 text-gray-900 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
                     <option value="">Selecciona...</option>
 
@@ -263,15 +271,11 @@
             </div>
 
             {{-- Experiencia en el rubro --}}
-            @php
-                $opExp = ['Sin experiencia', 'Menos de 1 año', 'Entre 1 y 2 años', 'Entre 3 y 4 años', 'Mas de 4 años'];
-            @endphp
             <div>
                 <label for="experiencia_rubro_edit"
                     class="block text-sm font-semibold text-gray-900 flex items-center gap-2">
                     <i class="fas fa-briefcase-clock text-blue-600"></i> Experiencia en el rubro
                 </label>
-
 
                 <select id="experiencia_rubro_edit" name="experiencia_rubro" required
                     class="mt-1 block w-full border border-gray-400 text-gray-900 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
@@ -287,14 +291,6 @@
             </div>
 
             {{-- Grado de instruccion --}}
-            @php
-                $opGrado = [
-                    'Universitaria',
-                    'Carrera Técnica',
-                    'Egresado de las FFAA / FFPP',
-                    '5º Grado de Secundaria',
-                ];
-            @endphp
             <div>
                 <label for="grado_instruccion_edit"
                     class="block text-sm font-semibold text-gray-900 flex items-center gap-2">
@@ -344,6 +340,10 @@
                     @endforeach
                 </select>
                 @error('sucamec')
+                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+
                     <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                 @enderror
             </div>

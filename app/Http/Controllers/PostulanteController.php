@@ -1193,7 +1193,7 @@ class PostulanteController extends Controller
         $distritos  = collect();
 
         // Requerimientos activos
-        $requerimientos = Requerimiento::where('estado', 1)
+        $requerimientos = Requerimiento::where('estado', 2)
             ->orderByDesc('created_at')
             ->get();
 
@@ -1248,7 +1248,7 @@ class PostulanteController extends Controller
         $distritos  = collect();
 
         // Requerimientos activos
-        $requerimientos = Requerimiento::where('estado', 1)
+        $requerimientos = Requerimiento::where('estado', 2)
             ->orderByDesc('created_at')
             ->get();
 

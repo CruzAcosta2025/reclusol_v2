@@ -17,7 +17,6 @@ class EstadoRequerimiento extends Model
 
     // Campos que se pueden asignar en masa (opcional)
     protected $fillable = [
-        'codigo',
         'nombre',
     ];
 

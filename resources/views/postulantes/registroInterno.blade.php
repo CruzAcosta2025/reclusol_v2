@@ -747,6 +747,23 @@
             document.getElementById('progress-bar').style.width = progress + '%';
         }
 
+        // Mostrar un paso específico y exponerlo globalmente
+        function showStep(step) {
+            step = Number(step) || 1;
+            if (step < 1) step = 1;
+            if (step > totalSteps) step = totalSteps;
+
+            // ocultar todos los pasos y mostrar el solicitado
+            document.querySelectorAll('.form-step').forEach(el => el.classList.add('hidden'));
+            const el = document.getElementById(`step-${step}`);
+            if (el) el.classList.remove('hidden');
+
+            currentStep = step;
+            updateProgressBar();
+            window.scrollTo(0, 0);
+        }
+        window.showStep = showStep;
+
         function nextStep() {
             console.log('Intentando avanzar del paso', currentStep, 'al', currentStep + 1);
             if (validateCurrentStep()) {
