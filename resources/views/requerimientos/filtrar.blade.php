@@ -19,54 +19,57 @@
                 {{-- </a> --}}
             </div>
         </x-block>
-        <x-modal name="crearRequerimiento" :show="false" maxWidth="2xl">
+        <x-modal name="crearRequerimiento" :show="false" maxWidth="2xl" :closeOnBackdrop="false">
             <x-slot name="title">
-                <h2 class="text-lg text-M2 font-bold">Nuevo Requerimiento</h2>
-                <p class="text-sm text-M3">Completa los datos paso a paso para crear un nuevo requerimiento.</p>
+                <div class="space-y-0.5">
+                    <h2 class="text-base text-M2 font-semibold">Nuevo Requerimiento</h2>
+                    <p class="text-xs text-neutral-dark">Completa los datos paso a paso para crear un nuevo requerimiento.</p>
+                </div>
             </x-slot>
             <form id="requerimiento-wizard-form" method="POST" action="{{ route('requerimientos.store') }}"
-                class="space-y-6">
+                class="">
                 @csrf
-                <div class="flex items-center justify-between">
-                    <div class="flex-1 flex items-center">
-                        <div class="flex flex-col items-center text-center w-full">
+                <div class="mb-4 rounded-lg border border-neutral bg-white px-4 py-3">
+                    <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-2 whitespace-nowrap">
                             <div id="step-indicator-0"
-                                class="w-10 h-10 flex items-center justify-center rounded-full border-2 border-M1 text-M1 bg-M6 font-semibold">
-                                1</div>
-                            <p id="step-label-0" class="mt-2 text-sm text-M1 font-semibold">Datos de la solicitud</p>
+                                class="w-6 h-6 flex items-center justify-center rounded-full border border-M1 bg-M1 text-white font-semibold text-xs">
+                                1
+                            </div>
+                            <p id="step-label-0" class="text-sm text-M1 font-semibold">Datos de la solicitud</p>
                         </div>
-                        <div class="h-px flex-1 bg-neutral hidden md:block"></div>
-                    </div>
-                    <div class="flex-1 flex items-center">
-                        <div class="flex flex-col items-center text-center w-full">
+                        <div id="step-connector-0" class="h-px flex-1 bg-neutral"></div>
+
+                        <div class="flex items-center gap-2 whitespace-nowrap">
                             <div id="step-indicator-1"
-                                class="w-10 h-10 flex items-center justify-center rounded-full border-2 border-neutral text-M3 bg-white font-semibold">
-                                2</div>
-                            <p id="step-label-1" class="mt-2 text-sm text-M3">Detalles del perfil</p>
+                                class="w-6 h-6 flex items-center justify-center rounded-full border border-neutral bg-white text-M3 font-semibold text-xs">
+                                2
+                            </div>
+                            <p id="step-label-1" class="text-sm text-M3 font-medium">Detalles del perfil</p>
                         </div>
-                        <div class="h-px flex-1 bg-neutral hidden md:block"></div>
-                    </div>
-                    <div class="flex-1 flex items-center">
-                        <div class="flex flex-col items-center text-center w-full">
+                        <div id="step-connector-1" class="h-px flex-1 bg-neutral"></div>
+
+                        <div class="flex items-center gap-2 whitespace-nowrap">
                             <div id="step-indicator-2"
-                                class="w-10 h-10 flex items-center justify-center rounded-full border-2 border-neutral text-M3 bg-white font-semibold">
-                                3</div>
-                            <p id="step-label-2" class="mt-2 text-sm text-M3">Remuneración y Beneficios</p>
+                                class="w-6 h-6 flex items-center justify-center rounded-full border border-neutral bg-white text-M3 font-semibold text-xs">
+                                3
+                            </div>
+                            <p id="step-label-2" class="text-sm text-M3 font-medium">Remuneración y Beneficios</p>
                         </div>
-                        <div class="h-px flex-1 bg-neutral hidden md:block"></div>
-                    </div>
-                    <div class="flex-1 flex items-center">
-                        <div class="flex flex-col items-center text-center w-full">
+                        <div id="step-connector-2" class="h-px flex-1 bg-neutral"></div>
+
+                        <div class="flex items-center gap-2 whitespace-nowrap">
                             <div id="step-indicator-3"
-                                class="w-10 h-10 flex items-center justify-center rounded-full border-2 border-neutral text-M3 bg-white font-semibold">
-                                4</div>
-                            <p id="step-label-3" class="mt-2 text-sm text-M3">Estado</p>
+                                class="w-6 h-6 flex items-center justify-center rounded-full border border-neutral bg-white text-M3 font-semibold text-xs">
+                                4
+                            </div>
+                            <p id="step-label-3" class="text-sm text-M3 font-medium">Estado</p>
                         </div>
                     </div>
                 </div>
-
+                
                 <!-- Contenido de Pasos -->
-                <div class="bg-M6 rounded-lg border border-neutral shadow-sm p-6 min-h-[400px]">
+                <div class="bg-white rounded-lg border border-neutral p-5 min-h-[380px]">
                     <!-- PASO 1: DATOS DE SOLICITUD -->
                     <div id="step-content-0" class="step-content">
                         @include('requerimientos.partials.form-datos-solicitud', [
@@ -368,37 +371,47 @@
 
                     <x-tabs-modal :tabs="$tabs" name="verRequerimiento">
                         <x-slot name="title">
-                            Detalle del Requerimiento
+                            <div class="space-y-0.5">
+                                <h2 class="text-base text-M2 font-semibold">Detalle del Requerimiento</h2>
+                                <p class="text-xs text-neutral-dark">Revisa la información registrada en cada sección.</p>
+                            </div>
                         </x-slot>
 
                         <!-- SECCIÓN 1: INFORMACIÓN GENERAL -->
                         <div id="section-general-info-section" class="view-section p-4 lg:p-0">
-                            <div class="mb-4 border-b border-neutral pb-3">
-                                <h3 class="text-base font-semibold text-M2">Información General</h3>
+                            <div class="mb-3 flex items-center gap-2 rounded-lg border border-neutral bg-neutral-lighter px-4 py-3">
+                                <div class="flex h-8 w-8 items-center justify-center rounded-full bg-M6 border border-neutral">
+                                    <i class="fa-solid fa-circle-info text-M3"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-semibold text-M2">Información General</h3>
+                                    <p class="text-xs text-neutral-dark">Datos base del requerimiento.</p>
+                                </div>
                             </div>
-                            <div class="space-y-3">
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
-                                    <label class="block text-xs font-semibold text-M3 mb-1">Fecha de Solicitud</label>
+                                    <label class="block text-xs font-semibold text-neutral-dark mb-1">Fecha de Solicitud</label>
                                     <input type="text" disabled id="requerimiento-fecha-solicitud"
-                                        class="form-input w-full px-2 py-1 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed"
+                                        class="form-input w-full px-3 py-2 text-sm border border-neutral rounded-lg bg-neutral-lightest text-neutral-darker cursor-not-allowed"
                                         value="—">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-M3 mb-1">Solicitado por</label>
+                                    <label class="block text-xs font-semibold text-neutral-dark mb-1">Solicitado por</label>
                                     <input type="text" disabled id="requerimiento-usuario"
-                                        class="form-input w-full px-2 py-1 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed"
+                                        class="form-input w-full px-3 py-2 text-sm border border-neutral rounded-lg bg-neutral-lightest text-neutral-darker cursor-not-allowed"
                                         value="—">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-M3 mb-1">Sucursal</label>
+                                    <label class="block text-xs font-semibold text-neutral-dark mb-1">Sucursal</label>
                                     <input type="text" disabled id="requerimiento-sucursal"
-                                        class="form-input w-full px-2 py-1 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed"
+                                        class="form-input w-full px-3 py-2 text-sm border border-neutral rounded-lg bg-neutral-lightest text-neutral-darker cursor-not-allowed"
                                         value="—">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-M3 mb-1">Cliente</label>
+                                    <label class="block text-xs font-semibold text-neutral-dark mb-1">Cliente</label>
                                     <input type="text" disabled id="requerimiento-cliente"
-                                        class="form-input w-full px-2 py-1 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed"
+                                        class="form-input w-full px-3 py-2 text-sm border border-neutral rounded-lg bg-neutral-lightest text-neutral-darker cursor-not-allowed"
                                         value="—">
                                 </div>
                             </div>
@@ -406,39 +419,46 @@
 
                         <!-- SECCIÓN 2: DETALLES DEL PUESTO -->
                         <div id="section-employment-details-section" class="view-section p-4 lg:p-0">
-                            <div class="mb-4 border-b border-neutral pb-3">
-                                <h3 class="text-base font-semibold text-M2">Detalles del Puesto</h3>
+                            <div class="mb-3 flex items-center gap-2 rounded-lg border border-neutral bg-neutral-lighter px-4 py-3">
+                                <div class="flex h-8 w-8 items-center justify-center rounded-full bg-M6 border border-neutral">
+                                    <i class="fa-solid fa-briefcase text-M3"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-semibold text-M2">Detalles del Puesto</h3>
+                                    <p class="text-xs text-neutral-dark">Tipo, cargo, cantidad y fechas.</p>
+                                </div>
                             </div>
-                            <div class="space-y-3">
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
-                                    <label class="block text-xs font-semibold text-M3 mb-1">Tipo de Personal</label>
+                                    <label class="block text-xs font-semibold text-neutral-dark mb-1">Tipo de Personal</label>
                                     <input type="text" disabled id="requerimiento-tipo-personal"
-                                        class="form-input w-full px-2 py-1 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed"
+                                        class="form-input w-full px-3 py-2 text-sm border border-neutral rounded-lg bg-neutral-lightest text-neutral-darker cursor-not-allowed"
                                         value="—">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-M3 mb-1">Cargo Solicitado</label>
+                                    <label class="block text-xs font-semibold text-neutral-dark mb-1">Cargo Solicitado</label>
                                     <input type="text" disabled id="requerimiento-cargo"
-                                        class="form-input w-full px-2 py-1 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed"
+                                        class="form-input w-full px-3 py-2 text-sm border border-neutral rounded-lg bg-neutral-lightest text-neutral-darker cursor-not-allowed"
                                         value="—">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-M3 mb-1">Cantidad Requerida</label>
+                                    <label class="block text-xs font-semibold text-neutral-dark mb-1">Cantidad Requerida</label>
                                     <input type="text" disabled id="requerimiento-cantidad"
-                                        class="form-input w-full px-2 py-1 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed"
+                                        class="form-input w-full px-3 py-2 text-sm border border-neutral rounded-lg bg-neutral-lightest text-neutral-darker cursor-not-allowed"
                                         value="—">
                                 </div>
-                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:col-span-2">
                                     <div>
-                                        <label class="block text-xs font-semibold text-M3 mb-1">Fecha Inicio</label>
+                                        <label class="block text-xs font-semibold text-neutral-dark mb-1">Fecha Inicio</label>
                                         <input type="text" disabled id="requerimiento-fecha-inicio"
-                                            class="form-input w-full px-2 py-1 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed"
+                                            class="form-input w-full px-3 py-2 text-sm border border-neutral rounded-lg bg-neutral-lightest text-neutral-darker cursor-not-allowed"
                                             value="—">
                                     </div>
                                     <div>
-                                        <label class="block text-xs font-semibold text-M3 mb-1">Fecha Fin</label>
+                                        <label class="block text-xs font-semibold text-neutral-dark mb-1">Fecha Fin</label>
                                         <input type="text" disabled id="requerimiento-fecha-fin"
-                                            class="form-input w-full px-2 py-1 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed"
+                                            class="form-input w-full px-3 py-2 text-sm border border-neutral rounded-lg bg-neutral-lightest text-neutral-darker cursor-not-allowed"
                                             value="—">
                                     </div>
                                 </div>
@@ -447,32 +467,39 @@
 
                         <!-- SECCIÓN 3: REQUISITOS -->
                         <div id="section-requirements-section" class="view-section p-4 lg:p-0">
-                            <div class="mb-4 border-b border-neutral pb-3">
-                                <h3 class="text-base font-semibold text-M2">Requisitos</h3>
+                            <div class="mb-3 flex items-center gap-2 rounded-lg border border-neutral bg-neutral-lighter px-4 py-3">
+                                <div class="flex h-8 w-8 items-center justify-center rounded-full bg-M6 border border-neutral">
+                                    <i class="fa-solid fa-list-check text-M3"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-semibold text-M2">Requisitos</h3>
+                                    <p class="text-xs text-neutral-dark">Rango de edad, experiencia y grado.</p>
+                                </div>
                             </div>
-                            <div class="space-y-3">
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
-                                    <label class="block text-xs font-semibold text-M3 mb-1">Edad Mínima</label>
+                                    <label class="block text-xs font-semibold text-neutral-dark mb-1">Edad Mínima</label>
                                     <input type="text" disabled id="requerimiento-edad-min"
-                                        class="form-input w-full px-2 py-1 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed"
+                                        class="form-input w-full px-3 py-2 text-sm border border-neutral rounded-lg bg-neutral-lightest text-neutral-darker cursor-not-allowed"
                                         value="—">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-M3 mb-1">Edad Máxima</label>
+                                    <label class="block text-xs font-semibold text-neutral-dark mb-1">Edad Máxima</label>
                                     <input type="text" disabled id="requerimiento-edad-max"
-                                        class="form-input w-full px-2 py-1 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed"
+                                        class="form-input w-full px-3 py-2 text-sm border border-neutral rounded-lg bg-neutral-lightest text-neutral-darker cursor-not-allowed"
                                         value="—">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-M3 mb-1">Experiencia Mínima</label>
+                                    <label class="block text-xs font-semibold text-neutral-dark mb-1">Experiencia Mínima</label>
                                     <input type="text" disabled id="requerimiento-experiencia"
-                                        class="form-input w-full px-2 py-1 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed"
+                                        class="form-input w-full px-3 py-2 text-sm border border-neutral rounded-lg bg-neutral-lightest text-neutral-darker cursor-not-allowed"
                                         value="—">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-M3 mb-1">Grado Académico</label>
+                                    <label class="block text-xs font-semibold text-neutral-dark mb-1">Grado Académico</label>
                                     <input type="text" disabled id="requerimiento-grado"
-                                        class="form-input w-full px-2 py-1 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed"
+                                        class="form-input w-full px-3 py-2 text-sm border border-neutral rounded-lg bg-neutral-lightest text-neutral-darker cursor-not-allowed"
                                         value="—">
                                 </div>
                             </div>
@@ -480,41 +507,55 @@
 
                         <!-- SECCIÓN 4: REMUNERACIÓN -->
                         <div id="section-compensation-section" class="view-section p-4 lg:p-0">
-                            <div class="mb-4 border-b border-neutral pb-3">
-                                <h3 class="text-base font-semibold text-M2">Remuneración y Beneficios</h3>
-                            </div>
-                            <div class="space-y-3">
-                                <div>
-                                    <label class="block text-xs font-semibold text-M3 mb-1">Sueldo Básico (S/)</label>
-                                    <input type="text" disabled id="requerimiento-sueldo"
-                                        class="form-input w-full px-2 py-1 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed"
-                                        value="—">
+                            <div class="mb-3 flex items-center gap-2 rounded-lg border border-neutral bg-neutral-lighter px-4 py-3">
+                                <div class="flex h-8 w-8 items-center justify-center rounded-full bg-M6 border border-neutral">
+                                    <i class="fa-solid fa-coins text-M3"></i>
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-M3 mb-1">Beneficios Incluidos</label>
-                                    <input type="text" disabled id="requerimiento-beneficios"
-                                        class="form-input w-full px-2 py-1 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed"
+                                    <h3 class="text-sm font-semibold text-M2">Remuneración y Beneficios</h3>
+                                    <p class="text-xs text-neutral-dark">Sueldo base y beneficios incluidos.</p>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-neutral-dark mb-1">Sueldo Básico (S/)</label>
+                                    <input type="text" disabled id="requerimiento-sueldo"
+                                        class="form-input w-full px-3 py-2 text-sm border border-neutral rounded-lg bg-neutral-lightest text-neutral-darker cursor-not-allowed"
                                         value="—">
+                                </div>
+                                <div class="sm:col-span-2">
+                                    <label class="block text-xs font-semibold text-neutral-dark mb-1">Beneficios Incluidos</label>
+                                    <textarea disabled id="requerimiento-beneficios" rows="3"
+                                        class="form-input w-full px-3 py-2 text-sm border border-neutral rounded-lg bg-neutral-lightest text-neutral-darker cursor-not-allowed resize-none"
+                                        placeholder="—">—</textarea>
                                 </div>
                             </div>
                         </div>
 
                         <!-- SECCIÓN 5: ESTADO -->
                         <div id="section-status-section" class="view-section p-4 lg:p-0">
-                            <div class="mb-4 border-b border-neutral pb-3">
-                                <h3 class="text-base font-semibold text-M2">Estado</h3>
-                            </div>
-                            <div class="space-y-3">
+                            <div class="mb-3 flex items-center gap-2 rounded-lg border border-neutral bg-neutral-lighter px-4 py-3">
+                                <div class="flex h-8 w-8 items-center justify-center rounded-full bg-M6 border border-neutral">
+                                    <i class="fa-solid fa-flag text-M3"></i>
+                                </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-M3 mb-1">Estado Actual</label>
+                                    <h3 class="text-sm font-semibold text-M2">Estado</h3>
+                                    <p class="text-xs text-neutral-dark">Estado actual y urgencia.</p>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-neutral-dark mb-1">Estado Actual</label>
                                     <input type="text" disabled id="requerimiento-estado"
-                                        class="form-input w-full px-2 py-1 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed"
+                                        class="form-input w-full px-3 py-2 text-sm border border-neutral rounded-lg bg-neutral-lightest text-neutral-darker cursor-not-allowed"
                                         value="—">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-M3 mb-1">Urgencia</label>
+                                    <label class="block text-xs font-semibold text-neutral-dark mb-1">Urgencia</label>
                                     <input type="text" disabled id="requerimiento-urgencia"
-                                        class="form-input w-full px-2 py-1 text-sm border border-gray-300 rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed"
+                                        class="form-input w-full px-3 py-2 text-sm border border-neutral rounded-lg bg-neutral-lightest text-neutral-darker cursor-not-allowed"
                                         value="—">
                                 </div>
                             </div>
@@ -957,40 +998,49 @@
             const errorSexo = document.getElementById('error-sexo');
 
             function validarSumaSexo() {
-                // Valores a enteros (o 0)
+                // Valores
                 const req = parseInt(cantidadRequerida.value) || 0;
-                const masc = parseInt(cantidadMasculino.value) || 0;
-                const fem = parseInt(cantidadFemenino.value) || 0;
+                const mascRaw = (cantidadMasculino?.value || '').trim();
+                const femRaw = (cantidadFemenino?.value || '').trim();
+                const masc = mascRaw === '' ? null : (parseInt(mascRaw) || 0);
+                const fem = femRaw === '' ? null : (parseInt(femRaw) || 0);
 
                 // Reset errores
-                cantidadRequerida.classList.remove('border-red-500');
-                cantidadMasculino.classList.remove('border-red-500');
-                cantidadFemenino.classList.remove('border-red-500');
+                cantidadRequerida.classList.remove('!border-error');
+                cantidadMasculino?.classList.remove('!border-error');
+                cantidadFemenino?.classList.remove('!border-error');
                 errorCantidad.classList.add('hidden');
                 errorSexo.classList.add('hidden');
 
-                if (req === 0 && (masc > 0 || fem > 0)) {
-                    // Si no hay cantidad requerida pero sí en sexo
-                    errorCantidad.textContent = "Primero indique la cantidad requerida.";
+                // Si NO se ingresa sexo (ambos vacíos), es válido
+                if (mascRaw === '' && femRaw === '') return true;
+
+                // Si se ingresa uno, se exige completar ambos
+                if (masc === null || fem === null) {
+                    errorSexo.textContent = 'Completa ambos campos (o déjalos vacíos).';
+                    errorSexo.classList.remove('hidden');
+                    if (masc === null) cantidadMasculino?.classList.add('!border-error');
+                    if (fem === null) cantidadFemenino?.classList.add('!border-error');
+                    return false;
+                }
+
+                // Si se usa distribución por sexo, debe cuadrar con la cantidad requerida
+                if (req === 0) {
+                    errorCantidad.textContent = 'Primero indica la cantidad requerida.';
                     errorCantidad.classList.remove('hidden');
-                    cantidadRequerida.classList.add('border-red-500');
+                    cantidadRequerida.classList.add('!border-error');
                     return false;
                 }
-                if ((masc + fem) > req) {
-                    errorSexo.textContent = `La suma (${masc + fem}) supera la cantidad requerida (${req}).`;
+
+                const suma = masc + fem;
+                if (suma !== req) {
+                    errorSexo.textContent = `La suma (${suma}) debe ser igual a la cantidad requerida (${req}).`;
                     errorSexo.classList.remove('hidden');
-                    cantidadMasculino.classList.add('border-red-500');
-                    cantidadFemenino.classList.add('border-red-500');
+                    cantidadMasculino?.classList.add('!border-error');
+                    cantidadFemenino?.classList.add('!border-error');
                     return false;
                 }
-                if ((masc + fem) < req) {
-                    errorSexo.textContent = `La suma (${masc + fem}) es menor que la cantidad requerida (${req}).`;
-                    errorSexo.classList.remove('hidden');
-                    cantidadMasculino.classList.add('border-red-500');
-                    cantidadFemenino.classList.add('border-red-500');
-                    return false;
-                }
-                // Si es igual está correcto
+
                 return true;
             }
 
@@ -1027,7 +1077,17 @@
                 inputsOperativo.forEach(el => {
                     el.required = esOperativo;
                     if (!esOperativo) {
-                        el.value = '';
+                        if (el.type === 'checkbox' || el.type === 'radio') {
+                            el.checked = false;
+                            const card = el.closest('label');
+                            if (card) card.classList.remove('!border-error');
+                        } else {
+                            el.value = '';
+                        }
+
+                        el.classList.remove('!border-error');
+                        const err = el.parentElement?.querySelector('.error-message');
+                        if (err) err.classList.add('hidden');
                         // Si prefieres bloquearlos en lugar de limpiar, usa:
                         // el.disabled = true; (y quítalo cuando esOperativo)
                     } else {
@@ -1118,19 +1178,26 @@
             const fechaFin = document.getElementById('fecha_fin');
             const urgenciaBox = document.getElementById('urgenciaAutoBox');
             const urgenciaDiv = document.getElementById('urgenciaAuto');
-            const urgenciaSelect = document.getElementById('urgencia');
+            const urgenciaInput = document.getElementById('urgencia');
 
             // Solo ejecutar si todos los elementos existen
-            if (!fechaInicio || !fechaFin || !urgenciaDiv || !urgenciaSelect) return;
+            if (!fechaInicio || !fechaFin || !urgenciaBox || !urgenciaDiv || !urgenciaInput) return;
 
-            function setUrgencia(valor, texto, colorClass) {
+            function setUrgencia(valor, texto, className) {
+                // Mostrar/ocultar el indicador. El input queda con el valor real.
+                urgenciaInput.value = valor || '';
+
+                if (!valor) {
+                    urgenciaBox.classList.add('hidden');
+                    urgenciaDiv.textContent = '';
+                    urgenciaDiv.className = 'text-sm rounded-lg px-3 py-2.5 font-semibold text-center transition-all duration-200 border';
+                    return;
+                }
+
+                urgenciaBox.classList.remove('hidden');
                 urgenciaDiv.textContent = texto;
                 urgenciaDiv.className =
-                    'rounded-lg px-4 py-2 font-semibold text-center transition-all duration-300 ' + colorClass;
-                urgenciaSelect.value = valor;
-                urgenciaSelect.className =
-                    'form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-300 ' +
-                    colorClass;
+                    'text-sm rounded-lg px-3 py-2.5 font-semibold text-center transition-all duration-200 border ' + className;
             }
 
             function calcularUrgencia() {
@@ -1141,18 +1208,19 @@
                     const diffDias = diffMs / (1000 * 60 * 60 * 24);
 
                     if (diffDias < 0) {
-                        setUrgencia("Invalida", "¡Fechas inválidas!", "bg-gray-400 text-white");
+                        setUrgencia('Invalida', '¡Fechas inválidas!', 'bg-error-light text-error-dark border-error');
                     } else if (diffDias <= 7) {
-                        setUrgencia("Alta", "Nivel de urgencia: Alta (1 semana)", "bg-red-500 text-white");
+                        setUrgencia('Alta', 'Urgencia: Alta (1 semana)', 'bg-error-light text-error-dark border-error');
                     } else if (diffDias > 7 && diffDias <= 14) {
-                        setUrgencia("Media", "Nivel de urgencia: Media (2 semanas)", "bg-yellow-400 text-gray-900");
+                        setUrgencia('Media', 'Urgencia: Media (2 semanas)', 'bg-warning-light text-warning-dark border-warning');
                     } else if (diffDias > 14 && diffDias <= 31) {
-                        setUrgencia("Baja", "Nivel de urgencia: Baja (1 mes)", "bg-green-500 text-white");
+                        setUrgencia('Baja', 'Urgencia: Baja (1 mes)', 'bg-success-light text-success-dark border-success');
                     } else {
-                        setUrgencia("Mayor", "Plazo mayor a 1 mes", "bg-blue-400 text-white");
+                        setUrgencia('Mayor', 'Plazo mayor a 1 mes', 'bg-info-light text-info-dark border-info');
                     }
                 } else {
-                    setUrgencia("", "NO SE SELECCIONÓ LA FECHA", "bg-gray-200 text-gray-700");
+                    // No mostrar mensaje cuando no hay fechas
+                    setUrgencia('', '', '');
                 }
             }
 
@@ -1337,12 +1405,15 @@
         });
 
         // Update scale info based on selection
-        document.getElementById('beneficios').addEventListener('change', function() {
-            const infoBox = document.querySelector('.bg-blue-50 p strong');
-            if (infoBox && this.value) {
-                infoBox.textContent = `Escala seleccionada: ${this.options[this.selectedIndex].text}`;
-            }
-        });
+        const beneficiosSelectLegacy = document.getElementById('beneficios');
+        if (beneficiosSelectLegacy) {
+            beneficiosSelectLegacy.addEventListener('change', function() {
+                const infoBox = document.querySelector('.bg-blue-50 p strong');
+                if (infoBox && this.value) {
+                    infoBox.textContent = `Escala seleccionada: ${this.options[this.selectedIndex].text}`;
+                }
+            });
+        }
 
         // ============ WIZARD LOGIC ============
         let wizardStep = 0;
@@ -1354,23 +1425,39 @@
                 el.classList.toggle('hidden', i !== wizardStep);
             });
 
-            // Actualizar indicadores de pasos
+            const checkSvg =
+                '<svg viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4" aria-hidden="true">' +
+                '<path fill-rule="evenodd" d="M16.704 5.29a1 1 0 010 1.414l-7.07 7.07a1 1 0 01-1.414 0L3.296 8.85a1 1 0 011.414-1.414l3.01 3.01 6.363-6.364a1 1 0 011.414 0z" clip-rule="evenodd" />' +
+                '</svg>';
+
+            // Actualizar indicadores y labels (estilo tipo checkout)
             document.querySelectorAll('[id^="step-indicator-"]').forEach((el, i) => {
-                if (i === wizardStep) {
+                const label = document.getElementById(`step-label-${i}`);
+
+                if (i < wizardStep) {
                     el.className =
-                        'w-10 h-10 flex items-center justify-center rounded-full border-2 border-M1 text-M1 bg-M6 font-semibold';
-                    document.getElementById(`step-label-${i}`).className = 'mt-2 text-sm text-M1 font-semibold';
-                } else if (i < wizardStep) {
+                        'w-6 h-6 flex items-center justify-center rounded-full border border-M1 bg-M1 text-white font-semibold text-xs';
+                    el.innerHTML = checkSvg;
+                    if (label) label.className = 'text-sm text-M1 font-semibold';
+                } else if (i === wizardStep) {
                     el.className =
-                        'w-10 h-10 flex items-center justify-center rounded-full border-2 border-green-500 text-white bg-green-500 font-semibold';
-                    document.getElementById(`step-label-${i}`).className =
-                        'mt-2 text-sm text-green-600 font-semibold';
+                        'w-6 h-6 flex items-center justify-center rounded-full border border-M1 bg-M1 text-white font-semibold text-xs';
+                    el.textContent = String(i + 1);
+                    if (label) label.className = 'text-sm text-M1 font-semibold';
                 } else {
                     el.className =
-                        'w-10 h-10 flex items-center justify-center rounded-full border-2 border-neutral text-M3 bg-white font-semibold';
-                    document.getElementById(`step-label-${i}`).className = 'mt-2 text-sm text-M3';
+                        'w-6 h-6 flex items-center justify-center rounded-full border border-neutral bg-white text-M3 font-semibold text-xs';
+                    el.textContent = String(i + 1);
+                    if (label) label.className = 'text-sm text-M3 font-medium';
                 }
             });
+
+            // Conectores
+            for (let i = 0; i < totalSteps - 1; i++) {
+                const conn = document.getElementById(`step-connector-${i}`);
+                if (!conn) continue;
+                conn.className = 'h-px flex-1 ' + (i < wizardStep ? 'bg-M1' : 'bg-neutral');
+            }
 
             // Mostrar/ocultar botones
             document.getElementById('wizard-prev-btn').classList.toggle('hidden', wizardStep === 0);
@@ -1378,11 +1465,83 @@
             document.getElementById('wizard-submit-btn').classList.toggle('hidden', wizardStep !== totalSteps - 1);
         }
 
+        function validateEdadRango(container) {
+            if (!container) return true;
+            const minEl = container.querySelector('#edad_minima');
+            const maxEl = container.querySelector('#edad_maxima');
+            const errEl = container.querySelector('#edad-rango-error');
+            if (!minEl || !maxEl) return true;
+
+            const minRaw = (minEl.value || '').trim();
+            const maxRaw = (maxEl.value || '').trim();
+
+            // Si están vacíos, deja que el required maneje el error.
+            if (minRaw === '' || maxRaw === '') {
+                minEl.classList.remove('!border-error');
+                maxEl.classList.remove('!border-error');
+                if (errEl) errEl.classList.add('hidden');
+                return true;
+            }
+
+            const minV = parseInt(minRaw, 10);
+            const maxV = parseInt(maxRaw, 10);
+            const ok = !Number.isNaN(minV) && !Number.isNaN(maxV) && minV <= maxV;
+
+            if (!ok) {
+                minEl.classList.add('!border-error');
+                maxEl.classList.add('!border-error');
+                if (errEl) {
+                    errEl.textContent = 'La edad mínima debe ser menor o igual que la edad máxima.';
+                    errEl.classList.remove('hidden');
+                }
+                return false;
+            }
+
+            minEl.classList.remove('!border-error');
+            maxEl.classList.remove('!border-error');
+            if (errEl) errEl.classList.add('hidden');
+            return true;
+        }
+
         function validateStep(stepIdx) {
             const container = document.getElementById(`step-content-${stepIdx}`);
             const required = container.querySelectorAll('[required]');
             let isValid = true;
             const invalidFields = [];
+            const validatedRadioGroups = new Set();
+
+            // Validación especial: Edad (rango) en paso Perfil (index 1)
+            if (stepIdx === 1) {
+                const okEdad = validateEdadRango(container);
+                if (!okEdad) {
+                    isValid = false;
+                    invalidFields.push('edad_minima/edad_maxima');
+                }
+            }
+
+            // Validación especial: Beneficios (checkboxes) en paso 3 (index 2)
+            if (stepIdx === 2) {
+                const beneficiosGroup = container.querySelector('#beneficios-group');
+                const beneficiosError = container.querySelector('#beneficios-error');
+                const checked = container.querySelectorAll('input[type="checkbox"][name="beneficios[]"]:checked');
+                const all = container.querySelectorAll('input[type="checkbox"][name="beneficios[]"]');
+
+                if (all.length > 0) {
+                    const ok = checked.length > 0;
+                    if (!ok) {
+                        isValid = false;
+                        invalidFields.push('beneficios[]');
+                        if (beneficiosError) {
+                            beneficiosError.textContent = 'Selecciona al menos un beneficio.';
+                            beneficiosError.classList.remove('hidden');
+                        }
+                        if (beneficiosGroup) beneficiosGroup.classList.add('!border-error');
+                    } else {
+                        if (beneficiosError) beneficiosError.classList.add('hidden');
+                        if (beneficiosGroup) beneficiosGroup.classList.remove('!border-error');
+                    }
+                }
+            }
 
             required.forEach((el) => {
                 // Ignorar campos que están ocultos o dentro de contenedores ocultos
@@ -1403,9 +1562,53 @@
 
                 if (isHidden) return; // Skip if parent is hidden
 
+                // Radios: validar por grupo (name)
+                if (el.type === 'radio') {
+                    const groupName = el.name || '';
+                    if (!groupName) return;
+                    if (validatedRadioGroups.has(groupName)) return;
+                    validatedRadioGroups.add(groupName);
+
+                    const radios = Array.from(container.querySelectorAll(`input[type="radio"][name="${CSS.escape(groupName)}"]`))
+                        .filter(r => !(r.offsetParent === null || r.style.display === 'none'));
+                    const checked = radios.some(r => r.checked);
+
+                    if (!checked) {
+                        isValid = false;
+                        invalidFields.push(groupName);
+                        radios.forEach(r => {
+                            const card = r.closest('label');
+                            if (card) {
+                                card.classList.add('!border-error');
+                            }
+                        });
+                    } else {
+                        radios.forEach(r => {
+                            const card = r.closest('label');
+                            if (card) {
+                                card.classList.remove('!border-error');
+                            }
+                        });
+                    }
+
+                    return;
+                }
+
+                // Checkboxes required
+                if (el.type === 'checkbox') {
+                    if (!el.checked) {
+                        el.classList.add('!border-error');
+                        invalidFields.push(el.name || el.id || 'checkbox');
+                        isValid = false;
+                    } else {
+                        el.classList.remove('!border-error');
+                    }
+                    return;
+                }
+
                 const val = (el.value || '').trim();
                 if (!val) {
-                    el.classList.add('border-red-500');
+                    el.classList.add('!border-error');
                     const err = el.parentElement?.querySelector('.error-message');
                     if (err) {
                         err.textContent = 'Este campo es obligatorio';
@@ -1414,7 +1617,7 @@
                     invalidFields.push(el.name || el.id || 'campo desconocido');
                     isValid = false;
                 } else {
-                    el.classList.remove('border-red-500');
+                    el.classList.remove('!border-error');
                     const err = el.parentElement?.querySelector('.error-message');
                     if (err) err.classList.add('hidden');
                 }
@@ -1426,6 +1629,22 @@
 
             return isValid;
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('requerimiento-wizard-form');
+            if (!form) return;
+            const minEl = form.querySelector('#edad_minima');
+            const maxEl = form.querySelector('#edad_maxima');
+            if (!minEl || !maxEl) return;
+
+            const container = minEl.closest('.step-content') || document;
+            const handler = () => validateEdadRango(container);
+            minEl.addEventListener('input', handler);
+            maxEl.addEventListener('input', handler);
+            minEl.addEventListener('change', handler);
+            maxEl.addEventListener('change', handler);
+            handler();
+        });
 
         function wizardNext() {
             if (validateStep(wizardStep) && wizardStep < totalSteps - 1) {
@@ -1442,7 +1661,21 @@
         }
 
         function closeRequerimientoWizard() {
-            document.dispatchEvent(new CustomEvent('close-modal', {
+            // Resetear wizard y formulario al cancelar
+            try {
+                const form = document.getElementById('requerimiento-wizard-form');
+                if (form) {
+                    form.reset();
+                }
+
+                wizardStep = 0;
+                updateWizardUI();
+            } catch (e) {
+                // no-op
+            }
+
+            // Alpine escucha `close-modal.window`, por eso se dispara en window
+            window.dispatchEvent(new CustomEvent('close-modal', {
                 detail: 'crearRequerimiento'
             }));
         }
@@ -1563,7 +1796,8 @@
                 function setValueIfExists(elementId, value) {
                     const element = document.getElementById(elementId);
                     if (element) {
-                        element.value = value || '—';
+                        const hasValue = value !== null && value !== undefined && String(value).trim() !== '';
+                        element.value = hasValue ? value : '—';
                     }
                 }
 

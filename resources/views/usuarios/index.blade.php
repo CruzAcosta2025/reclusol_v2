@@ -14,43 +14,6 @@
             </div>
         </x-block>
 
-        {{-- Filtros --}}
-        <x-block class="flex flex-col">
-            <form id="filter-form" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Buscar Usuario</label>
-                    <input type="text" name="buscar" value="{{ request('buscar') }}" placeholder="Nombre..."
-                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-0 bg-white/80 transition-colors">
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
-                    <select name="estado"
-                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-0 bg-white/80 transition-colors">
-                        <option value="">Todos</option>
-                        <option value="habilitado" {{ request('estado') == 'habilitado' ? 'selected' : '' }}>Habilitados
-                        </option>
-                        <option value="inhabilitado" {{ request('estado') == 'inhabilitado' ? 'selected' : '' }}>
-                            Inhabilitados</option>
-                    </select>
-                </div>
-
-                <div class="flex items-end">
-                    <div class="flex space-x-2 w-full">
-                        <button type="submit"
-                            class="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors flex items-center justify-center space-x-2">
-                            <i class="fas fa-filter"></i>
-                            <span>Filtrar</span>
-                        </button>
-                        <button type="button" onclick="limpiarFiltros()"
-                            class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 transition">
-                            <i class="fas fa-times"></i> Limpiar filtros
-                        </button>
-                    </div>
-                </div>
-            </form>
-        </x-block>
-
         {{-- Estadísticas --}}
         <div class="">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -104,6 +67,43 @@
             </div>
         </div>
 
+        {{-- Filtros --}}
+        <x-block class="flex flex-col">
+            <form id="filter-form" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Buscar Usuario</label>
+                    <input type="text" name="buscar" value="{{ request('buscar') }}" placeholder="Nombre..."
+                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-0 bg-white/80 transition-colors">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                    <select name="estado"
+                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-0 bg-white/80 transition-colors">
+                        <option value="">Todos</option>
+                        <option value="habilitado" {{ request('estado') == 'habilitado' ? 'selected' : '' }}>Habilitados
+                        </option>
+                        <option value="inhabilitado" {{ request('estado') == 'inhabilitado' ? 'selected' : '' }}>
+                            Inhabilitados</option>
+                    </select>
+                </div>
+
+                <div class="flex items-end">
+                    <div class="flex space-x-2 w-full">
+                        <button type="submit"
+                            class="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors flex items-center justify-center space-x-2">
+                            <i class="fas fa-filter"></i>
+                            <span>Filtrar</span>
+                        </button>
+                        <button type="button" onclick="limpiarFiltros()"
+                            class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 transition">
+                            <i class="fas fa-times"></i> Limpiar filtros
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </x-block>
+
         {{-- Tabla de usuarios --}}
         <div>
             <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
@@ -137,7 +137,8 @@
                                         <div class="flex flex-col">
                                             <p class="text-sm font-semibold text-gray-900">{{ $user->name }}</p>
                                             <p class="text-xs text-gray-500">Registrado:
-                                                {{ $user->created_at->format('d/m/Y') }}</p>
+                                                {{ $user->created_at->format('d/m/Y') }}
+                                            </p>
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 text-center">
@@ -271,11 +272,11 @@
         // ------ MODAL: CREAR USUARIO ------
         function openCreateModal() {
             fetch('/usuarios/create', {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'text/html'
-                    }
-                })
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'text/html'
+                }
+            })
                 .then(response => response.text())
                 .then(html => {
                     const target = document.getElementById('create-modal-content');
@@ -303,7 +304,7 @@
             const passField = modal.querySelector('#contrasena');
 
             if (passEyeBtn && passField) {
-                passEyeBtn.onclick = function() {
+                passEyeBtn.onclick = function () {
                     if (passField.type === 'password') {
                         passField.type = 'text';
                         passEyeBtn.classList.remove('fa-eye');
@@ -319,27 +320,27 @@
             // --- Envío del formulario de creación ---
             const form = modal.querySelector('#create-user-form');
             if (form) {
-                form.addEventListener('submit', function(e) {
+                form.addEventListener('submit', function (e) {
                     e.preventDefault();
                     const formData = new FormData(form);
 
                     // Limpiar errores anteriores
                     const errorMessages = form.querySelectorAll('.error-message');
-                    errorMessages.forEach(function(el) {
+                    errorMessages.forEach(function (el) {
                         el.classList.add('hidden');
                         el.textContent = '';
                     });
 
                     fetch(form.action, {
-                            method: 'POST',
-                            headers: {
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
-                                    'content'),
-                                'Accept': 'application/json',
-                                'X-Requested-With': 'XMLHttpRequest'
-                            },
-                            body: formData
-                        })
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                                'content'),
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: formData
+                    })
                         .then(response => {
                             if (!response.ok) {
                                 return response.json().then(err => Promise.reject(err));
@@ -355,7 +356,7 @@
                         })
                         .catch(error => {
                             if (error && error.errors) {
-                                Object.keys(error.errors).forEach(function(field) {
+                                Object.keys(error.errors).forEach(function (field) {
                                     const input = form.querySelector('[name="' + field + '"]');
                                     if (input && input.parentNode) {
                                         const errorDiv = input.parentNode.querySelector(
@@ -379,7 +380,7 @@
             const apellidos = modal.querySelector('#apellidos');
 
             if (dni && nombres && apellidos) {
-                const urlFor = function(d) {
+                const urlFor = function (d) {
                     return window.ROUTE_DNI_SIMPLE.replace('DNI_PLACEHOLDER', d);
                 };
                 let t = null;
@@ -404,18 +405,18 @@
                     }
                 }
 
-                dni.addEventListener('input', function(e) {
+                dni.addEventListener('input', function (e) {
                     const v = e.target.value.replace(/\D/g, '').slice(0, 8);
                     e.target.value = v;
                     clearTimeout(t);
                     if (v.length === 8) {
-                        t = setTimeout(function() {
+                        t = setTimeout(function () {
                             lookup(v);
                         }, 300);
                     }
                 });
 
-                dni.addEventListener('blur', function(e) {
+                dni.addEventListener('blur', function (e) {
                     const v = e.target.value.replace(/\D/g, '');
                     if (v.length === 8) {
                         lookup(v);
@@ -430,7 +431,7 @@
         }
 
         // Inicializa eventos del modal de creación al cargar la vista (contenido ya está incluido en el x-modal)
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             if (document.getElementById('create-modal-content')) {
                 inicializarEventosCreateModal();
             }
@@ -439,11 +440,11 @@
         // ------ MODAL: EDITAR USUARIO ------
         function openEditModal(id) {
             fetch('/usuarios/' + id + '/edit', {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'text/html'
-                    }
-                })
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'text/html'
+                }
+            })
                 .then(r => r.text())
                 .then(html => {
                     document.getElementById('edit-modal-content').innerHTML = html;
@@ -465,7 +466,7 @@
             const passField = modal.querySelector('#contrasena');
 
             if (passEyeBtn && passField) {
-                passEyeBtn.onclick = function() {
+                passEyeBtn.onclick = function () {
                     if (passField.type === 'password') {
                         passField.type = 'text';
                         passEyeBtn.classList.remove('fa-eye');
@@ -479,44 +480,44 @@
             }
 
             if (form) {
-                form.addEventListener('submit', function(e) {
+                form.addEventListener('submit', function (e) {
                     e.preventDefault();
                     const fd = new FormData(form); // incluye @method('PUT')
 
                     // Limpiar errores anteriores
                     const errorMessages = form.querySelectorAll('.error-message');
-                    errorMessages.forEach(function(el) {
+                    errorMessages.forEach(function (el) {
                         el.classList.add('hidden');
                         el.textContent = '';
                     });
 
                     fetch(form.action, {
-                            method: 'POST',
-                            headers: {
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
-                                    'content'),
-                                'Accept': 'application/json',
-                                'X-Requested-With': 'XMLHttpRequest'
-                            },
-                            body: fd
-                        })
-                        .then(function(r) {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                                'content'),
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: fd
+                    })
+                        .then(function (r) {
                             if (r.ok) return r.json();
-                            return r.json().then(function(err) {
+                            return r.json().then(function (err) {
                                 return Promise.reject(err);
                             });
                         })
-                        .then(function(j) {
+                        .then(function (j) {
                             if (j.success) {
                                 window.location.reload();
                             } else {
                                 alert(j.message || 'Error al editar');
                             }
                         })
-                        .catch(function(err) {
+                        .catch(function (err) {
                             console.log(err);
                             if (err && err.errors) {
-                                Object.keys(err.errors).forEach(function(field) {
+                                Object.keys(err.errors).forEach(function (field) {
                                     const input = form.querySelector('[name="' + field + '"]');
                                     if (input && input.parentNode) {
                                         const el = input.parentNode.querySelector('.error-message');
@@ -539,7 +540,7 @@
             const apellidos = modal.querySelector('#apellidos');
 
             if (dni && nombres && apellidos) {
-                const urlFor = function(d) {
+                const urlFor = function (d) {
                     return window.ROUTE_DNI_SIMPLE.replace('DNI_PLACEHOLDER', d);
                 };
                 let t = null;
@@ -558,18 +559,18 @@
                     }
                 }
 
-                dni.addEventListener('input', function(e) {
+                dni.addEventListener('input', function (e) {
                     const v = e.target.value.replace(/\D/g, '').slice(0, 8);
                     e.target.value = v;
                     clearTimeout(t);
                     if (v.length === 8) {
-                        t = setTimeout(function() {
+                        t = setTimeout(function () {
                             lookup(v);
                         }, 300);
                     }
                 });
 
-                dni.addEventListener('blur', function(e) {
+                dni.addEventListener('blur', function (e) {
                     const v = e.target.value.replace(/\D/g, '');
                     if (v.length === 8) {
                         lookup(v);
@@ -581,13 +582,13 @@
         // ------ CAMBIAR ESTADO (HABILITAR / INHABILITAR) ------
         function toggleUserStatus(userId) {
             fetch('/usuarios/' + userId + '/habilitar', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
@@ -618,15 +619,15 @@
             const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
             fetch('/usuarios/' + deleteUserId, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': token,
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-                    },
-                    body: '_method=DELETE'
-                })
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': token,
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                },
+                body: '_method=DELETE'
+            })
                 .then(r => r.json())
                 .then(data => {
                     if (data.success) {
@@ -638,10 +639,10 @@
                 .catch(() => alert('Error al eliminar usuario'));
         }
 
-        document.addEventListener('click', function(event) {
+        document.addEventListener('click', function (event) {
             // Para modales legacy (edit/view/delete) se mantiene la lógica de backdrop clic
             const modals = ['edit-modal', 'view-modal', 'delete-modal'];
-            modals.forEach(function(modalId) {
+            modals.forEach(function (modalId) {
                 const modal = document.getElementById(modalId);
                 if (modal && event.target === modal) {
                     modal.classList.add('hidden');

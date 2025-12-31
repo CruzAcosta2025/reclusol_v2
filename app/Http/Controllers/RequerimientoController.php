@@ -122,7 +122,7 @@ class RequerimientoController extends Controller
     {
         try {
             // Este endpoint se usa para el modal de "ver"; devolver solo detalle evita fallos
-            // por catlogos/tablas que pueden vivir en otro origen.
+            // por calogos/tablas que pueden vivir en otro origen.
             $detalle = $this->service->getDetalleCompleto($id);
 
             if (!$detalle) {
@@ -161,10 +161,10 @@ class RequerimientoController extends Controller
                 'fecha_fin'            => 'required|date|after_or_equal:fecha_inicio',
                 'urgencia'             => 'required|string|max:50',
                 'cantidad_requerida'   => 'required|integer|min:1|max:255',
-                'cantidad_masculino'   => 'required|integer|min:0|max:255',
-                'cantidad_femenino'    => 'required|integer|min:0|max:255',
-                'edad_minima'          => 'required|integer|min:18|max:65',
-                'edad_maxima'          => 'required|integer|min:18|max:70',
+                'cantidad_masculino'   => 'nullable|integer|min:0|max:255',
+                'cantidad_femenino'    => 'nullable|integer|min:0|max:255',
+                'edad_minima'          => 'required|integer|min:1|max:100|lte:edad_maxima',
+                'edad_maxima'          => 'required|integer|min:1|max:100|gte:edad_minima',
                 'experiencia_minima'   => 'required|string|max:50',
                 'curso_sucamec_operativo'   => 'nullable|string|max:50',
                 'carne_sucamec_operativo'   => 'nullable|string|max:50',
@@ -175,7 +175,8 @@ class RequerimientoController extends Controller
                 'requiere_licencia_conducir' => 'nullable|string|max:50',
                 'validado_rrhh'             => 'boolean',
                 'sueldo_basico'             => 'required|string|max:50',
-                'beneficios'                => 'required|string|max:50',
+                'beneficios'                => 'required|array|min:1',
+                'beneficios.*'              => 'string|max:50',
 
                 //'prioridad'                 => 'nullable|exists:prioridad_requerimiento,id',
                 'estado'                    => 'required|exists:estado_requerimiento,id',
@@ -184,6 +185,39 @@ class RequerimientoController extends Controller
                 //'requiere_sucamec'          => 'boolean',
                 //'requisitos_adicionales'    => 'nullable|string',
             ]);
+
+            // Coherencia: distribución por sexo es opcional, pero si se usa debe ser completa y cuadrar.
+            $masc = $validated['cantidad_masculino'] ?? null;
+            $fem = $validated['cantidad_femenino'] ?? null;
+            if (($masc === null) !== ($fem === null)) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'cantidad_masculino' => ['Completa ambos campos (o déjalos vacíos).'],
+                    'cantidad_femenino'  => ['Completa ambos campos (o déjalos vacíos).'],
+                ]);
+            }
+            if ($masc !== null && $fem !== null) {
+                $req = (int) ($validated['cantidad_requerida'] ?? 0);
+                if (($masc + $fem) !== $req) {
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'cantidad_masculino' => ['La suma de Masculino y Femenino debe ser igual a la cantidad requerida.'],
+                        'cantidad_femenino'  => ['La suma de Masculino y Femenino debe ser igual a la cantidad requerida.'],
+                    ]);
+                }
+            }
+
+            // Beneficios: viene como array (beneficios[]). Persistimos como CSV para mantener compatibilidad con campo string.
+            $beneficiosCsv = implode(',', array_map('strval', $validated['beneficios'] ?? []));
+            if ($beneficiosCsv === '') {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'beneficios' => ['Selecciona al menos un beneficio.'],
+                ]);
+            }
+            if (mb_strlen($beneficiosCsv) > 50) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'beneficios' => ['La selección de beneficios es demasiado larga. Reduce la cantidad de opciones.'],
+                ]);
+            }
+            $validated['beneficios'] = $beneficiosCsv;
 
             // Calcular urgencia en backend (fuente de verdad)
             $urg = $this->service->calcularUrgencia($validated['fecha_inicio'] ?? null, $validated['fecha_fin'] ?? null);
@@ -223,13 +257,10 @@ class RequerimientoController extends Controller
             $validated['requiere_sucamec'] = $request->boolean('requiere_sucamec');
             $validated['validado_rrhh'] = $request->boolean('validado_rrhh');
 
-            /* ---------- 4. CREAR EN TRANSACCIÓN ---------- */
-            $requerimiento = DB::transaction(function () use ($validated) {
-                Log::info('Iniciando transacción...');
-                $req = Requerimiento::create($validated);
-                Log::info('Requerimiento creado con ID:', ['id' => $req->id]);
-                return $req;
-            });
+            /* ---------- 4. CREAR (SERVICE/REPOSITORY) ---------- */
+            Log::info('Creando requerimiento (service/repository)...');
+            $requerimiento = $this->service->crear($validated);
+            Log::info('Requerimiento creado con ID:', ['id' => $requerimiento->id]);
 
             /* ---------- 5. NOTIFICACIONES ---------- */
             try {
@@ -339,8 +370,8 @@ class RequerimientoController extends Controller
             'cargo_solicitado'           => 'required|string|max:50',
             'cantidad_requerida'         => 'required|integer|min:1|max:255',
             'fecha_limite'               => 'required|date|after_or_equal:today',
-            'edad_minima'                => 'required|integer|min:18|max:65',
-            'edad_maxima'                => 'required|integer|min:18|max:65',
+            'edad_minima'                => 'required|integer|min:1|max:100|lte:edad_maxima',
+            'edad_maxima'                => 'required|integer|min:1|max:100|gte:edad_minima',
             'requiere_licencia_conducir' => 'required|string|max:50',
             'requiere_sucamec'           => 'boolean',
             'nivel_estudios'             => 'required|string|max:50',
@@ -350,7 +381,6 @@ class RequerimientoController extends Controller
             //'escala_remunerativa'        => 'required|string|max:10',
             'prioridad'                  => 'required|exists:prioridad_requerimiento,id',
             'estado'                     => 'required|exists:estado_requerimiento,id',
-
         ]);
 
         // 2. Actualizar

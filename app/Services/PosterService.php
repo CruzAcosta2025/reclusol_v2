@@ -49,12 +49,12 @@ class PosterService
     public function obtenerRecursos()
     {
         return [
-            'plantillas'  => $this->collectAssets('assets/plantillas'),
-            'iconosG'     => $this->collectAssets('assets/icons/iconG'),
+            'plantillas' => $this->collectAssets('assets/plantillas'),
+            'iconosG' => $this->collectAssets('assets/icons/iconG'),
             'iconosCheck' => $this->collectAssets('assets/icons/iconCheck'),
             'iconosPhone' => $this->collectAssets('assets/icons/iconPhone'),
             'iconosEmail' => $this->collectAssets('assets/icons/iconEmail'),
-            'fonts'       => $this->collectAssets('fonts', ['ttf', 'otf']),
+            'fonts' => $this->collectAssets('fonts', ['ttf', 'otf']),
         ];
     }
 
@@ -83,8 +83,8 @@ class PosterService
 
                 return (object) [
                     'filename' => $filename,
-                    'name'     => $name,
-                    'path'     => $relativePath . '/' . $filename,
+                    'name' => $name,
+                    'path' => $relativePath . '/' . $filename,
                 ];
             })
             ->values();
@@ -100,12 +100,12 @@ class PosterService
 
         return collect(File::files($fullPath))->map(function ($file) use ($relativePath) {
             $filename = $file->getFilename();
-            $slug     = pathinfo($filename, PATHINFO_FILENAME);
+            $slug = pathinfo($filename, PATHINFO_FILENAME);
 
             return (object) [
-                'slug'     => $slug,
-                'name'     => Str::headline($slug),
-                'path'     => $relativePath . '/' . $filename,
+                'slug' => $slug,
+                'name' => Str::headline($slug),
+                'path' => $relativePath . '/' . $filename,
                 'filename' => $filename,
             ];
         });
@@ -114,12 +114,12 @@ class PosterService
     public function obtenerRecursosEscaneados()
     {
         return [
-            'plantillas'  => $this->scanImages('assets/plantillas'),
-            'iconosG'     => $this->scanImages('assets/icons/iconG'),
+            'plantillas' => $this->scanImages('assets/plantillas'),
+            'iconosG' => $this->scanImages('assets/icons/iconG'),
             'iconosCheck' => $this->scanImages('assets/icons/iconCheck'),
             'iconosPhone' => $this->scanImages('assets/icons/iconPhone'),
             'iconosEmail' => $this->scanImages('assets/icons/iconEmail'),
-            'fonts'       => $this->scanImages('fonts'),
+            'fonts' => $this->scanImages('fonts'),
         ];
     }
 
@@ -133,7 +133,7 @@ class PosterService
         }
 
         $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-        $extension    = strtolower($file->getClientOriginalExtension());
+        $extension = strtolower($file->getClientOriginalExtension());
 
         $slugName = Str::slug($originalName, '-');
         if ($slugName === '') {
@@ -161,14 +161,14 @@ class PosterService
 
         return [
             'relativePath' => $relativePath,
-            'filename'     => $filename,
+            'filename' => $filename,
         ];
     }
 
     public function eliminarAsset(string $tipo, string $filename)
     {
         $relativePath = $this->obtenerRutaPorTipo($tipo);
-        
+
         if (!$relativePath) {
             return false;
         }
@@ -205,8 +205,8 @@ class PosterService
         $req->sucursal_nombre = $sucursales->get($codigoSucursal) ?? $req->sucursal;
 
         // Mapear nombres legibles para provincia y distrito
-        $codigoProvincia = ltrim((string)$req->provincia, '0');
-        $codigoDistrito = ltrim((string)$req->distrito, '0');
+        $codigoProvincia = ltrim((string) $req->provincia, '0');
+        $codigoDistrito = ltrim((string) $req->distrito, '0');
 
         $req->nombre_provincia = $provincias->get($codigoProvincia) ?? $req->provincia;
         $req->nombre_distrito = $distritos->get($codigoDistrito) ?? $req->distrito;
@@ -238,16 +238,16 @@ class PosterService
 
     private function procesarRecursos(array $recursos)
     {
-        $iconGPath     = $recursos['iconG']     ?? 'assets/icons/iconG/guardia.png';
+        $iconGPath = $recursos['iconG'] ?? 'assets/icons/iconG/guardia.png';
         $iconCheckPath = $recursos['iconCheck'] ?? 'assets/icons/iconCheck/icon_check1.png';
         $iconPhonePath = $recursos['iconPhone'] ?? 'assets/icons/iconPhone/icon_phone1.png';
         $iconEmailPath = $recursos['iconEmail'] ?? 'assets/icons/iconEmail/icon_email1.png';
-        $fontPath      = $recursos['font']      ?? 'fonts/OpenSans-Regular.ttf';
+        $fontPath = $recursos['font'] ?? 'fonts/OpenSans-Regular.ttf';
 
-        $iconGFull     = file_exists(public_path($iconGPath))     ? public_path($iconGPath)     : null;
+        $iconGFull = file_exists(public_path($iconGPath)) ? public_path($iconGPath) : null;
         $iconCheckFull = file_exists(public_path($iconCheckPath)) ? public_path($iconCheckPath) : null;
         $iconPhoneFull = file_exists(public_path($iconPhonePath)) ? public_path($iconPhonePath) : null;
-        $iconMailFull  = file_exists(public_path($iconEmailPath)) ? public_path($iconEmailPath) : null;
+        $iconMailFull = file_exists(public_path($iconEmailPath)) ? public_path($iconEmailPath) : null;
 
         $fontFull = file_exists(public_path($fontPath))
             ? public_path($fontPath)
@@ -258,11 +258,11 @@ class PosterService
         }
 
         return [
-            'iconGFull'     => $iconGFull,
+            'iconGFull' => $iconGFull,
             'iconCheckFull' => $iconCheckFull,
             'iconPhoneFull' => $iconPhoneFull,
-            'iconMailFull'  => $iconMailFull,
-            'fontFull'      => $fontFull,
+            'iconMailFull' => $iconMailFull,
+            'fontFull' => $fontFull,
         ];
     }
 
@@ -293,15 +293,15 @@ class PosterService
         if ($format === 'jpg') {
             return [
                 'binary' => $bg->encode(new JpegEncoder(quality: 90)),
-                'mime'   => 'image/jpeg',
-                'ext'    => 'jpg',
+                'mime' => 'image/jpeg',
+                'ext' => 'jpg',
             ];
         }
 
         return [
             'binary' => $bg->encode(new PngEncoder()),
-            'mime'   => 'image/png',
-            'ext'    => 'png',
+            'mime' => 'image/png',
+            'ext' => 'png',
         ];
     }
 
@@ -401,9 +401,9 @@ class PosterService
             ? Image::read($iconCheckFull)->resize(32, 32)
             : null;
 
-        $y          = 450;
-        $iconX      = 420;
-        $textX      = 480;
+        $y = 450;
+        $iconX = 420;
+        $textX = 480;
         $lineHeight = 50;
 
         foreach ($lines as $text) {
@@ -478,13 +478,13 @@ class PosterService
     private function obtenerRutaPorTipo(string $tipo): ?string
     {
         return match ($tipo) {
-            'plantilla'  => 'assets/plantillas',
-            'iconG'      => 'assets/icons/iconG',
-            'iconCheck'  => 'assets/icons/iconCheck',
-            'iconPhone'  => 'assets/icons/iconPhone',
-            'iconEmail'  => 'assets/icons/iconEmail',
-            'font'       => 'fonts',
-            default      => null,
+            'plantilla' => 'assets/plantillas',
+            'iconG' => 'assets/icons/iconG',
+            'iconCheck' => 'assets/icons/iconCheck',
+            'iconPhone' => 'assets/icons/iconPhone',
+            'iconEmail' => 'assets/icons/iconEmail',
+            'font' => 'fonts',
+            default => null,
         };
     }
 }

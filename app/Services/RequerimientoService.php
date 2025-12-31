@@ -238,6 +238,15 @@ class RequerimientoService
         // cantidad_requerida
         $data['cantidad_requerida'] = $model && !empty($model->cantidad_requerida) ? $model->cantidad_requerida : '—';
 
+        // cantidad por sexo (presentación)
+        $mascRaw = $model ? (int)($model->cantidad_masculino ?? 0) : 0;
+        $femRaw  = $model ? (int)($model->cantidad_femenino ?? 0) : 0;
+        $data['cantidad_masculino_raw'] = $mascRaw;
+        $data['cantidad_femenino_raw'] = $femRaw;
+        $sinDistribucionSexo = ($mascRaw === 0 && $femRaw === 0);
+        $data['cantidad_masculino_display'] = $sinDistribucionSexo ? '--' : (string)$mascRaw;
+        $data['cantidad_femenino_display'] = $sinDistribucionSexo ? '--' : (string)$femRaw;
+
         // experiencia_minima
         $rawExp = $model && !empty($model->experiencia_minima) ? (string)$model->experiencia_minima : '';
         $data['experiencia_minima_raw'] = $rawExp;
@@ -273,7 +282,16 @@ class RequerimientoService
         $beneficios = $this->getBeneficios();
         $rawBenef = $model && !empty($model->beneficios) ? (string)$model->beneficios : ($data['beneficios'] ?? '');
         $data['beneficios'] = $rawBenef;
-        $data['beneficios_nombre'] = $beneficios[$rawBenef] ?? ($data['beneficios'] ?? '—');
+        $keys = array_values(array_filter(array_map('trim', explode(',', $rawBenef))));
+        if (empty($keys)) {
+            $data['beneficios_nombre'] = '—';
+        } elseif (count($keys) === 1) {
+            $k = $keys[0];
+            $data['beneficios_nombre'] = $beneficios[$k] ?? $k;
+        } else {
+            $labels = array_map(fn($k) => $beneficios[$k] ?? $k, $keys);
+            $data['beneficios_nombre'] = implode(', ', $labels);
+        }
         return $data;
     }
 
@@ -429,5 +447,20 @@ class RequerimientoService
         } else {
             return ['valor' => 'Mayor', 'texto' => 'Plazo mayor a 1 mes'];
         }
+    }
+
+    public function crear(array $data): Requerimiento
+    {
+        // Si el usuario no desea distribuir por sexo, se persiste como 0/0.
+        if (!array_key_exists('cantidad_masculino', $data) || $data['cantidad_masculino'] === null) {
+            $data['cantidad_masculino'] = 0;
+        }
+        if (!array_key_exists('cantidad_femenino', $data) || $data['cantidad_femenino'] === null) {
+            $data['cantidad_femenino'] = 0;
+        }
+
+        return $this->requerimientoRepository->transaction(function () use ($data) {
+            return $this->requerimientoRepository->create($data);
+        });
     }
 }

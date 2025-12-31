@@ -56,86 +56,6 @@
         </div>
     </div>
 
-    {{-- Departamento, Provincia, Distrito --}}
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div>
-            <label for="departamento" class="block font-medium text-gray-700 mb-1">Departamento</label>
-            <select id="departamento" name="departamento" required
-                class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500 text-xs">
-                <option value="">Selecciona el departamento</option>
-                @foreach ($departamentos as $key => $departamento)
-                    @php
-                        $depaCodigo = is_object($departamento)
-                            ? ($departamento->DEPA_CODIGO ?? $key)
-                            : (is_array($departamento) ? ($departamento['DEPA_CODIGO'] ?? $key) : $key);
-                        $depaDescripcion = is_object($departamento)
-                            ? ($departamento->DEPA_DESCRIPCION ?? $departamento->descripcion ?? $depaCodigo)
-                            : (is_array($departamento) ? ($departamento['DEPA_DESCRIPCION'] ?? $departamento['descripcion'] ?? $depaCodigo) : $departamento);
-                    @endphp
-                    <option value="{{ $depaCodigo }}"
-                        {{ old('departamento', $requerimiento->departamento) == $depaCodigo ? 'selected' : '' }}>
-                        {{ $depaDescripcion }}
-                    </option>
-                @endforeach
-            </select>
-            @error('departamento')
-                <p class="mt-1 text-red-600">{{ $message }}</p>
-            @enderror
-        </div>
-
-        <div>
-            <label for="provincia" class="block font-medium text-gray-700 mb-1">Provincia</label>
-            <select id="provincia" name="provincia" required
-                data-selected="{{ old('provincia', $requerimiento->provincia) }}"
-                class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500 text-xs">
-                <option value="">Selecciona la provincia</option>
-                @foreach ($provincias as $key => $provincia)
-                    @php
-                        $proviCodigo = is_object($provincia)
-                            ? ($provincia->PROVI_CODIGO ?? $key)
-                            : (is_array($provincia) ? ($provincia['PROVI_CODIGO'] ?? $key) : $key);
-                        $proviDescripcion = is_object($provincia)
-                            ? ($provincia->PROVI_DESCRIPCION ?? $provincia->descripcion ?? $proviCodigo)
-                            : (is_array($provincia) ? ($provincia['PROVI_DESCRIPCION'] ?? $provincia['descripcion'] ?? $proviCodigo) : $provincia);
-                    @endphp
-                    <option value="{{ $proviCodigo }}"
-                        {{ old('provincia', $requerimiento->provincia) == $proviCodigo ? 'selected' : '' }}>
-                        {{ $proviDescripcion }}
-                    </option>
-                @endforeach
-            </select>
-            @error('provincia')
-                <p class="mt-1 text-red-600">{{ $message }}</p>
-            @enderror
-        </div>
-
-        <div>
-            <label for="distrito" class="block font-medium text-gray-700 mb-1">Distrito</label>
-            <select id="distrito" name="distrito" required
-                data-selected="{{ old('distrito', $requerimiento->distrito) }}"
-                class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500 text-xs">
-                <option value="">Selecciona el distrito</option>
-                @foreach ($distritos as $key => $distrito)
-                    @php
-                        $distCodigo = is_object($distrito)
-                            ? ($distrito->DIST_CODIGO ?? $key)
-                            : (is_array($distrito) ? ($distrito['DIST_CODIGO'] ?? $key) : $key);
-                        $distDescripcion = is_object($distrito)
-                            ? ($distrito->DIST_DESCRIPCION ?? $distrito->descripcion ?? $distCodigo)
-                            : (is_array($distrito) ? ($distrito['DIST_DESCRIPCION'] ?? $distrito['descripcion'] ?? $distCodigo) : $distrito);
-                    @endphp
-                    <option value="{{ $distCodigo }}"
-                        {{ old('distrito', $requerimiento->distrito) == $distCodigo ? 'selected' : '' }}>
-                        {{ $distDescripcion }}
-                    </option>
-                @endforeach
-            </select>
-            @error('distrito')
-                <p class="mt-1 text-red-600">{{ $message }}</p>
-            @enderror
-        </div>
-    </div>
-
     {{-- Tipo de Cargo, Cargo Solicitado --}}
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
@@ -190,7 +110,7 @@
         <div>
             <label for="edad_minima" class="block font-medium text-gray-700 mb-1">Edad Mínima</label>
             <input type="number" id="edad_minima" name="edad_minima"
-                value="{{ old('edad_minima', $requerimiento->edad_minima) }}" required min="18" max="65"
+                value="{{ old('edad_minima', $requerimiento->edad_minima) }}" required min="1" max="100"
                 class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500 text-xs">
             @error('edad_minima')
                 <p class="mt-1 text-red-600">{{ $message }}</p>
@@ -199,7 +119,7 @@
         <div>
             <label for="edad_maxima" class="block font-medium text-gray-700 mb-1">Edad Máxima</label>
             <input type="number" id="edad_maxima" name="edad_maxima"
-                value="{{ old('edad_maxima', $requerimiento->edad_maxima) }}" required min="18" max="65"
+                value="{{ old('edad_maxima', $requerimiento->edad_maxima) }}" required min="1" max="100"
                 class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500 text-xs">
             @error('edad_maxima')
                 <p class="mt-1 text-red-600">{{ $message }}</p>

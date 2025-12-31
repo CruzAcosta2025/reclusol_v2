@@ -233,10 +233,8 @@ class ExampleController extends Controller
         return back()->with('error', 'El archivo ya no existe en el servidor.');
     }
 
-
     public function show(Request $request, Requerimiento $req, string $template)
     {
-
         // Cargar catálogos
         $cargos = Cargo::forSelect();
         $sucursales = Sucursal::forSelect();

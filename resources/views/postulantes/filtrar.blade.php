@@ -24,6 +24,38 @@
         {{-- Filtro --}}
         <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+                <div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {{-- Aptos --}}
+                <div class="bg-green-100 border border-green-200 p-4 rounded-lg text-center flex flex-col items-center">
+                    <div class="self-center"> 
+                        <i class="fas fa-check-circle fa-2x text-green-500"></i>
+                        <p class="text-sm text-gray-600">Postulantes Aptos</p>
+                        <p class="text-2xl font-bold">{{ $stats['aptos'] ?? 0 }}</p>
+                    </div>   
+                </div>
+                {{-- No Aptos --}}
+                <div class="bg-red-100 border border-red-200 p-4 rounded-lg text-center flex flex-col items-center">
+                    <i class="fas fa-times-circle fa-2x text-red-500"></i>
+                    <p class="text-sm text-gray-600">Postulantes No Aptos</p>
+                    <p class="text-2xl font-bold">{{ $stats['no_aptos'] ?? 0 }}</p>
+                </div>
+                {{-- Total --}}
+                <div class="bg-blue-100 border border-blue-200 p-4 rounded-lg text-center flex flex-col items-center">
+                    <i class="fa-solid fa-users fa-2x text-blue-500"></i>
+                    <p class="text-sm text-gray-600">Total Postulantes</p>
+                    <p class="text-2xl font-bold">{{ $stats['total'] ?? 0 }}</p>
+                </div>
+                {{-- Total postulantes (OPERATIVO Y ADMINISTRATIVO) --}}
+                <div class="bg-blue-100 border border-blue-200 p-4 rounded-lg text-center flex flex-col items-center">
+                    <i class="fa-solid fa-users fa-2x text-blue-500"></i>
+                    <p class="text-sm text-gray-600">Postulantes Administrativo</p>
+                    <p class="text-sm text-gray-600">Postulantes Operativo</p>
+                    <p class="text-2xl font-bold">{{ $stats['total'] ?? 0 }}</p>
+                </div>
+            </div>
+        </div>
+
         <x-block>
             <form id="filter-form" method="GET"
                 class="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -115,36 +147,6 @@
                 </div>
             </form>
         </x-block>
-
-        <div>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {{-- Aptos --}}
-                <div class="bg-green-100 border border-green-200 p-4 rounded-lg text-center flex flex-col items-center">
-                    <i class="fas fa-check-circle fa-2x text-green-500"></i>
-                    <p class="text-sm text-gray-600">Postulantes Aptos</p>
-                    <p class="text-2xl font-bold">{{ $stats['aptos'] ?? 0 }}</p>
-                </div>
-                {{-- No Aptos --}}
-                <div class="bg-red-100 border border-red-200 p-4 rounded-lg text-center flex flex-col items-center">
-                    <i class="fas fa-times-circle fa-2x text-red-500"></i>
-                    <p class="text-sm text-gray-600">Postulantes No Aptos</p>
-                    <p class="text-2xl font-bold">{{ $stats['no_aptos'] ?? 0 }}</p>
-                </div>
-                {{-- Total --}}
-                <div class="bg-blue-100 border border-blue-200 p-4 rounded-lg text-center flex flex-col items-center">
-                    <i class="fa-solid fa-users fa-2x text-blue-500"></i>
-                    <p class="text-sm text-gray-600">Total Postulantes</p>
-                    <p class="text-2xl font-bold">{{ $stats['total'] ?? 0 }}</p>
-                </div>
-                {{-- Total postulantes (OPERATIVO Y ADMINISTRATIVO) --}}
-                <div class="bg-blue-100 border border-blue-200 p-4 rounded-lg text-center flex flex-col items-center">
-                    <i class="fa-solid fa-users fa-2x text-blue-500"></i>
-                    <p class="text-sm text-gray-600">Postulantes Administrativo</p>
-                    <p class="text-sm text-gray-600">Postulantes Operativo</p>
-                    <p class="text-2xl font-bold">{{ $stats['total'] ?? 0 }}</p>
-                </div>
-            </div>
-        </div>
 
         {{-- Tabla de Resultados --}}
         <div>

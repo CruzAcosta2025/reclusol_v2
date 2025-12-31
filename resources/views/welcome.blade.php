@@ -1,46 +1,7 @@
-<!DOCTYPE html>
-<html lang="es">
+@extends('layouts.guest')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RECLUSOL - Plataforma de Reclutamiento</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link rel="icon" type="image/png" href="{{ asset('imagenes/logo_app.png') }}">
-    <style>
-        .gradient-bg {
-            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #1d4ed8 100%);
-        }
-
-        .card-hover {
-            transition: all 0.3s ease;
-        }
-
-        .card-hover:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #1d4ed8, #1e40af);
-            transform: translateY(-1px);
-        }
-
-        .avatar-container {
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            border: 4px solid white;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        }
-    </style>
-</head>
-
-<body class="bg-gray-50">
+@section('content')
+<div class="bg-gray-50">
     <!-- Header -->
     <header class="bg-white shadow-sm border-b">
         <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -238,6 +199,5 @@
             });
         });
     </script>
-</body>
-
-</html>
+</div>
+@endsection

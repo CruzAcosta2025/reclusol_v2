@@ -503,18 +503,23 @@
                 return;
             }
 
-            const req = requerimientosData[id];
-            if (!req) return;
-
-            let url = `/poster/${id}/${selectedTemplate}?preview=1&logo=1`;
+            // Nota: el backend puede generar el afiche con el ID, no necesitamos validar contra requerimientosData.
+            // Cache-buster para que el navegador no reutilice una imagen previa al cambiar plantilla/iconos/fuente.
+            let url = `/poster/${id}/${selectedTemplate}?preview=1&logo=1&_t=${Date.now()}`;
             if (selectedIconG) url += `&iconG=${encodeURIComponent(selectedIconG)}`;
             if (selectedIconCheck) url += `&iconCheck=${encodeURIComponent(selectedIconCheck)}`;
             if (selectedIconPhone) url += `&iconPhone=${encodeURIComponent(selectedIconPhone)}`;
             if (selectedIconEmail) url += `&iconEmail=${encodeURIComponent(selectedIconEmail)}`;
             if (selectedFont) url += `&font=${encodeURIComponent(selectedFont)}`;
 
+            const previewFallback = @json(asset('assets/plantillas/modern.png'));
+
             posterImage.classList.remove('hidden');
-            posterImage.onerror = () => posterImage.src = '/assets/plantillas/placeholder.png';
+            posterImage.onerror = () => {
+                // Evitar loop si el fallback también fallara
+                posterImage.onerror = null;
+                posterImage.src = previewFallback;
+            };
             posterImage.src = url;
         }
 
@@ -564,7 +569,7 @@
 
         function downloadPoster(format = 'png') {
             if (!selectedRequirement) return alert('Selecciona un requerimiento primero');
-            let url = `/poster/${selectedRequirement}/${selectedTemplate}?logo=1&format=${encodeURIComponent(format)}`;
+            let url = `/poster/${selectedRequirement}/${selectedTemplate}?logo=1&format=${encodeURIComponent(format)}&_t=${Date.now()}`;
             if (selectedIconG) url += `&iconG=${encodeURIComponent(selectedIconG)}`;
             if (selectedIconCheck) url += `&iconCheck=${encodeURIComponent(selectedIconCheck)}`;
             if (selectedIconPhone) url += `&iconPhone=${encodeURIComponent(selectedIconPhone)}`;

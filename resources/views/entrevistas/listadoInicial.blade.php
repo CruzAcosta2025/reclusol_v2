@@ -9,36 +9,6 @@
             <p class="text-M3 text-sm">Busque postulantes por DNI o nombre</p>
         </x-block>
 
-        {{-- Filtros --}}
-        <x-block class="flex flex-col">
-            <form id="filter-form" method="GET" action="{{ route('entrevistas.index') }}"
-                class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">DNI</label>
-                    <input type="text" name="dni" value="{{ request('dni') }}" placeholder="Ingrese DNI"
-                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-0 bg-white/80 transition-colors">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
-                    <input type="text" name="nombre" value="{{ request('nombre') }}" placeholder="Nombre o Apellido"
-                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-0 bg-white/80 transition-colors">
-                </div>
-                <div class="flex items-end">
-                    <div class="flex space-x-2 w-full">
-                        <button type="submit"
-                            class="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors flex items-center justify-center space-x-2">
-                            <i class="fas fa-search"></i>
-                            <span>Buscar</span>
-                        </button>
-                        <button type="button" onclick="limpiarFiltros()"
-                            class="px-4 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl transition-colors">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                </div>
-            </form>
-        </x-block>
-
         {{-- Estadísticas --}}
         <x-block class="flex flex-col">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -69,12 +39,41 @@
             </div>
         </x-block>
 
+        {{-- Filtros --}}
+        <x-block class="flex flex-col">
+            <form id="filter-form" method="GET" action="{{ route('entrevistas.index') }}"
+                class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">DNI</label>
+                    <input type="text" name="dni" value="{{ request('dni') }}" placeholder="Ingrese DNI"
+                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-0 bg-white/80 transition-colors">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+                    <input type="text" name="nombre" value="{{ request('nombre') }}" placeholder="Nombre o Apellido"
+                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-0 bg-white/80 transition-colors">
+                </div>
+                <div class="flex items-end">
+                    <div class="flex space-x-2 w-full">
+                        <button type="submit"
+                            class="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors flex items-center justify-center space-x-2">
+                            <i class="fas fa-search"></i>
+                            <span>Buscar</span>
+                        </button>
+                        <button type="button" onclick="limpiarFiltros()"
+                            class="px-4 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl transition-colors">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </x-block>
+
         {{-- ALERTA LISTA NEGRA --}}
         @if ($listaNegra && $listaNegra->count() > 0)
             @foreach ($listaNegra as $item)
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-4">
-                    <div
-                        class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-xl shadow-md flex items-center">
+                    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-xl shadow-md flex items-center">
                         <i class="fas fa-ban text-red-500 text-2xl mr-4"></i>
                         <div>
                             <span class="font-bold">¡ATENCIÓN!</span>
@@ -150,7 +149,8 @@
                 @endphp
 
                 <div class="bg-white">
-                    <x-data-table :columns="$columns" :rows="$rows" :initial-per-page="10" empty-message="No hay postulantes en proceso" />
+                    <x-data-table :columns="$columns" :rows="$rows" :initial-per-page="10"
+                        empty-message="No hay postulantes en proceso" />
                 </div>
             </div>
         </div>
@@ -262,12 +262,12 @@
         function confirmDelete() {
             if (deletePostulanteId) {
                 fetch(`/entrevistas/${deletePostulanteId}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                            'Accept': 'application/json',
-                        }
-                    })
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json',
+                    }
+                })
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
@@ -286,7 +286,7 @@
         }
 
         // ------ Cerrar modales al hacer clic fuera ------
-        document.addEventListener('click', function(event) {
+        document.addEventListener('click', function (event) {
             const modals = ['view-modal', 'edit-modal'];
             modals.forEach(modalId => {
                 const modal = document.getElementById(modalId);

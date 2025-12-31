@@ -242,5 +242,4 @@ rounded-full flex items-center justify-center flex-shrink-0">
         });
     </script>
 </body>
-
 </html>
