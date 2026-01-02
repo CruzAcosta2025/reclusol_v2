@@ -2,7 +2,7 @@
     'name' => 'sidebar',
     'show' => false,
     'logo' => 'RECLUSOL',
-    'subtitle' => 'Sistema de Gestión',
+    'subtitle' => 'Sistema de Reclutamiento',
     'items' => [
         ['label' => 'Dashboard', 'href' => '#', 'icon' => 'fa-home'],
     ],
@@ -17,6 +17,17 @@
 // Helper para determinar si un item tiene subitems
 function hasSubitems($item) {
     return !empty($item['subitems']) && is_array($item['subitems']);
+}
+
+if (!function_exists('sidebar_is_active')) {
+    function sidebar_is_active($href) {
+        if (!$href || $href === '#') return false;
+
+        $current = rtrim(url()->current(), '/');
+        $target = rtrim($href, '/');
+
+        return $current === $target;
+    }
 }
 @endphp
 
@@ -53,14 +64,13 @@ function hasSubitems($item) {
         x-transition:leave-start="translate-x-0" x-transition:leave-end="-translate-x-full"
         :class="{
             'fixed left-0 top-0 h-screen z-50 w-64 shadow-lg': isMobile,
-            'w-64': !isMobile && (typeof sidebarOpen === 'undefined' ? true : sidebarOpen),
-            'w-0 overflow-hidden': !isMobile && !(typeof sidebarOpen === 'undefined' ? true : sidebarOpen)
+            'w-64': !isMobile
         }"
-        class="bg-M2 text-M6 transition-all duration-300 overflow-hidden md:relative md:translate-x-0">
+        class="bg-M2 text-M6 transition-transform duration-300 overflow-hidden md:relative md:translate-x-0 border-r border-M3">
         <div class="p-5 h-screen w-full flex flex-col">
             <!-- Logo Section -->
             <div class="mb-5 pb-6 border-b border-M3">
-                <h1 class="text-xl font-bold text-accent">{{ $logo }}</h1>
+                <h1 class="text-xl font-semibold text-neutral-lighter">{{ $logo }}</h1>
                 <p class="text-xs text-neutral-lighter mt-1">{{ $subtitle }}</p>
             </div>
 
@@ -70,8 +80,21 @@ function hasSubitems($item) {
                     @if(hasSubitems($item))
                         {{-- Item con subitems --}}
                         <div x-data="{ expanded: false }" class="space-y-1">
+                            @php
+                                $isGroupActive = false;
+                                foreach (($item['subitems'] ?? []) as $sub) {
+                                    if (sidebar_is_active($sub['href'] ?? null)) {
+                                        $isGroupActive = true;
+                                        break;
+                                    }
+                                }
+                            @endphp
                             <button @click="expanded = !expanded; $dispatch('sidebar-toggle', { key: {{ $index }} })"
-                                class="w-full flex items-center justify-between px-3 py-3 rounded-lg transition-all duration-200 text-sm text-M6 hover:bg-M1 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-opacity-40">
+                                @class([
+                                    'w-full flex items-center justify-between px-3 py-3 rounded-lg transition-all duration-200 text-sm focus:outline-none focus:ring-2 focus:ring-M3 focus:ring-opacity-40',
+                                    'bg-M1 text-neutral-light' => $isGroupActive,
+                                    'text-neutral-lighter hover:bg-M1' => !$isGroupActive,
+                                ])>
                                 <span class="flex items-center gap-3">
                                     <i class="fas {{ $item['icon'] ?? 'fa-folder' }} w-5"></i>
                                     <span>{{ $item['label'] }}</span>
@@ -87,8 +110,15 @@ function hasSubitems($item) {
                                 x-transition:leave-start="opacity-100 translate-y-0"
                                 x-transition:leave-end="opacity-0 -translate-y-2" class="space-y-1 pl-4 border-l border-M3">
                                 @foreach($item['subitems'] as $subitem)
+                                    @php
+                                        $isSubActive = sidebar_is_active($subitem['href'] ?? null);
+                                    @endphp
                                     <a href="{{ $subitem['href'] }}"
-                                        class="block px-3 py-2 rounded-lg transition-all duration-200 text-xs text-M6 hover:bg-M1"
+                                        @class([
+                                            'block px-3 py-2 rounded-lg transition-all duration-200 text-xs',
+                                            'bg-M1 text-neutral-light' => $isSubActive,
+                                            'text-neutral-lighter hover:bg-M1' => !$isSubActive,
+                                        ])
                                         @click="if(isMobile){ show = false; window.dispatchEvent(new CustomEvent('close-parent-sidebar')) }">
                                         <span class="flex items-center gap-2">
                                             <i class="fas {{ $subitem['icon'] ?? 'fa-link' }} w-4"></i>
@@ -100,8 +130,15 @@ function hasSubitems($item) {
                         </div>
                     @else
                         {{-- Item simple (sin subitems) --}}
+                        @php
+                            $isActive = sidebar_is_active($item['href'] ?? null);
+                        @endphp
                         <a href="{{ $item['href'] }}"
-                            class="block px-3 py-3 rounded-lg transition-all duration-200 text-sm text-M6 hover:bg-M1 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-opacity-40"
+                            @class([
+                                'block px-3 py-3 rounded-lg transition-all duration-200 text-sm focus:outline-none focus:ring-2 focus:ring-M3 focus:ring-opacity-40',
+                                'bg-M1 text-neutral-light' => $isActive,
+                                'text-neutral-lighter hover:bg-M1' => !$isActive,
+                            ])
                             @click="if(isMobile){ show = false; window.dispatchEvent(new CustomEvent('close-parent-sidebar')) }">
                             <span class="flex items-center gap-3">
                                 <i class="fas {{ $item['icon'] ?? 'fa-link' }} w-5"></i>

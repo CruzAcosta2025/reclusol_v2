@@ -3,7 +3,7 @@
 @section('content')
     <div class="space-y-4">
         {{-- Encabezado --}}
-        <x-block>
+        <x-block class="justify-between">
             <div class="flex flex-col gap-1">
                 <h1 class="text-xl font-bold text-M2">
                     Listado de Postulantes

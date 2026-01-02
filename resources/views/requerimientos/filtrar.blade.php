@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="space-y-4">
-        <x-block>
+        <x-block class="justify-between">
             <div class="flex flex-col gap-1">
                 <h1 class="text-xl font-bold text-M2">
                     Listado de Requerimientos
@@ -113,28 +113,44 @@
         <!-- Stats Section -->
         <div class="w-full">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="bg-yellow-100 border border-yellow-200 p-4 rounded-lg text-center flex flex-col items-center">
-                    <i class="fas fa-hourglass-half text-yellow-500 mb-2"></i>
-                    <h3 class="text-sm text-gray-600">En Proceso</h3>
-                    <p class="text-2xl font-bold">{{ $stats['en_validacion'] ?? 0 }} </p>
+                <div class="bg-M6 border border-neutral shadow-sm p-4 rounded-lg flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-center sm:text-left">
+                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-yellow-100">
+                        <i class="fas fa-hourglass-half text-yellow-600"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-md font-bold">En Proceso</h3>
+                        <p class="text-sm text-gray-600">{{ $stats['en_validacion'] ?? 0 }} </p>
+                    </div>
                 </div>
 
-                <div class="bg-green-100 border border-green-200 p-4 rounded-lg text-center flex flex-col items-center">
-                    <i class="fas fa-check-circle text-green-500 mb-2"></i>
-                    <h3 class="text-sm text-gray-600">Cubiertos</h3>
-                    <p class="text-2xl font-bold">{{ $stats['aprobado'] ?? 0 }}</p>
+                <div class="bg-M6 border border-neutral shadow-sm p-4 rounded-lg flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-center sm:text-left">
+                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-100">
+                        <i class="fas fa-check-circle text-green-600"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-md font-bold">Cubiertos</h3>
+                        <p class="text-sm text-gray-600">{{ $stats['aprobado'] ?? 0 }}</p>
+                    </div>
                 </div>
 
-                <div class="bg-blue-100 border border-blue-200 p-4 rounded-lg text-center flex flex-col items-center">
-                    <i class="fas fa-times-circle text-blue-500 mb-2"></i>
-                    <h3 class="text-sm text-gray-600">Cancelados</h3>
-                    <p class="text-2xl font-bold">{{ $stats['cancelado'] ?? 0 }}</p>
+                <div class="bg-M6 border border-neutral shadow-sm p-4 rounded-lg flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-center sm:text-left">
+                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100">
+                        <i class="fas fa-times-circle text-blue-600"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-md font-bold">Cancelados</h3>
+                        <p class="text-sm text-gray-600">{{ $stats['cancelado'] ?? 0 }}</p>
+                    </div>
                 </div>
 
-                <div class="bg-red-100 border border-red-200 p-4 rounded-lg text-center flex flex-col items-center">
-                    <i class="fas fa-clock text-red-500 mb-2"></i>
-                    <h3 class="text-sm text-gray-600">Vencidos</h3>
-                    <p class="text-2xl font-bold">{{ $stats['cerrado'] ?? 0 }} </p>
+                <div class="bg-M6 border border-neutral shadow-sm p-4 rounded-lg flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-center sm:text-left">
+                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-100">
+                        <i class="fas fa-clock text-red-600"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-md font-bold">Vencidos</h3>
+                        <p class="text-sm text-gray-600">{{ $stats['cerrado'] ?? 0 }} </p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -235,13 +251,15 @@
                     </x-select>
                 </div>
                 <div class="md:col-span-4 flex flex-wrap gap-2 mt-4">
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
-                        <i class="fas fa-filter mr-2"></i> Filtrar
-                    </button>
-                    <button type="button" onclick="limpiarFiltros()"
-                        class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 transition">
-                        <i class="fas fa-times"></i> Limpiar filtros
-                    </button>
+                    <x-confirm-button type="submit">
+                        <i class="fas fa-filter"></i>
+                        <span>Filtrar</span>
+                    </x-confirm-button>
+
+                    <x-cancel-button type="button" onclick="limpiarFiltros()">
+                        <i class="fas fa-times"></i>
+                        <span>Limpiar filtros</span>
+                    </x-cancel-button>
                 </div>
             </form>
         </div>

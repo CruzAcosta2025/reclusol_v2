@@ -11,11 +11,9 @@
     <link rel="icon" type="image/png" href="{{ asset('imagenes/logo_app.png') }}">
 
     <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-
-    <!-- TailwindCSS CDN (funciona siempre, incluso si Vite no) -->
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
 
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -33,7 +31,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="font-sans antialiased overflow-x-hidden">
+<body class="overflow-x-hidden">
     <div x-data="{
         sidebarOpen: window.innerWidth >= 768,
         isMobile: window.innerWidth < 768
@@ -42,8 +40,8 @@
         @close-parent-sidebar.window="sidebarOpen = false" class="flex h-screen w-screen overflow-hidden">
 
         @include('components.sidebar', [
-            'logo' => 'RECLUSOL',
-            'subtitle' => 'Sistema de Gestión',
+            'logo' => 'Reclusol',
+            'subtitle' => 'Sistema Reclutamiento',
             'items' => [
                 ['label' => 'Dashboard', 'href' => route('dashboard'), 'icon' => 'fa-tachometer-alt'],
                 ['label' => 'Solicitudes', 'href' => route('requerimientos.filtrar'), 'icon' => 'fa-file-alt'],
@@ -70,7 +68,7 @@
 
         <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
             <!-- Top Bar -->
-            <header class="bg-white/10 border-b border-white/20 z-40">
+            <header class="bg-white/10 border-b border-neutral z-40">
                 <div class="px-4 sm:px-6 lg:px-8">
                     <div class="flex justify-between items-center h-16">
                         <!-- Left: Sidebar button + Date -->
@@ -87,12 +85,7 @@
                                 <span class="text-sm">{{ now()->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}</span>
                             </div>
                         </div>
-
-                        <!-- Center Title -->
-                        <div class="hidden lg:block text-center flex-1">
-                            <h1 class="text-base text-M2 font-semibold">Sistema de reclutamiento - RECLUSOL </h1>
-                        </div>
-
+                        
                         <!-- Right: User Info -->
                         <div class="flex items-center space-x-3 relative">
                             <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">

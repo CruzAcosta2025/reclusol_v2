@@ -5,108 +5,128 @@
         <!-- KPI Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
             <!-- Total Postulantes -->
-            <x-block class="flex flex-col">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-users text-blue-600 text-xl"></i>
+            <x-block class="flex flex-col justify-start">
+                <div class="mb-1">
+                    <div class="w-10 h-10 flex items-center justify-center">
+                        <i class="fas fa-users text-blue-950 text-xl"></i>
                     </div>
-
-                    {{-- porcentaje de cambio --}}
-                    <span class="text-green-500 text-sm font-medium">
+                    <p class="text-gray-600 text-sm">Total de postulantes</p>
+                </div>
+                <h3 class="text-3xl font-bold text-gray-800">{{ $totalPostulantes }}</h3>
+                <div class="bg-green-100 border border-green-200 px-1 self-start">
+                    <span class="text-success-dark text-xs font-medium">
                         {{ $variacionPostulantes > 0 ? '+' : '' }}{{ $variacionPostulantes }}%
                     </span>
                 </div>
-                {{-- total real de postulantes --}}
-                <h3 class="text-3xl font-bold text-gray-800 mb-1">{{ $totalPostulantes }}</h3>
-                <p class="text-gray-600 text-sm">Total de postulantes registrados</p>
             </x-block>
 
             <!-- Requerimientos Activos -->
-            <x-block class="flex flex-col">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-briefcase text-orange-600 text-xl"></i>
+            <x-block class="flex flex-col justify-start">
+                <div class="mb-1">
+                    <div class="w-10 h-10 flex items-center justify-center">
+                        <i class="fas fa-briefcase text-blue-950 text-xl"></i>
                     </div>
-                    <span
-                        class="text-green-500 text-sm font-medium">{{ $variacionRequerimientos > 0 ? '+' : '' }}{{ $variacionRequerimientos }}%</span>
+                    <p class="text-gray-600 text-sm">Requerimientos activos</p>
                 </div>
-                <h3 class="text-3xl font-bold text-gray-800 mb-1">{{ $totalRequerimientos }}</h3>
-                <p class="text-gray-600 text-sm">Requerimientos activos</p>
-                <p class="text-xs text-gray-500 mt-1">Vacantes abiertas</p>
+                <h3 class="text-3xl font-bold text-gray-800">{{ $totalRequerimientos }}</h3>
+                <div class="bg-green-100 border border-green-200 px-1 self-start">
+                    <span class="text-success-dark text-xs font-medium">
+                        {{ $variacionRequerimientos > 0 ? '+' : '' }}{{ $variacionRequerimientos }}%
+                    </span>
+                </div>
             </x-block>
 
             <!-- Entrevistas Programadas -->
-            <x-block class="flex flex-col">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-calendar-alt text-green-600 text-xl"></i>
+            <x-block class="flex flex-col justify-start">
+                <div class="mb-1">
+                    <div class="w-10 h-10 flex items-center justify-center">
+                        <i class="fas fa-calendar-alt text-blue-950 text-xl"></i>
                     </div>
-                    <span class="text-blue-500 text-sm font-medium">Hoy</span>
+                    <p class="text-gray-600 text-sm">Entrevistas programadas</p>
                 </div>
-                <h3 class="text-3xl font-bold text-gray-800 mb-1">6</h3>
-                <p class="text-gray-600 text-sm">Entrevistas programadas hoy</p>
-                <p class="text-xs text-gray-500 mt-1">entrevistas</p>
+                <h3 class="text-3xl font-bold text-gray-800">6</h3>
+                <div class="bg-green-100 border border-green-200 px-1 self-start">
+                    <span class="text-success-dark text-xs font-medium">Hoy</span>
+                </div>
             </x-block>
 
             <!-- Contrataciones -->
-            <x-block class="flex flex-col">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                        <i class="fa-solid fa-user-shield text-purple-600 text-x1"></i>
+            <x-block class="flex flex-col justify-start">
+                <div class="mb-1">
+                    <div class="w-10 h-10 flex items-center justify-center">
+                        <i class="fa-solid fa-user-shield text-blue-950 text-xl"></i>
                     </div>
-                    <span class="text-green-500 text-sm font-medium">+5</span>
+                    <p class="text-gray-600 text-sm">Personal Operativo</p>
                 </div>
-                <h3 class="text-3xl font-bold text-gray-800 mb-1">18</h3>
-                <p class="text-gray-600 text-sm">Personal Operativo</p>
+                <h3 class="text-3xl font-bold text-gray-800">18</h3>
+                <div class="bg-green-100 border border-green-200 px-1 self-start">
+                    <span class="text-success-dark text-xs font-medium">+5</span>
+                </div>
             </x-block>
 
-            <x-block class="flex flex-col">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                        <i class="fa-solid fa-user-tie text-purple-600 text-x1"></i>
+            <x-block class="flex flex-col justify-start">
+                <div class="mb-1">
+                    <div class="w-10 h-10 flex items-center justify-center">
+                        <i class="fa-solid fa-user-tie text-blue-950 text-xl"></i>
                     </div>
-                    <span class="text-green-500 text-sm font-medium">+5</span>
+                    <p class="text-gray-600 text-sm">Personal Administrativo</p>
                 </div>
-                <h3 class="text-3xl font-bold text-gray-800 mb-1">18</h3>
-                <p class="text-gray-600 text-sm">Personal Administrativo</p>
+                <h3 class="text-3xl font-bold text-gray-800">18</h3>
+                <div class="bg-green-100 border border-green-200 px-1 self-start">
+                    <span class="text-success-dark text-xs font-medium">+5</span>
+                </div>
             </x-block>
         </div>
 
         <!-- Charts Section -->
         <div class="grid lg:grid-cols-2 gap-6 mb-8">
             <!-- Postulaciones por Sede -->
-            <div
-                class="bg-M6 rounded-lg border border-neutral shadow-sm p-5 flex flex-col items-start justify-start mx-auto w-full">
-                <div class="flex items-center justify-between mb-6 w-full">
-                    <h3 class="text-lg font-bold text-M2">Postulaciones por Sede</h3>
-                    <i class="fas fa-chart-bar text-M2"></i>
+            <div class="bg-M6 rounded-lg border border-neutral shadow-sm p-5 flex flex-col items-start justify-start mx-auto w-full">
+                @php
+                    $totalPorSede = collect($porSede)->sum('total');
+                    $topShare = $totalPorSede ? round(($maxTotalSede / $totalPorSede) * 100, 1) : 0;
+                @endphp
+
+                <div class="flex items-center justify-between w-full">
+                    <h3 class="text-md font-semibold text-M2">Postulaciones por Sede</h3>
                 </div>
 
-                <div class="space-y-4 w-full">
-                    @php
-                        /* Colores tailwind para las barras (cicla si hay más sedes) */
-                        $colores = ['blue-500', 'green-500', 'yellow-500', 'red-500', 'purple-500', 'orange-500'];
-                    @endphp
+                <div class="mt-2 flex items-end gap-3">
+                    <h4 class="text-3xl font-bold text-gray-800">{{ number_format($totalPorSede) }}</h4>
+                    <div class="bg-success-light border border-green-300 px-1 self-end">
+                        <span class="text-success-dark text-xs font-semibold">Top {{ $topShare }}%</span>
+                    </div>
+                </div>
 
+                <div class="mt-6 space-y-3 w-full">
                     @foreach ($porSede as $idx => $sede)
                         @php
-                            $porcentaje = $maxTotalSede ? round(($sede->total / $maxTotalSede) * 100) : 0;
-                            $color = $colores[$idx % count($colores)];
+                            $porcentaje = $totalPorSede ? round(($sede->total / $totalPorSede) * 100) : 0;
+                            $idxMod = $idx % 6;
                         @endphp
 
-                        <div class="flex items-center justify-between">
-                            <span class="text-gray-600 capitalize">
-                                {{ strtolower($sede->nombre_departamento) }}
-                            </span>
-
-                            <div class="flex items-center space-x-3 flex-1 mx-4">
-                                <div class="flex-1 bg-gray-200 rounded-full h-3 overflow-hidden">
-                                    <div class="bg-{{ $color }} h-3" style="width: {{ $porcentaje }}%">
-                                    </div>
+                        <div class="space-y-1">
+                            <div class="flex items-center justify-between">
+                                <div class="min-w-0">
+                                    <span class="text-sm text-gray-700 capitalize truncate">
+                                        {{ strtolower($sede->nombre_departamento) }}
+                                    </span>
                                 </div>
-                                <span class="text-sm font-semibold text-gray-800 w-8">
-                                    {{ $sede->total }}
-                                </span>
+                                <span class="text-sm text-gray-500 font-medium">{{ $porcentaje }}%</span>
+                            </div>
+
+                            <div class="w-full h-1.5 rounded-full bg-neutral overflow-hidden">
+                                <div
+                                    @class([
+                                        'h-1.5 rounded-full',
+                                        'bg-info' => $idxMod === 0,
+                                        'bg-success' => $idxMod === 1,
+                                        'bg-warning' => $idxMod === 2,
+                                        'bg-paused' => $idxMod === 3,
+                                        'bg-error' => $idxMod === 4,
+                                        'bg-accent' => $idxMod === 5,
+                                    ])
+                                    style="width: {{ $porcentaje }}%"></div>
                             </div>
                         </div>
                     @endforeach
@@ -116,38 +136,70 @@
             <!-- Estado de Postulantes -->
             <div
                 class="bg-M6 rounded-lg border border-neutral shadow-sm p-5 flex flex-col items-start justify-start mx-auto w-full">
-                <div class="flex items-center justify-between mb-6 w-full">
-                    <h3 class="text-lg font-bold text-M2">Estado de Postulantes</h3>
-                    <i class="fas fa-user-check text-M2"></i>
+                <div class="flex items-center justify-between w-full">
+                    <h3 class="text-md font-semibold text-M2">Estado de Postulantes</h3>
                 </div>
-                <div class="space-y-4 w-full">
-                    <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-3 h-3 bg-green-500 rounded-full"></div>
-                            <span class="text-gray-700">Apto</span>
+
+                <div class="mt-4 w-full">
+                    <div class="relative w-full flex justify-center" style="height: 170px;">
+                        <svg class="absolute top-0" width="320" height="170" viewBox="0 0 100 60" fill="none" aria-hidden="true">
+                            <path d="M 10 50 A 40 40 0 0 1 90 50" pathLength="100" stroke="rgba(0,0,0,0.08)" stroke-width="8" stroke-linecap="butt" />
+
+                            <path d="M 10 50 A 40 40 0 0 1 90 50" pathLength="100"
+                                class="stroke-success" stroke-width="8" stroke-linecap="butt"
+                                stroke-dasharray="{{ $estadoGauge['aptoPct'] }} {{ 100 - $estadoGauge['aptoPct'] }}" stroke-dashoffset="-{{ $estadoGauge['offsetApto'] }}" />
+
+                            <path d="M 10 50 A 40 40 0 0 1 90 50" pathLength="100"
+                                class="stroke-warning" stroke-width="8" stroke-linecap="butt"
+                                stroke-dasharray="{{ $estadoGauge['pendientePct'] }} {{ 100 - $estadoGauge['pendientePct'] }}" stroke-dashoffset="-{{ $estadoGauge['offsetPendiente'] }}" />
+
+                            <path d="M 10 50 A 40 40 0 0 1 90 50" pathLength="100"
+                                class="stroke-info" stroke-width="8" stroke-linecap="butt"
+                                stroke-dasharray="{{ $estadoGauge['entrevistaPct'] }} {{ 100 - $estadoGauge['entrevistaPct'] }}" stroke-dashoffset="-{{ $estadoGauge['offsetEntrevista'] }}" />
+
+                            <path d="M 10 50 A 40 40 0 0 1 90 50" pathLength="100"
+                                class="stroke-error" stroke-width="8" stroke-linecap="butt"
+                                stroke-dasharray="{{ $estadoGauge['noAptoPct'] }} {{ 100 - $estadoGauge['noAptoPct'] }}" stroke-dashoffset="-{{ $estadoGauge['offsetNoApto'] }}" />
+                        </svg>
+
+                        <div class="absolute inset-0 flex flex-col items-center justify-center" style="padding-top: 22px;">
+                            <div class="text-4xl font-bold text-gray-800">{{ number_format($estadoPostulantes['total']) }}</div>
+                            <div class="text-sm text-gray-500">Estado de postulantes</div>
                         </div>
-                        <span class="font-bold text-green-600">140</span>
                     </div>
-                    <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                            <span class="text-gray-700">Pendiente</span>
+
+                    <div class="mt-2 space-y-3 w-full">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2 min-w-0">
+                                <span class="w-2 h-2 rounded-full bg-success flex-shrink-0"></span>
+                                <span class="text-sm text-gray-700 truncate">Apto</span>
+                            </div>
+                            <span class="text-sm text-gray-700 font-medium">{{ number_format($estadoPostulantes['apto']) }}</span>
                         </div>
-                        <span class="font-bold text-yellow-600">40</span>
-                    </div>
-                    <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
-                            <span class="text-gray-700">En entrevista</span>
+
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2 min-w-0">
+                                <span class="w-2 h-2 rounded-full bg-warning flex-shrink-0"></span>
+                                <span class="text-sm text-gray-700 truncate">Pendiente</span>
+                            </div>
+                            <span class="text-sm text-gray-700 font-medium">{{ number_format($estadoPostulantes['pendiente']) }}</span>
                         </div>
-                        <span class="font-bold text-blue-600">53</span>
-                    </div>
-                    <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-3 h-3 bg-red-500 rounded-full"></div>
-                            <span class="text-gray-700">No Apto</span>
+
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2 min-w-0">
+                                <span class="w-2 h-2 rounded-full bg-info flex-shrink-0"></span>
+                                <span class="text-sm text-gray-700 truncate">En entrevista</span>
+                            </div>
+                            <span class="text-sm text-gray-700 font-medium">{{ number_format($estadoPostulantes['entrevista']) }}</span>
                         </div>
-                        <span class="font-bold text-red-600">15</span>
+
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2 min-w-0">
+                                <span class="w-2 h-2 rounded-full bg-error flex-shrink-0"></span>
+                                <span class="text-sm text-gray-700 truncate">No apto</span>
+                            </div>
+                            <span class="text-sm text-gray-700 font-medium">{{ number_format($estadoPostulantes['no_apto']) }}</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -159,8 +211,7 @@
             <div
                 class="bg-M6 rounded-lg border border-neutral shadow-sm p-5 flex flex-col items-start justify-start mx-auto w-full">
                 <div class="flex items-center justify-between mb-6 w-full">
-                    <h3 class="text-lg font-bold text-M2">Próximas Entrevistas Programadas</h3>
-                    <i class="fas fa-calendar-check text-M2"></i>
+                    <h3 class="text-md font-semibold text-M2">Próximas Entrevistas Programadas</h3>
                 </div>
                 <div class="overflow-x-auto w-full">
                     <table class="w-full text-sm">
@@ -199,8 +250,7 @@
                                 <td class="py-3 font-medium">Bryan Arteaga</td>
                                 <td class="py-3">Analista Programador</td>
                                 <td class="py-3">
-                                    <span
-                                        class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Completo</span>
+                                    <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Completo</span>
                                 </td>
                             </tr>
                         </tbody>
@@ -212,8 +262,7 @@
             <div
                 class="bg-M6 rounded-lg border border-neutral shadow-sm p-5 flex flex-col items-start justify-start mx-auto w-full">
                 <div class="flex items-center justify-between mb-6 w-full">
-                    <h3 class="text-lg font-bold text-M2">Alertas Recientes</h3>
-                    <i class="fas fa-bell text-M2"></i>
+                    <h3 class="text-md font-semibold text-M2">Alertas Recientes</h3>
                 </div>
                 <div class="space-y-3 w-full">
                     <!-- Alert row (yellow) -->
@@ -270,7 +319,7 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const progressBars = document.querySelectorAll('[style*="width:"]');
             progressBars.forEach(bar => {
                 const width = bar.style.width;

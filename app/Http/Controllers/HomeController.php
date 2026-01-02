@@ -52,7 +52,6 @@ class HomeController extends Controller
 
         $maxTotalSede = $porSede->max('total');    // para calcular porcentajes
 
-        
         $requerimientos = Requerimiento::orderByDesc('created_at')->get(); // Puedes agregar filtros si deseas solo los activos o validados
 
         $departamentos = $this->departamentoModel->forSelectPadded();
@@ -63,6 +62,8 @@ class HomeController extends Controller
             $sede->nombre_departamento = $departamentos->get($codigo, 'Sin nombre');
         }
 
+        [$estadoPostulantes, $estadoGauge] = $this->calcularEstadoPostulantes();
+
         return view('dashboard', compact(
             'totalPostulantes',
             'variacionPostulantes',
@@ -71,7 +72,63 @@ class HomeController extends Controller
             'porSede',
             'maxTotalSede',
             'requerimientos',
-            'notificaciones'
+            'notificaciones',
+            'estadoPostulantes',
+            'estadoGauge'
         ));
+    }
+
+
+    protected function calcularEstadoPostulantes(): array
+    {
+        $total = Postulante::count();
+
+        $noApto = Postulante::where('decision', 'no_apto')->count();
+
+        $enEntrevista = Postulante::whereHas('entrevistas')
+            ->where(function ($q) {
+                $q->whereNull('decision')->orWhere('decision', '!=', 'no_apto');
+            })
+            ->count();
+
+        $apto = Postulante::where('decision', 'apto')
+            ->whereDoesntHave('entrevistas')
+            ->count();
+
+        $pendiente = max(0, $total - ($noApto + $enEntrevista + $apto));
+
+        $pct = function (int $n) use ($total): float {
+            return $total ? round(($n / $total) * 100, 2) : 0.0;
+        };
+
+        $aptoPct = $pct($apto);
+        $pendientePct = $pct($pendiente);
+        $entrevistaPct = $pct($enEntrevista);
+        $noAptoPct = max(0.0, round(100 - ($aptoPct + $pendientePct + $entrevistaPct), 2));
+
+        $offsetApto = 0.0;
+        $offsetPendiente = round($offsetApto + $aptoPct, 2);
+        $offsetEntrevista = round($offsetPendiente + $pendientePct, 2);
+        $offsetNoApto = round($offsetEntrevista + $entrevistaPct, 2);
+
+        return [
+            [
+                'total' => $total,
+                'apto' => $apto,
+                'pendiente' => $pendiente,
+                'entrevista' => $enEntrevista,
+                'no_apto' => $noApto,
+            ],
+            [
+                'aptoPct' => $aptoPct,
+                'pendientePct' => $pendientePct,
+                'entrevistaPct' => $entrevistaPct,
+                'noAptoPct' => $noAptoPct,
+                'offsetApto' => $offsetApto,
+                'offsetPendiente' => $offsetPendiente,
+                'offsetEntrevista' => $offsetEntrevista,
+                'offsetNoApto' => $offsetNoApto,
+            ],
+        ];
     }
 }
