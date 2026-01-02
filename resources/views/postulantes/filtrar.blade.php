@@ -4,42 +4,6 @@
 
 @section('content')
 
-    <style>
-        /* Panel claro (no blanco puro) para que combine con el tema oscuro */
-        .panel-light {
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(249, 250, 251, 0.86));
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            border-radius: 1.25rem;
-            box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
-            backdrop-filter: blur(10px);
-        }
-
-        /* Inputs dentro del panel: texto visible sobre fondo claro */
-        .panel-light input[type="text"],
-        .panel-light input[type="number"],
-        .panel-light input[type="date"],
-        .panel-light select,
-        .panel-light textarea {
-            background-color: #ffffff;
-            color: #111827 !important;
-            /* fuerza texto oscuro */
-            border-color: #e5e7eb;
-        }
-
-        .panel-light input::placeholder,
-        .panel-light textarea::placeholder {
-            color: #9ca3af;
-            opacity: 1;
-        }
-
-        /* Mejoras sutiles de tabla */
-        .table-sticky thead th {
-            position: sticky;
-            top: 0;
-            z-index: 1;
-        }
-    </style>
-
     <div class="space-y-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {{-- Encabezado --}}
@@ -241,10 +205,13 @@
                         <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Experiencia</th>
                         <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Curso SUCAMEC</th>
                         <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Carne SUCAMEC</th>
-                        <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Grado de Instrucción</th>
+                        <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Grado de Instrucción
+                        </th>
                         <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Celular</th>
-                        <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Licencia de Arma L4</th>
-                        <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Licencia de Conducir A1</th>
+                        <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Licencia de Arma L4
+                        </th>
+                        <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Licencia de Conducir A1
+                        </th>
                         <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">CV</th>
                         <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">CUL</th>
                         <th class="px-6 py-4 text-sm font-bold text-gray-800 uppercase text-center">Acciones</th>
@@ -359,41 +326,46 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" class="px-4 py-6 text-center text-gray-500">No hay postulantes registrados</td>
+                            <td colspan="9" class="px-4 py-6 text-center text-gray-500">No hay postulantes registrados
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
 
-        {{-- Modales (eliminaciÃ³n, ediciÃ³n, validaciÃ³n) --}}
-        {{-- Modal de EliminaciÃ³n --}}
+        {{-- Modales (eliminación, edición, validación) --}}
+        {{-- Modal de Eliminación --}}
         <div id="delete-modal"
             class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" role="dialog"
             aria-modal="true" aria-labelledby="delete-title" aria-describedby="delete-desc">
             <!-- Panel -->
-            <div class="bg-white w-full max-w-md mx-4 rounded-2xl shadow-2xl border border-gray-100 p-6 opacity-0 translate-y-2 transition-all duration-200 ease-out data-[open=true]:opacity-100 data-[open=true]:translate-y-0"
-                id="delete-panel" data-open="true">
-                <!-- Encabezado -->
-                <div class="flex items-start gap-3 mb-4">
-                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-50">
-                        <i class="fa-solid fa-triangle-exclamation text-red-600"></i>
-                    </div>
-                    <div>
-                        <h3 id="delete-title" class="text-xl font-semibold">Eliminar postulante</h3>
-                        <p id="delete-desc" class="text-sm text-gray-600 mt-1">Esta accion no se puede deshacer.</p>
+            <div class="bg-white w-full max-w-sm mx-4 rounded-3xl shadow-2xl p-8 opacity-0 scale-95 transition-all duration-300 ease-out data-[open=true]:opacity-100 data-[open=true]:scale-100"
+                id="delete-panel" data-open="false">
+                <!-- Icono circular -->
+                <div class="flex justify-center mb-6">
+                    <div class="flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
+                        <i class="fa-solid fa-triangle-exclamation text-red-600 text-2xl"></i>
                     </div>
                 </div>
 
+                <!-- Título -->
+                <h3 id="delete-title" class="text-center text-2xl font-bold text-gray-900 mb-3">¿Eliminar postulante?</h3>
+
+                <!-- Descripción -->
+                <p id="delete-desc" class="text-center text-sm text-gray-600 mb-8">Esta acción no se puede deshacer. Confirma que deseas eliminar este postulante.</p>
+
                 <!-- Botones -->
-                <div class="mt-5 flex justify-end gap-3 pt-4 border-t border-gray-100">
+                <div class="flex gap-3 justify-center">
                     <button type="button" onclick="closeDeleteModal()"
-                        class="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 focus:outline-none focus:ring focus:ring-gray-300 transition">
+                        class="px-6 py-2 rounded-lg border-2 border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300 transition flex items-center gap-2">
+                        <i class="fa-solid fa-x text-lg"></i>
                         Cancelar
                     </button>
 
                     <button type="button" onclick="confirmDelete()"
-                        class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white focus:outline-none focus:ring focus:ring-red-300 transition">
+                        class="px-6 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold focus:outline-none focus:ring-2 focus:ring-red-400 transition flex items-center gap-2">
+                        <i class="fa-solid fa-trash text-lg"></i>
                         Eliminar
                     </button>
                 </div>
@@ -420,7 +392,8 @@
                     <i class="fa-solid fa-clipboard-check text-emerald-600"></i>
                     Validar: <span id="val-nombre" class="font-normal text-gray-700"></span>
                 </h3>
-                <p id="validar-desc" class="text-sm text-gray-600 mb-3">Selecciona el resultado de validacion y agrega comentario si corresponde.</p>
+                <p id="validar-desc" class="text-sm text-gray-600 mb-3">Selecciona el resultado de validacion y agrega
+                    comentario si corresponde.</p>
 
                 <!-- Formulario -->
                 <form id="form-validar" method="POST" class="space-y-4" autocomplete="off">
@@ -538,6 +511,7 @@
             document.addEventListener('keydown', onEscClose);
             modal.addEventListener('mousedown', onBackdropClick);
         }
+
 
         // Mantengo tu firma para compatibilidad con el onclick anterior
         function eliminarPostulante(id) {
@@ -747,9 +721,13 @@
                 const html = await res.text();
                 editContent.innerHTML = html;
 
-                // === IMPORTANTE: inicializar selects dependientes del modal ===
+                // === PASO 1: Inicializar dinámicamente la restauración de selects ===
+                restoreAllSelectValues();
+
+                // === PASO 2: Inicializar campos operativos basado en tipo_cargo ===
                 initEditForm(editContent);
 
+                // === PASO 3: Foco en primer elemento ===
                 const firstEl = editContent.querySelector('[autofocus], input, select, textarea, button');
                 if (firstEl) firstEl.focus();
 
@@ -818,8 +796,8 @@
                         if (data.success) {
                             Swal.fire({
                                 icon: 'success',
-                                title: 'Â¡Ã‰xito!',
-                                text: 'Â¡Postulante actualizado correctamente!',
+                                title: '¡Exito!',
+                                text: '¡Postulante actualizado correctamente!',
                                 confirmButtonColor: '#3085d6',
                                 timer: 1800,
                                 timerProgressBar: true,
@@ -839,17 +817,17 @@
                         }
                     })
                     .catch(err => {
-                        let mensaje = 'OcurriÃ³ un error inesperado.';
+                        let mensaje = 'Ocurrió un error inesperado.';
                         if (err.errors) {
                             mensaje = Object.values(err.errors).flat().join('\n');
                         }
                         Swal.fire({
                             icon: 'error',
-                            title: 'Error de validaciÃ³n',
+                            title: 'Error de validación',
                             text: mensaje,
                             confirmButtonColor: '#d33'
                         });
-                        console.error('Errores de validaciÃ³n:', err.errors || err);
+                        console.error('Errores de validación:', err.errors || err);
                     });
             }
         });
@@ -929,104 +907,85 @@
             if (preview) preview.classList.remove("hidden");
         }
 
+        // === FUNCIÓN PARA RESTAURAR TODOS LOS SELECTS CON data-value ===
+        function restoreAllSelectValues(rootElement = editContent) {
+            if (!rootElement) return;
+            
+            rootElement.querySelectorAll('select[data-value]').forEach((sel) => {
+                const val = sel.dataset.value;
+                if (val !== undefined && val !== null && val !== '') {
+                    // Buscar opción exacta
+                    for (let opt of sel.options) {
+                        if (opt.value === val) {
+                            sel.value = val;
+                            break;
+                        }
+                    }
+                }
+            });
+        }
+
         function initEditForm(root) {
-            // Elementos del modal
             const tipoSel = root.querySelector('#tipo_cargo_edit');
-            const cargoSel = root.querySelector('#cargo_edit');
-            const depaSel = root.querySelector('#departamento_edit');
-            const provSel = root.querySelector('#provincia_edit');
-            const distSel = root.querySelector('#distrito_edit');
-            if (!tipoSel || !cargoSel || !depaSel || !provSel || !distSel) return;
+            const camposOperativoEl = root.querySelector('#campos-operativo-edit');
 
-            // Helpers
-            const pad = (v, l) =>
-                (v == null || v === '') ? '' : String(v).replace(/\D+/g, '').padStart(l, '0');
+            if (!tipoSel || !camposOperativoEl) return;
 
-            const setOptions = (select, list, placeholder = 'Seleccionaâ€¦') => {
-                select.innerHTML = `<option value="">${placeholder}</option>`;
-                list.forEach(it => {
-                    const opt = document.createElement('option');
-                    opt.value = String(it.value ?? '');
-                    opt.textContent = String(it.label ?? '');
-                    select.appendChild(opt);
+            const pad = (v, l) => (v == null || v === '') ? '' : String(v).replace(/\D+/g, '').padStart(l, '0');
+
+            // ✅ Mostrar SOLO si tipo = 01 o 03 (operativo)
+            const toggleCamposOperativo = () => {
+                const t = String(tipoSel.value || '').replace(/\D+/g, '').padStart(2, '0');
+                const show = ['01', '03'].includes(t);
+
+                camposOperativoEl.classList.toggle('hidden', !show);
+                camposOperativoEl.querySelectorAll('select, input, textarea').forEach(el => {
+                    el.disabled = !show; // si no es operativo, NO se envían
                 });
             };
 
-            // âœ… CLAVE: cargo (CODI_CARG) siempre a 4 dÃ­gitos, igual que data-value del blade
-            const fillCargos = (tipo, preselect = null) => {
-                const t = pad(tipo, 2);
+            // ✅ Ejecutar al cargar
+            toggleCamposOperativo();
 
-                const list = cargos
-                    .filter(c => pad(c.TIPO_CARG, 2) === t)
-                    .map(c => ({
-                        value: pad(c.CODI_CARG, 4),
-                        label: c.DESC_CARGO
-                    }));
-
-                setOptions(cargoSel, list, 'Selecciona el cargo');
-
-                // preselect: primero data-value, sino el value actual
-                const v = pad(preselect, 4);
-                if (v) cargoSel.value = v;
-            };
-
-            const fillProvs = (depa, preselect = null) => {
-                const d = pad(depa, 2);
-
-                const list = provincias
-                    .filter(p => pad(p.DEPA_CODIGO, 2) === d)
-                    .map(p => ({
-                        value: pad(p.PROVI_CODIGO, 4),
-                        label: p.PROVI_DESCRIPCION
-                    }));
-
-                setOptions(provSel, list, 'Seleccionaâ€¦');
-
-                const v = pad(preselect, 4);
-                if (v) provSel.value = v;
-            };
-
-            const fillDists = (prov, preselect = null) => {
-                const p = pad(prov, 4);
-
-                const list = distritos
-                    .filter(d => pad(d.PROVI_CODIGO, 4) === p)
-                    .map(d => ({
-                        value: pad(d.DIST_CODIGO, 6),
-                        label: d.DIST_DESCRIPCION
-                    }));
-
-                setOptions(distSel, list, 'Seleccionaâ€¦');
-
-                const v = pad(preselect, 6);
-                if (v) distSel.value = v;
-            };
-
-            // Estado inicial usando data-value del parcial (o value actual como fallback)
-            fillCargos(tipoSel.value, cargoSel.dataset.value || cargoSel.value || '');
-            fillProvs(depaSel.value, provSel.dataset.value || provSel.value || '');
-            fillDists(provSel.value, distSel.dataset.value || distSel.value || '');
-
-            // Listeners en el modal
+            // ✅ Ejecutar al cambiar tipo
             tipoSel.addEventListener('change', () => {
-                fillCargos(tipoSel.value, ''); // recarga cargos y limpia selecciÃ³n
-            });
-
-            depaSel.addEventListener('change', () => {
-                fillProvs(depaSel.value, ''); // recarga provincias
-                setOptions(distSel, [], 'Seleccionaâ€¦'); // limpia distritos
-            });
-
-            provSel.addEventListener('change', () => {
-                fillDists(provSel.value, ''); // recarga distritos
+                toggleCamposOperativo();
             });
         }
     </script>
+    <style>
+        /* Panel claro (no blanco puro) para que combine con el tema oscuro */
+        .panel-light {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(249, 250, 251, 0.86));
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 1.25rem;
+            box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Inputs dentro del panel: texto visible sobre fondo claro */
+        .panel-light input[type="text"],
+        .panel-light input[type="number"],
+        .panel-light input[type="date"],
+        .panel-light select,
+        .panel-light textarea {
+            background-color: #ffffff;
+            color: #111827 !important;
+            /* fuerza texto oscuro */
+            border-color: #e5e7eb;
+        }
+
+        .panel-light input::placeholder,
+        .panel-light textarea::placeholder {
+            color: #9ca3af;
+            opacity: 1;
+        }
+
+        /* Mejoras sutiles de tabla */
+        .table-sticky thead th {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+    </style>
 @endsection
-
-
-
-
-
-
-

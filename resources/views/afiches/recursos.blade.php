@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('module', 'afiches')
 
@@ -13,13 +13,13 @@
                         </h2>
 
                         <p class="text-sm text-white/70 mt-1">
-                            Aquí puedes subir nuevas plantillas, íconos o fuentes para usarlas en el generador de afiches.
+                            AquÃ­ puedes subir nuevas plantillas, Ã­conos o fuentes para usarlas en el generador de afiches.
                         </p>
                     </div>
                     <div class="flex items-center gap-2 flex-wrap">
                         <a href="{{ route('afiches.assets.upload') }}"
                             class="px-4 py-2 rounded-xl font-semibold text-sm bg-white/10 hover:bg-white/15 transition">
-                            <i class="fas fa-plus mr-2"></i>Añadir recursos
+                            <i class="fas fa-plus mr-2"></i>AÃ±adir recursos
                         </a>
                         <a href="{{ route('dashboard') }}"
                             class="px-4 py-2 rounded-xl font-semibold text-sm bg-white/10 hover:bg-white/15 transition">
@@ -65,13 +65,13 @@
                                     <option value="">-- Selecciona --</option>
                                     <option value="plantilla" {{ old('tipo') === 'plantilla' ? 'selected' : '' }}>Plantilla
                                         de afiche</option>
-                                    <option value="iconG" {{ old('tipo') === 'iconG' ? 'selected' : '' }}>Ícono principal
+                                    <option value="iconG" {{ old('tipo') === 'iconG' ? 'selected' : '' }}>Ãcono principal
                                         (personaje)</option>
-                                    <option value="iconCheck" {{ old('tipo') === 'iconCheck' ? 'selected' : '' }}>Ícono de
+                                    <option value="iconCheck" {{ old('tipo') === 'iconCheck' ? 'selected' : '' }}>Ãcono de
                                         check (requisitos)</option>
-                                    <option value="iconPhone" {{ old('tipo') === 'iconPhone' ? 'selected' : '' }}>Ícono de
-                                        teléfono</option>
-                                    <option value="iconEmail" {{ old('tipo') === 'iconEmail' ? 'selected' : '' }}>Ícono de
+                                    <option value="iconPhone" {{ old('tipo') === 'iconPhone' ? 'selected' : '' }}>Ãcono de
+                                        telÃ©fono</option>
+                                    <option value="iconEmail" {{ old('tipo') === 'iconEmail' ? 'selected' : '' }}>Ãcono de
                                         email</option>
                                     <option value="font" {{ old('tipo') === 'font' ? 'selected' : '' }}>Fuente (TTF/OTF)
                                     </option>
@@ -83,7 +83,7 @@
                                 <input type="file" name="archivo"
                                     class="form-input w-full border-2 border-gray-200 rounded-xl px-3 py-2 bg-white text-gray-900 text-sm focus:border-blue-500 focus:ring-0 transition">
                                 <p class="text-xs text-gray-500 mt-1">
-                                    Imágenes: PNG/JPG. Fuentes: TTF/OTF. Tamaño máximo: 4 MB.
+                                    ImÃ¡genes: PNG/JPG. Fuentes: TTF/OTF. TamaÃ±o mÃ¡ximo: 4 MB.
                                 </p>
                             </div>
 
@@ -97,8 +97,8 @@
                     </div>
                 </div>
 
-                {{-- COL 2–3: LISTAS CON TOGGLES --}}
-                {{-- COL 2–3: LISTAS --}}
+                {{-- COL 2â€“3: LISTAS CON TOGGLES --}}
+                {{-- COL 2â€“3: LISTAS --}}
                 <div class="md:col-span-2 space-y-6">
                     {{-- Plantillas --}}
                     <div class="bg-white rounded-2xl shadow-lg p-6 card-hover">
@@ -142,10 +142,10 @@
                         </div>
                     </div>
 
-                    {{-- Íconos principales --}}
+                    {{-- Ãconos principales --}}
                     <div class="bg-white rounded-2xl shadow-lg p-6 card-hover">
                         <div class="flex items-center justify-between">
-                            <h2 class="text-lg font-semibold text-gray-800">Íconos principales (iconG)</h2>
+                            <h2 class="text-lg font-semibold text-gray-800">Ãconos principales (iconG)</h2>
                             <button type="button" class="text-sm text-blue-600 hover:text-blue-800"
                                 onclick="toggleSection('sec-iconG')">
                                 Mostrar / Ocultar
@@ -177,17 +177,17 @@
                                     </div>
                                 @empty
                                     <p class="text-sm text-gray-500 col-span-full">
-                                        No hay íconos principales cargados.
+                                        No hay Ã­conos principales cargados.
                                     </p>
                                 @endforelse
                             </div>
                         </div>
                     </div>
 
-                    {{-- Íconos de check --}}
+                    {{-- Ãconos de check --}}
                     <div class="bg-white rounded-2xl shadow-lg p-6 card-hover">
                         <div class="flex items-center justify-between">
-                            <h2 class="text-lg font-semibold text-gray-800">Íconos de check</h2>
+                            <h2 class="text-lg font-semibold text-gray-800">Ãconos de check</h2>
                             <button type="button" class="text-sm text-blue-600 hover:text-blue-800"
                                 onclick="toggleSection('sec-iconCheck')">
                                 Mostrar / Ocultar
@@ -216,17 +216,17 @@
                                     </div>
                                 @empty
                                     <p class="text-sm text-gray-500 col-span-full">
-                                        No hay íconos de check cargados.
+                                        No hay Ã­conos de check cargados.
                                     </p>
                                 @endforelse
                             </div>
                         </div>
                     </div>
 
-                    {{-- Íconos de teléfono --}}
+                    {{-- Ãconos de telÃ©fono --}}
                     <div class="bg-white rounded-2xl shadow-lg p-6 card-hover">
                         <div class="flex items-center justify-between">
-                            <h2 class="text-lg font-semibold text-gray-800">Íconos de teléfono</h2>
+                            <h2 class="text-lg font-semibold text-gray-800">Ãconos de telÃ©fono</h2>
                             <button type="button" class="text-sm text-blue-600 hover:text-blue-800"
                                 onclick="toggleSection('sec-iconPhone')">
                                 Mostrar / Ocultar
@@ -255,17 +255,17 @@
                                     </div>
                                 @empty
                                     <p class="text-sm text-gray-500 col-span-full">
-                                        No hay íconos de teléfono cargados.
+                                        No hay Ã­conos de telÃ©fono cargados.
                                     </p>
                                 @endforelse
                             </div>
                         </div>
                     </div>
 
-                    {{-- Íconos de email --}}
+                    {{-- Ãconos de email --}}
                     <div class="bg-white rounded-2xl shadow-lg p-6 card-hover">
                         <div class="flex items-center justify-between">
-                            <h2 class="text-lg font-semibold text-gray-800">Íconos de email</h2>
+                            <h2 class="text-lg font-semibold text-gray-800">Ãconos de email</h2>
                             <button type="button" class="text-sm text-blue-600 hover:text-blue-800"
                                 onclick="toggleSection('sec-iconEmail')">
                                 Mostrar / Ocultar
@@ -294,7 +294,7 @@
                                     </div>
                                 @empty
                                     <p class="text-sm text-gray-500 col-span-full">
-                                        No hay íconos de email cargados.
+                                        No hay Ã­conos de email cargados.
                                     </p>
                                 @endforelse
                             </div>
@@ -351,12 +351,126 @@
     {{-- SweetAlert + toggle secciones --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        const formulario = document.querySelector('form[action="{{ route('afiches.assets.upload') }}"]');
+        const tipoInput = formulario?.querySelector('select[name="tipo"]');
+        const archivoInput = formulario?.querySelector('input[name="archivo"]');
+
+        if (formulario && archivoInput) {
+            formulario.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const tipo = tipoInput.value;
+                const archivo = archivoInput.files[0];
+
+                if (!tipo) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Tipo de recurso',
+                        text: 'Por favor selecciona un tipo de recurso',
+                        confirmButtonColor: '#3b82f6',
+                    });
+                    return false;
+                }
+
+                if (!archivo) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Archivo requerido',
+                        text: 'Por favor selecciona un archivo para subir',
+                        confirmButtonColor: '#3b82f6',
+                    });
+                    return false;
+                }
+
+                const maxSize = 4 * 1024 * 1024; // 4 MB
+                if (archivo.size > maxSize) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Archivo demasiado grande',
+                        text: 'El archivo no debe superar 4 MB. Tu archivo pesa ' + (archivo.size / 1024 / 1024).toFixed(2) + ' MB',
+                        confirmButtonColor: '#ef4444',
+                    });
+                    return false;
+                }
+
+                const nombreArchivo = archivo.name.toLowerCase();
+                let tiposPermitidos = [];
+                let tiposPermitidosTexto = '';
+
+                if (tipo === 'font') {
+                    tiposPermitidos = ['ttf', 'otf'];
+                    tiposPermitidosTexto = 'TTF/OTF';
+                } else {
+                    tiposPermitidos = ['png', 'jpg', 'jpeg'];
+                    tiposPermitidosTexto = 'PNG/JPG';
+                }
+
+                const extension = nombreArchivo.split('.').pop();
+                if (!tiposPermitidos.includes(extension)) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Formato de archivo no válido',
+                        html: <div class="text-left">
+                            <p class="mb-3"><strong>Archivo:</strong> </p>
+                            <p class="mb-3"><strong>Formato recibido:</strong> .</p>
+                            <p><strong>Formatos permitidos:</strong> </p>
+                        </div>,
+                        confirmButtonColor: '#ef4444',
+                    });
+                    return false;
+                }
+
+                const mapLabel = {
+                    plantilla: 'Plantilla de afiche',
+                    iconG: 'Icono principal (personaje)',
+                    iconCheck: 'Icono de check',
+                    iconPhone: 'Icono de teléfono',
+                    iconEmail: 'Icono de email',
+                    font: 'Fuente',
+                };
+                const tipoLabel = mapLabel[tipo] || 'Recurso';
+
+                Swal.fire({
+                    icon: 'question',
+                    title: '¿Confirmar carga?',
+                    html: <div class="text-left space-y-2">
+                            <p><strong>Tipo:</strong> </p>
+                            <p><strong>Archivo:</strong> </p>
+                        </div>,
+                    showCancelButton: true,
+                    confirmButtonColor: '#3b82f6',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Subir recurso',
+                    cancelButtonText: 'Revisar',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        this.submit();
+                    }
+                });
+            });
+        }
+
         function confirmarEliminar(form, nombre) {
-            event.preventDefault();
+            const tipo = form.querySelector('input[name="tipo"]')?.value || '';
+            const tipoLabel = {
+                plantilla: 'Plantilla',
+                iconG: 'Icono principal',
+                iconCheck: 'Icono de check',
+                iconPhone: 'Icono de teléfono',
+                iconEmail: 'Icono de email',
+                font: 'Fuente',
+            }[tipo] || 'Recurso';
+
+            if (event && typeof event.preventDefault === 'function') {
+                event.preventDefault();
+            }
 
             Swal.fire({
                 title: '¿Eliminar recurso?',
-                text: nombre ? 'Se eliminará: ' + nombre : 'Se eliminará este archivo.',
+                html: <div class="text-left space-y-2">
+                        <p><strong>Tipo:</strong> </p>
+                        <p><strong>Nombre:</strong> </p>
+                    </div>,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#e11d48',
@@ -398,3 +512,4 @@
         }
     </style>
 @endsection
+

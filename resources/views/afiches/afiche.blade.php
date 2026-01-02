@@ -21,13 +21,19 @@
                         </p>
                     </div>
                     <div class="flex items-center gap-2 flex-wrap">
-                        <a href="{{ route('postulantes.filtrar') }}"
-                            class="px-4 py-2 rounded-xl font-semibold text-sm bg-white/10 hover:bg-white/15 transition">
-                            <i class="fas fa-list mr-2"></i>Ver Postulantes
-                        </a>
                         <a href="{{ route('dashboard') }}"
                             class="px-4 py-2 rounded-xl font-semibold text-sm bg-white/10 hover:bg-white/15 transition">
                             <i class="fas fa-gauge-high mr-2"></i>Dashboard
+                        </a>
+                        
+                        <a href="{{ route('requerimientos.filtrar') }}"
+                            class="px-4 py-2 rounded-xl font-semibold text-sm bg-white/10 hover:bg-white/15 transition">
+                            <i class="fas fa-list mr-2"></i>Ver Requerimientos
+                        </a>
+                        
+                        <a href="{{ route('afiches.assets.upload') }}"
+                            class="px-4 py-2 rounded-xl font-semibold text-sm bg-white/10 hover:bg-white/15 transition">
+                            <i class="fas fa-plus mr-2"></i>Añadir recursos
                         </a>
                     </div>
                 </div>

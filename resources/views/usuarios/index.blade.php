@@ -2,42 +2,6 @@
 @section('module', 'usuarios')
 @section('content')
 
-    <style>
-        /* Panel claro (no blanco puro) para que combine con el tema oscuro */
-        .panel-light {
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(249, 250, 251, 0.86));
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            border-radius: 1.25rem;
-            box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
-            backdrop-filter: blur(10px);
-        }
-
-        /* Inputs dentro del panel: texto visible sobre fondo claro */
-        .panel-light input[type="text"],
-        .panel-light input[type="number"],
-        .panel-light input[type="date"],
-        .panel-light select,
-        .panel-light textarea {
-            background-color: #ffffff;
-            color: #111827 !important;
-            /* texto oscuro */
-            border-color: #e5e7eb;
-        }
-
-        .panel-light input::placeholder,
-        .panel-light textarea::placeholder {
-            color: #9ca3af;
-            opacity: 1;
-        }
-
-        /* Mejoras sutiles de tabla */
-        .table-sticky thead th {
-            position: sticky;
-            top: 0;
-            z-index: 1;
-        }
-    </style>
-
     <div class="space-y-6">
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -702,4 +666,39 @@
             });
         });
     </script>
+        <style>
+        /* Panel claro (no blanco puro) para que combine con el tema oscuro */
+        .panel-light {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(249, 250, 251, 0.86));
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 1.25rem;
+            box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Inputs dentro del panel: texto visible sobre fondo claro */
+        .panel-light input[type="text"],
+        .panel-light input[type="number"],
+        .panel-light input[type="date"],
+        .panel-light select,
+        .panel-light textarea {
+            background-color: #ffffff;
+            color: #111827 !important;
+            /* texto oscuro */
+            border-color: #e5e7eb;
+        }
+
+        .panel-light input::placeholder,
+        .panel-light textarea::placeholder {
+            color: #9ca3af;
+            opacity: 1;
+        }
+
+        /* Mejoras sutiles de tabla */
+        .table-sticky thead th {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+    </style>
 @endsection

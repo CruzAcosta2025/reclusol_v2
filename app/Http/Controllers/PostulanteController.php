@@ -1002,8 +1002,8 @@ class PostulanteController extends Controller
         $departamentos = Departamento::forSelect();   // [DEPA_CODIGO => DEPA_DESCRIPCION]
         $tipoCargos    = TipoCargo::forSelect();      // [CODI_TIPO_CARG => DESC_TIPO_CARG]
 
-        // Cargos vigentes (si ya tiene tipo_cargo, los filtramos para el select)
-        $cargos = Cargo::forSelectByTipo($postulante->tipo_cargo); // [CODI_CARG => DESC_CARGO]
+        // Cargos: traer TODOS (sin filtrar por tipo, porque en edición no pueden cambiar de tipo)
+        $cargos = Cargo::forSelect(); // [CODI_CARG => DESC_CARGO]
 
         // Normalizador para códigos numéricos (rellena con ceros)
         $pad = function ($val, int $len) {
@@ -1060,35 +1060,41 @@ class PostulanteController extends Controller
             return $v === '' ? null : str_pad($v, $len, '0', STR_PAD_LEFT);
         };
 
-        // VALIDACIÓN (DNI ya NO se edita)
-        $data = $request->validate([
+        // Determinar si es operativo (01 o 03)
+        $tipoCargoCodigo = $pad($request->input('tipo_cargo'), 2);
+        $esOperativo = in_array($tipoCargoCodigo, ['01', '03'], true);
+
+        // Construir reglas de validación dinámicamente
+        $rules = [
             'nombres'           => ['required', 'string', 'max:50'],
             'apellidos'         => ['required', 'string', 'max:50'],
             'edad'              => ['required', 'integer', 'min:18', 'max:120'],
 
-            // geo (se normalizan abajo)
+            // geo
             'departamento'      => ['required', 'string', 'max:6'],
             'provincia'         => ['required', 'string', 'max:6'],
             'distrito'          => ['required', 'string', 'max:6'],
 
             'celular'           => ['required', 'digits:9'],
-            // quitados: celular_referencia, estado_civil
-
             'nacionalidad'      => ['required', 'string', 'max:50'],
 
-            // tipo + cargo (checamos consistencia abajo)
+            // tipo + cargo (no editables, pero se envían en hidden)
             'tipo_cargo'        => ['required', 'string', 'max:2'],
             'cargo'             => ['required', 'exists:CARGOS,CODI_CARG'],
 
             'fecha_postula'     => ['required', 'date'],
             'experiencia_rubro' => ['required', 'string', 'max:50'],
-
-            'sucamec'           => ['required', 'string', 'max:10'],
             'grado_instruccion' => ['required', 'string', 'max:50'],
             'servicio_militar'  => ['nullable', 'string', 'max:15'],
-            'licencia_arma'     => ['required', 'string', 'max:10'],
-            'licencia_conducir' => ['required', 'string', 'max:10'],
-        ]);
+
+            // Campos operativos (opcionales para administrativos, requeridos para operativos)
+            'sucamec'           => $esOperativo ? ['required', 'string', 'max:10'] : ['nullable', 'string', 'max:10'],
+            'carne_sucamec'     => $esOperativo ? ['required', 'string', 'max:10'] : ['nullable', 'string', 'max:10'],
+            'licencia_arma'     => $esOperativo ? ['required', 'string', 'max:10'] : ['nullable', 'string', 'max:10'],
+            'licencia_conducir' => $esOperativo ? ['required', 'string', 'max:10'] : ['nullable', 'string', 'max:10'],
+        ];
+
+        $data = $request->validate($rules);
 
         // Normalizaciones (coincidir con el almacenamiento)
         $data['departamento'] = $pad($data['departamento'], 2);
@@ -1096,13 +1102,23 @@ class PostulanteController extends Controller
         $data['distrito']     = $pad($data['distrito'], 6);
         $data['tipo_cargo']   = $pad($data['tipo_cargo'], 2);
 
-        // Coherencia cargo ↔ tipo_cargo
-        $cargoTipo = Cargo::where('CODI_CARG', $data['cargo'])->value('TIPO_CARG'); // '01'/'02'
-        if ($cargoTipo && $data['tipo_cargo'] !== str_pad((string)$cargoTipo, 2, '0', STR_PAD_LEFT)) {
+        // Si es administrativo, limpiar campos operativos
+        if (!$esOperativo) {
+            $data['sucamec']           = null;
+            $data['carne_sucamec']     = null;
+            $data['licencia_arma']     = null;
+            $data['licencia_conducir'] = null;
+        }
+
+        // Coherencia cargo ↔ tipo_cargo (solo si cambió el tipo_cargo, pero esto es edición interna)
+        // En edición, el tipo_cargo NO debe cambiar porque viene del origen de la postulación
+        // Solo verificamos que el cargo exista y sea válido
+        $cargoExists = Cargo::where('CODI_CARG', $data['cargo'])->exists();
+        if (!$cargoExists) {
             return response()->json([
                 'success' => false,
-                'message' => 'El cargo seleccionado no corresponde al tipo de cargo elegido.',
-                'errors'  => ['cargo' => ['El cargo no pertenece al tipo seleccionado.']]
+                'message' => 'El cargo seleccionado no existe.',
+                'errors'  => ['cargo' => ['Cargo inválido.']]
             ], 422);
         }
 
