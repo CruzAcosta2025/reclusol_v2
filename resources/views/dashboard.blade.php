@@ -115,10 +115,10 @@
                                 <span class="text-sm text-gray-500 font-medium">{{ $porcentaje }}%</span>
                             </div>
 
-                            <div class="w-full h-1.5 rounded-full bg-neutral overflow-hidden">
+                            <div class="w-full h-1.5 bg-neutral overflow-hidden">
                                 <div
                                     @class([
-                                        'h-1.5 rounded-full',
+                                        'h-1.5',
                                         'bg-info' => $idxMod === 0,
                                         'bg-success' => $idxMod === 1,
                                         'bg-warning' => $idxMod === 2,

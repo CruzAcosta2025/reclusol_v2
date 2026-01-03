@@ -24,34 +24,51 @@
         {{-- Filtro --}}
         <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-                <div>
+        <div class="w-full">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {{-- Aptos --}}
-                <div class="bg-green-100 border border-green-200 p-4 rounded-lg text-center flex flex-col items-center">
-                    <div class="self-center"> 
-                        <i class="fas fa-check-circle fa-2x text-green-500"></i>
-                        <p class="text-sm text-gray-600">Postulantes Aptos</p>
-                        <p class="text-2xl font-bold">{{ $stats['aptos'] ?? 0 }}</p>
-                    </div>   
+                <div class="bg-M6 border border-neutral shadow-sm p-4 rounded-lg flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-center sm:text-left">
+                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-100">
+                        <i class="fas fa-check-circle text-green-600"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-md font-bold">Postulantes Aptos</h3>
+                        <p class="text-sm text-gray-600">{{ $stats['aptos'] ?? 0 }}</p>
+                    </div>
                 </div>
+
                 {{-- No Aptos --}}
-                <div class="bg-red-100 border border-red-200 p-4 rounded-lg text-center flex flex-col items-center">
-                    <i class="fas fa-times-circle fa-2x text-red-500"></i>
-                    <p class="text-sm text-gray-600">Postulantes No Aptos</p>
-                    <p class="text-2xl font-bold">{{ $stats['no_aptos'] ?? 0 }}</p>
+                <div class="bg-M6 border border-neutral shadow-sm p-4 rounded-lg flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-center sm:text-left">
+                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-100">
+                        <i class="fas fa-times-circle text-red-600"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-md font-bold">Postulantes No Aptos</h3>
+                        <p class="text-sm text-gray-600">{{ $stats['no_aptos'] ?? 0 }}</p>
+                    </div>
                 </div>
+
                 {{-- Total --}}
-                <div class="bg-blue-100 border border-blue-200 p-4 rounded-lg text-center flex flex-col items-center">
-                    <i class="fa-solid fa-users fa-2x text-blue-500"></i>
-                    <p class="text-sm text-gray-600">Total Postulantes</p>
-                    <p class="text-2xl font-bold">{{ $stats['total'] ?? 0 }}</p>
+                <div class="bg-M6 border border-neutral shadow-sm p-4 rounded-lg flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-center sm:text-left">
+                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100">
+                        <i class="fa-solid fa-users text-blue-600"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-md font-bold">Total Postulantes</h3>
+                        <p class="text-sm text-gray-600">{{ $stats['total'] ?? 0 }}</p>
+                    </div>
                 </div>
+
                 {{-- Total postulantes (OPERATIVO Y ADMINISTRATIVO) --}}
-                <div class="bg-blue-100 border border-blue-200 p-4 rounded-lg text-center flex flex-col items-center">
-                    <i class="fa-solid fa-users fa-2x text-blue-500"></i>
-                    <p class="text-sm text-gray-600">Postulantes Administrativo</p>
-                    <p class="text-sm text-gray-600">Postulantes Operativo</p>
-                    <p class="text-2xl font-bold">{{ $stats['total'] ?? 0 }}</p>
+                <div class="bg-M6 border border-neutral shadow-sm p-4 rounded-lg flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-center sm:text-left">
+                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-indigo-100">
+                        <i class="fa-solid fa-users text-indigo-600"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-md font-bold">Postulantes Administrativo</h3>
+                        <p class="text-sm text-gray-600">Postulantes Operativo</p>
+                        <p class="text-sm text-gray-600">{{ $stats['total'] ?? 0 }}</p>
+                    </div>
                 </div>
             </div>
         </div>

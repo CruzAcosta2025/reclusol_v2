@@ -22,7 +22,7 @@ $fortalezasTexto = old('fortalezas', $entrevista->fortalezas ?? '');
 $oportunidadesTexto = old('oportunidades', $entrevista->oportunidades ?? '');
 @endphp
 
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+<div class="max-w-7xl mx-auto mb-8">
     <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
         <div class="bg-gradient-to-r from-teal-500 to-teal-600 text-white px-6 py-4">
             <h2 class="flex items-center text-lg font-semibold">
