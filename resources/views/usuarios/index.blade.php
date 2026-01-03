@@ -15,55 +15,51 @@
         </x-block>
 
         {{-- Estadísticas --}}
-        <div class="">
+        <div class="w-full">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {{-- Total Usuarios --}}
-                <x-block class="flex flex-col">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-users text-blue-600 text-xl"></i>
-                        </div>
-                        <span class="text-blue-500 text-sm font-medium">Total</span>
+                <div class="bg-M6 border border-neutral shadow-sm p-4 rounded-lg flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-center sm:text-left">
+                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100">
+                        <i class="fas fa-users text-blue-600"></i>
                     </div>
-                    <h3 class="text-3xl font-bold text-gray-800 mb-1">{{ $estadisticas['total'] ?? 0 }}</h3>
-                    <p class="text-gray-600 text-sm">Usuarios registrados</p>
-                </x-block>
+                    <div>
+                        <h3 class="text-md font-bold">Total Usuarios</h3>
+                        <p class="text-sm text-gray-600">{{ $estadisticas['total'] ?? 0 }}</p>
+                    </div>
+                </div>
 
                 {{-- Usuarios Habilitados --}}
-                <x-block class="flex flex-col">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-user-check text-green-600 text-xl"></i>
-                        </div>
-                        <span class="text-green-500 text-sm font-medium">Habilitados</span>
+                <div class="bg-M6 border border-neutral shadow-sm p-4 rounded-lg flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-center sm:text-left">
+                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-100">
+                        <i class="fas fa-user-check text-green-600"></i>
                     </div>
-                    <h3 class="text-3xl font-bold text-gray-800 mb-1">{{ $estadisticas['active'] ?? 0 }}</h3>
-                    <p class="text-gray-600 text-sm">Usuarios Habilitados</p>
-                </x-block>
+                    <div>
+                        <h3 class="text-md font-bold">Habilitados</h3>
+                        <p class="text-sm text-gray-600">{{ $estadisticas['active'] ?? 0 }}</p>
+                    </div>
+                </div>
 
                 {{-- Usuarios Inhabilitados --}}
-                <x-block class="flex flex-col">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-user-times text-red-600 text-xl"></i>
-                        </div>
-                        <span class="text-red-500 text-sm font-medium">Inhabilitados</span>
+                <div class="bg-M6 border border-neutral shadow-sm p-4 rounded-lg flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-center sm:text-left">
+                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-100">
+                        <i class="fas fa-user-times text-red-600"></i>
                     </div>
-                    <h3 class="text-3xl font-bold text-gray-800 mb-1">{{ $estadisticas['inactive'] ?? 0 }}</h3>
-                    <p class="text-gray-600 text-sm">Usuarios Inhabilitados</p>
-                </x-block>
+                    <div>
+                        <h3 class="text-md font-bold">Inhabilitados</h3>
+                        <p class="text-sm text-gray-600">{{ $estadisticas['inactive'] ?? 0 }}</p>
+                    </div>
+                </div>
 
                 {{-- Nuevos este mes --}}
-                <x-block class="flex flex-col">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-user-plus text-purple-600 text-xl"></i>
-                        </div>
-                        <span class="text-purple-500 text-sm font-medium">Nuevos</span>
+                <div class="bg-M6 border border-neutral shadow-sm p-4 rounded-lg flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-center sm:text-left">
+                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-purple-100">
+                        <i class="fas fa-user-plus text-purple-600"></i>
                     </div>
-                    <h3 class="text-3xl font-bold text-gray-800 mb-1">{{ $estadisticas['newThisMonth'] ?? 0 }}</h3>
-                    <p class="text-gray-600 text-sm">Este mes</p>
-                </x-block>
+                    <div>
+                        <h3 class="text-md font-bold">Nuevos</h3>
+                        <p class="text-sm text-gray-600">{{ $estadisticas['newThisMonth'] ?? 0 }}</p>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -88,18 +84,16 @@
                     </select>
                 </div>
 
-                <div class="flex items-end">
-                    <div class="flex space-x-2 w-full">
-                        <button type="submit"
-                            class="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors flex items-center justify-center space-x-2">
-                            <i class="fas fa-filter"></i>
-                            <span>Filtrar</span>
-                        </button>
-                        <button type="button" onclick="limpiarFiltros()"
-                            class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 transition">
-                            <i class="fas fa-times"></i> Limpiar filtros
-                        </button>
-                    </div>
+                <div class="md:col-span-4 flex flex-wrap gap-2 mt-4">
+                    <x-confirm-button type="submit">
+                        <i class="fas fa-filter"></i>
+                        <span>Filtrar</span>
+                    </x-confirm-button>
+
+                    <x-cancel-button type="button" onclick="limpiarFiltros()">
+                        <i class="fas fa-times"></i>
+                        <span>Limpiar filtros</span>
+                    </x-cancel-button>
                 </div>
             </form>
         </x-block>

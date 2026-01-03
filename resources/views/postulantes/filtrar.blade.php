@@ -154,13 +154,15 @@
                 </div>
 
                 <div class="md:col-span-4 flex flex-wrap gap-2 mt-4">
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
-                        <i class="fas fa-filter mr-2"></i> Filtrar
-                    </button>
-                    <button type="button" onclick="limpiarFiltros()"
-                        class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 transition">
-                        <i class="fas fa-times"></i> Limpiar filtros
-                    </button>
+                    <x-confirm-button type="submit">
+                        <i class="fas fa-filter"></i>
+                        <span>Filtrar</span>
+                    </x-confirm-button>
+
+                    <x-cancel-button type="button" onclick="limpiarFiltros()">
+                        <i class="fas fa-times"></i>
+                        <span>Limpiar filtros</span>
+                    </x-cancel-button>
                 </div>
             </form>
         </x-block>
