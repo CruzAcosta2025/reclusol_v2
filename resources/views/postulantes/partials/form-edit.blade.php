@@ -1,12 +1,4 @@
-<div class="relative p-6 bg-white rounded-lg">
-    {{-- Cerrar --}}
-    <button type="button" onclick="closeEditModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
-        <i class="fas fa-times fa-lg"></i>
-    </button>
-
-    <h2 class="text-2xl font-semibold mb-6">Editar Postulante</h2>
-
-    <form id="form-edit" method="POST" action="{{ route('postulantes.update', $postulante) }}" enctype="multipart/form-data" class="space-y-6">
+<form id="form-edit" method="POST" action="{{ route('postulantes.update', $postulante) }}" enctype="multipart/form-data" class="space-y-6">
         @csrf
         @method('PUT')
 
@@ -231,14 +223,4 @@
             </div>
         </div>
 
-        {{-- Botones --}}
-        <div class="flex justify-end space-x-3">
-            <button type="button" onclick="closeEditModal()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
-                Cancelar
-            </button>
-            <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
-                Guardar cambios
-            </button>
-        </div>
-    </form>
-</div>
+</form>

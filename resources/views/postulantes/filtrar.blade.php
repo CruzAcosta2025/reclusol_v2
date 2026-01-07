@@ -232,105 +232,93 @@
             </div>
 
             {{-- Modal de Eliminación --}}
-            <div id="delete-modal"
-                class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-                role="dialog" aria-modal="true" aria-labelledby="delete-title" aria-describedby="delete-desc">
-                <!-- Panel -->
-                <div class="bg-white w-full max-w-md mx-4 rounded-2xl shadow-2xl border border-gray-100 p-6 opacity-0 translate-y-2 transition-all duration-200 ease-out data-[open=true]:opacity-100 data-[open=true]:translate-y-0"
-                    id="delete-panel" data-open="true">
-                    <!-- Encabezado -->
-                    <div class="flex items-start gap-3 mb-4">
+            <x-modal name="eliminarPostulante" :show="false" maxWidth="md">
+                <x-slot name="title">
+                    <div class="flex items-start gap-3">
                         <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-50">
                             <i class="fa-solid fa-triangle-exclamation text-red-600"></i>
                         </div>
                         <div>
-                            <h3 id="delete-title" class="text-xl font-semibold">¿Eliminar postulante?</h3>
-                            <p id="delete-desc" class="text-sm text-gray-600 mt-1">Esta acción no se puede deshacer.</p>
+                            <h3 id="delete-title" class="text-base text-M2 font-semibold">¿Eliminar postulante?</h3>
+                            <p id="delete-desc" class="text-xs text-neutral-dark mt-1">Esta acción no se puede deshacer.</p>
                         </div>
                     </div>
-
-                    <!-- Botones -->
-                    <div class="mt-5 flex justify-end gap-3 pt-4 border-t border-gray-100">
-                        <button type="button" onclick="closeDeleteModal()"
-                            class="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 focus:outline-none focus:ring focus:ring-gray-300 transition">
-                            Cancelar
-                        </button>
-
-                        <button type="button" onclick="confirmDelete()"
-                            class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white focus:outline-none focus:ring focus:ring-red-300 transition">
-                            Eliminar
-                        </button>
-                    </div>
-                </div>
-            </div>
+                </x-slot>
+                <x-slot name="footer">
+                    <x-cancel-button id="delete-cancel" type="button" x-on:click="$dispatch('close-modal', 'eliminarPostulante')">
+                        Cancelar
+                    </x-cancel-button>
+                    <x-confirm-button id="delete-confirm" type="button" onclick="confirmDelete()">
+                        Eliminar
+                    </x-confirm-button>
+                </x-slot>
+            </x-modal>
 
             {{-- Modal de Edición --}}
-            <div id="edit-modal"
-                class="hidden fixed inset-0 z-50 items-center justify-center bg-black/50 backdrop-blur-sm">
-                <div id="edit-panel"
-                    class="bg-white w-full max-w-3xl mx-4 rounded-2xl shadow-2xl border border-gray-100 max-h-[90vh] overflow-y-auto opacity-0 scale-95 transition duration-200 ease-out data-[open=true]:opacity-100 data-[open=true]:scale-100">
-                    <div id="edit-modal-content"><!-- aquí se inyecta el formulario --></div>
-                </div>
-            </div>
+            <x-modal name="editarPostulante" :show="false" maxWidth="2xl" focusable>
+                <x-slot name="title">
+                    <div class="space-y-0.5">
+                        <h2 class="text-base text-M2 font-semibold">Editar postulante</h2>
+                        <p class="text-xs text-neutral-dark">Actualiza la información y guarda los cambios.</p>
+                    </div>
+                </x-slot>
+                <div id="edit-modal-content"><!-- aquí se inyecta el formulario --></div>
+                <x-slot name="footer">
+                    <x-cancel-button type="button" x-on:click="$dispatch('close-modal', 'editarPostulante')">Cancelar</x-cancel-button>
+                    <x-confirm-button type="submit" form="form-edit">Guardar cambios</x-confirm-button>
+                </x-slot>
+            </x-modal>
 
             {{-- Modal de Validación --}}
-            <div id="validar-modal"
-                class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-                role="dialog" aria-modal="true" aria-labelledby="validar-title" aria-describedby="validar-desc">
-                <div
-                    class="bg-white p-6 rounded-2xl w-full max-w-md shadow-2xl border border-gray-100 mx-4 focus:outline-none focus-visible:ring focus-visible:ring-emerald-200">
-
-                    <!-- Encabezado -->
-                    <h3 id="validar-title" class="text-lg font-semibold mb-4 flex items-center gap-2">
-                        <i class="fa-solid fa-clipboard-check text-emerald-600"></i>
-                        Validar: <span id="val-nombre" class="font-normal text-gray-700"></span>
-                    </h3>
-                    <p id="validar-desc" class="sr-only">Selecciona el resultado de validación y agrega comentario si
-                        corresponde.</p>
-
-                    <!-- Formulario -->
-                    <form id="form-validar" method="POST" class="space-y-4" autocomplete="off">
-                        @csrf
-
-                        <!-- Opciones de radio -->
-                        <fieldset class="space-y-2">
-                            <legend class="sr-only">Resultado</legend>
-                            <label
-                                class="flex items-center gap-2 p-2 rounded-lg border hover:bg-gray-50 cursor-pointer transition">
-                                <input type="radio" name="decision" value="apto" class="accent-emerald-600" checked>
-                                <span class="text-gray-800 font-medium">Apto</span>
-                            </label>
-                            <label
-                                class="flex items-center gap-2 p-2 rounded-lg border hover:bg-gray-50 cursor-pointer transition">
-                                <input type="radio" name="decision" value="no_apto" class="accent-red-600">
-                                <span class="text-gray-800 font-medium">No apto</span>
-                            </label>
-                        </fieldset>
-
-                        <!-- Comentario -->
-                        <div>
-                            <label for="comentario-no-apto" class="block text-sm font-medium text-gray-600 mb-1">
-                                Comentario <span class="text-gray-400">(obligatorio si es No apto)</span>
-                            </label>
-                            <textarea name="comentario" id="comentario-no-apto" rows="3" maxlength="300"
-                                class="w-full border border-gray-300 rounded-lg p-2 placeholder:text-gray-400 focus:border-emerald-500 focus:ring focus:ring-emerald-200 transition resize-none"
-                                placeholder="Motivo o notas (máx. 300 caracteres)"></textarea>
+            <x-modal name="validarPostulante" :show="false" maxWidth="md">
+                <x-slot name="title">
+                    <div class="flex items-start gap-2">
+                        <i class="fa-solid fa-clipboard-check text-M1 mt-0.5"></i>
+                        <div class="space-y-0.5">
+                            <h2 id="validar-title" class="text-base text-M2 font-semibold">
+                                Validar: <span id="val-nombre" class="font-normal text-M3"></span>
+                            </h2>
+                            <p id="validar-desc" class="text-xs text-neutral-dark">
+                                Selecciona el resultado de validación y agrega comentario si corresponde.
+                            </p>
                         </div>
+                    </div>
+                </x-slot>
 
-                        <!-- Botones -->
-                        <div class="flex justify-end gap-3 pt-3 border-t border-gray-100">
-                            <button type="button" onclick="cerrarValidar()"
-                                class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700 focus:outline-none focus:ring focus:ring-gray-300 transition">
-                                Cancelar
-                            </button>
-                            <button type="submit"
-                                class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white focus:outline-none focus:ring focus:ring-emerald-300 transition">
-                                Guardar
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+                <form id="form-validar" method="POST" class="space-y-4" autocomplete="off">
+                    @csrf
+
+                    <fieldset class="space-y-2">
+                        <legend class="sr-only">Resultado</legend>
+                        <label class="flex items-center gap-2 p-2 rounded-lg border border-neutral bg-white hover:bg-M6 cursor-pointer transition">
+                            <input type="radio" name="decision" value="apto" class="accent-emerald-600" checked>
+                            <span class="text-M2 font-medium">Apto</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-2 rounded-lg border border-neutral bg-white hover:bg-M6 cursor-pointer transition">
+                            <input type="radio" name="decision" value="no_apto" class="accent-red-600">
+                            <span class="text-M2 font-medium">No apto</span>
+                        </label>
+                    </fieldset>
+
+                    <div>
+                        <label for="comentario-no-apto" class="block text-sm font-medium text-M3 mb-1">
+                            Comentario <span class="text-neutral-dark">(obligatorio si es No apto)</span>
+                        </label>
+                        <textarea name="comentario" id="comentario-no-apto" rows="3" maxlength="300"
+                            class="w-full border border-neutral rounded-lg p-2 placeholder:text-neutral-dark/70 focus:border-M1 focus:ring focus:ring-accent/30 transition resize-none bg-white"
+                            placeholder="Motivo o notas (máx. 300 caracteres)"></textarea>
+                    </div>
+                </form>
+
+                <x-slot name="footer">
+                    <x-cancel-button x-on:click="$dispatch('close-modal', 'validarPostulante')">
+                        Cancelar
+                    </x-cancel-button>
+                    <x-confirm-button type="submit" form="form-validar">
+                        Guardar
+                    </x-confirm-button>
+                </x-slot>
+            </x-modal>
         </div>
     </div>
 
@@ -338,13 +326,9 @@
     <script>
         let deletePostulanteId = null;
         let deleteTriggerEl = null; // para devolver el foco
-        const modal = document.getElementById('delete-modal');
-        const panel = document.getElementById('delete-panel');
-        const btnCancelar = modal?.querySelector('button[onclick="closeDeleteModal()"]');
-        const btnEliminar = modal?.querySelector('button[onclick="confirmDelete()"]');
+        const btnCancelar = document.getElementById('delete-cancel');
+        const btnEliminar = document.getElementById('delete-confirm');
 
-        const editModal = document.getElementById('edit-modal');
-        const editPanel = document.getElementById('edit-panel'); // <- debe existir en el HTML
         const editContent = document.getElementById('edit-modal-content');
         let editTriggerEl = null;
 
@@ -381,25 +365,14 @@
             deletePostulanteId = id;
             deleteTriggerEl = triggerEl || document.activeElement;
 
-            // Mostrar overlay
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-
-            // Bloquear scroll del fondo
-            document.body.style.overflow = 'hidden';
-
-            // Forzar reflow para que la transición se aplique
-            void panel.offsetWidth;
-            panel.setAttribute('data-open', 'true');
+            window.dispatchEvent(new CustomEvent('open-modal', {
+                detail: 'eliminarPostulante'
+            }));
 
             // Foco al botón más seguro (Cancelar)
             setTimeout(() => {
                 btnCancelar?.focus();
             }, 0);
-
-            // Listeners de UX
-            document.addEventListener('keydown', onEscClose);
-            modal.addEventListener('mousedown', onBackdropClick);
         }
 
         // Mantengo tu firma para compatibilidad con el onclick anterior
@@ -410,40 +383,18 @@
         function closeDeleteModal() {
             deletePostulanteId = null;
 
-            // Animación de salida
-            panel.setAttribute('data-open', 'false');
-
-            // Habilitar de nuevo botones y texto original si estaba cargando
             restoreButtons();
 
-            // Quitar listeners
-            document.removeEventListener('keydown', onEscClose);
-            modal.removeEventListener('mousedown', onBackdropClick);
+            window.dispatchEvent(new CustomEvent('close-modal', {
+                detail: 'eliminarPostulante'
+            }));
 
-            // Devolver scroll
-            document.body.style.overflow = '';
-
-            // Ocultar después de la duración de la transición (200ms)
             setTimeout(() => {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-                // Devolver foco al disparador
                 if (deleteTriggerEl && typeof deleteTriggerEl.focus === 'function') {
                     deleteTriggerEl.focus();
                 }
                 deleteTriggerEl = null;
-            }, 200);
-        }
-
-        function onEscClose(e) {
-            if (e.key === 'Escape') closeDeleteModal();
-        }
-
-        function onBackdropClick(e) {
-            // Cierra si clickea fuera del panel (overlay)
-            if (!panel.contains(e.target)) {
-                closeDeleteModal();
-            }
+            }, 0);
         }
 
         async function confirmDelete() {
@@ -572,20 +523,15 @@
 
             // Skeleton
             editContent.innerHTML = `
-    <div class="p-6 space-y-3">
-      <div class="h-6 w-40 bg-gray-200 rounded animate-pulse"></div>
-      <div class="h-4 w-3/4 bg-gray-200 rounded animate-pulse"></div>
-      <div class="h-32 w-full bg-gray-200 rounded animate-pulse"></div>
-    </div>`;
+        <div class="space-y-3">
+            <div class="h-6 w-40 bg-gray-200 rounded animate-pulse"></div>
+            <div class="h-4 w-3/4 bg-gray-200 rounded animate-pulse"></div>
+            <div class="h-32 w-full bg-gray-200 rounded animate-pulse"></div>
+        </div>`;
 
-            // Mostrar modal
-            editModal.classList.remove('hidden');
-            editModal.classList.add('flex');
-            document.body.style.overflow = 'hidden';
-            if (editPanel) {
-                void editPanel.offsetWidth;
-                editPanel.setAttribute('data-open', 'true');
-            }
+            window.dispatchEvent(new CustomEvent('open-modal', {
+                detail: 'editarPostulante'
+            }));
 
             try {
                 const res = await fetch(url, {
@@ -601,9 +547,6 @@
 
                 const firstEl = editContent.querySelector('[autofocus], input, select, textarea, button');
                 if (firstEl) firstEl.focus();
-
-                editModal.addEventListener('mousedown', onEditBackdropClick);
-                document.addEventListener('keydown', onEditEsc);
             } catch (e) {
                 editContent.innerHTML = `<div class="p-6 text-sm text-red-600">No se pudo cargar el formulario.</div>`;
             }
@@ -611,30 +554,14 @@
 
 
         function closeEditModal() {
-            // Animación de salida
-            if (editPanel) editPanel.setAttribute('data-open', 'false');
+            window.dispatchEvent(new CustomEvent('close-modal', {
+                detail: 'editarPostulante'
+            }));
 
-            // Quitar listeners y devolver scroll
-            document.removeEventListener('keydown', onEditEsc);
-            editModal.removeEventListener('mousedown', onEditBackdropClick);
-            document.body.style.overflow = '';
-
-            // Ocultar tras la duración de la animación (200ms)
             setTimeout(() => {
-                editModal.classList.add('hidden');
-                editModal.classList.remove('flex');
-                // Devolver foco al disparador
                 if (editTriggerEl && typeof editTriggerEl.focus === 'function') editTriggerEl.focus();
                 editTriggerEl = null;
-            }, 200);
-        }
-
-        function onEditEsc(e) {
-            if (e.key === 'Escape') closeEditModal();
-        }
-
-        function onEditBackdropClick(e) {
-            if (!editPanel?.contains(e.target)) closeEditModal();
+            }, 0);
         }
 
         // Conectar los botones "Editar" a la nueva función
@@ -722,16 +649,16 @@
                 document.getElementById('comentario-no-apto').removeAttribute('required');
 
                 // abrir modal
-                const m = document.getElementById('validar-modal');
-                m.classList.remove('hidden');
-                m.classList.add('flex');
+                window.dispatchEvent(new CustomEvent('open-modal', {
+                    detail: 'validarPostulante'
+                }));
             });
         });
 
         function cerrarValidar() {
-            const m = document.getElementById('validar-modal');
-            m.classList.add('hidden');
-            m.classList.remove('flex');
+            window.dispatchEvent(new CustomEvent('close-modal', {
+                detail: 'validarPostulante'
+            }));
         }
 
         // Requerir comentario si "no_apto"
