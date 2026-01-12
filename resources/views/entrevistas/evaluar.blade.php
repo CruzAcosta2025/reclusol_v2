@@ -167,9 +167,7 @@
         $fechaEntrevista = $entrevista?->fecha_entrevista
             ? \Carbon\Carbon::parse($entrevista->fecha_entrevista)
             : null;
-        $whatsappFecha = $fechaEntrevista ? $fechaEntrevista->format('d/m/Y') : null;
-        $whatsappHoraInicio = $fechaEntrevista ? $fechaEntrevista->format('H:i') : null;
-        $whatsappHoraFin = $fechaEntrevista ? $fechaEntrevista->copy()->addMinutes(20)->format('H:i') : null;
+        
         @endphp
 
         {{-- Evaluación de Aptitud --}}
@@ -247,46 +245,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-
-
-        {{-- Mensajeria WhatsApp --}}
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
-            <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-                <div class="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-6 py-4">
-                    <h2 class="flex items-center text-lg font-semibold">
-                        <i class="fab fa-whatsapp mr-2"></i>
-                        Enviar mensaje por WhatsApp
-                    </h2>
-                </div>
-                <div class="p-6 flex flex-col lg:flex-row lg:items-center gap-4">
-                    <div class="flex-1 space-y-1">
-                        <p class="text-sm text-gray-700">Número registrado:
-                            <span class="font-semibold">{{ $postulante->celular ?? 'Sin número' }}</span>
-                        </p>
-                        <p class="text-xs text-gray-500">Se usará el texto predeterminado según el resultado de aptitud.</p>
-                    </div>
-                    <div class="flex flex-wrap gap-3">
-                        <button type="button"
-                            class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-md flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
-                            onclick="abrirWhatsappDesdeSeleccion('apto')" @if(empty($postulante->celular)) disabled @endif>
-                            <i class="fab fa-whatsapp"></i>
-                            <span>Mensaje apto</span>
-                        </button>
-                        <button type="button"
-                            class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-xl shadow-md flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
-                            onclick="abrirWhatsappDesdeSeleccion('no_apto')" @if(empty($postulante->celular)) disabled @endif>
-                            <i class="fab fa-whatsapp"></i>
-                            <span>Mensaje no apto</span>
-                        </button>
-                    </div>
-                </div>
-                @if(empty($postulante->celular))
-                <div class="px-6 pb-6">
-                    <p class="text-sm text-red-600">Registre un celular para habilitar el envío por WhatsApp.</p>
-                </div>
-                @endif
             </div>
         </div>
 
@@ -487,15 +445,6 @@
         }
     });
 
-    const whatsappConfig = {
-        ruta: @json(route('entrevistas.whatsapp', ['postulante' => $postulante->id])),
-        numero: @json($postulante->celular),
-        nombre: @json(trim($postulante->nombres . ' ' . $postulante->apellidos)),
-        puesto: @json($postulante->puesto_postula ?? 'el puesto indicado'),
-        fecha: @json($whatsappFecha),
-        horaInicio: @json($whatsappHoraInicio),
-        horaFin: @json($whatsappHoraFin),
-    };
 
     function obtenerTipoDesdeSeleccion() {
         const seleccionado = document.querySelector('input[name="apto_puesto"]:checked');
@@ -504,178 +453,6 @@
         return 'apto';
     }
 
-    function abrirWhatsappDesdeSeleccion(forzado = null) {
-        const tipo = forzado || obtenerTipoDesdeSeleccion();
-
-        if (!tipo) {
-            Swal.fire({
-                icon: 'info',
-                title: 'Selecciona el resultado',
-                text: 'Define si el postulante es apto o no apto para elegir el mensaje.',
-                confirmButtonColor: '#3b82f6',
-            });
-            return;
-        }
-
-        if (!whatsappConfig.numero) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Sin celular',
-                text: 'No hay un nÇ§mero de contacto registrado para este postulante.',
-                confirmButtonColor: '#f59e0b',
-            });
-            return;
-        }
-
-        mostrarModalWhatsapp(tipo);
-    }
-
-    function construirMensajePreview(tipo, data) {
-        const nombre = data.nombre || '';
-        const puesto = data.puesto || 'el puesto indicado';
-
-        if (tipo === 'apto') {
-            const fechaTxt = data.fecha ? ` para el dÇða ${data.fecha}` : '';
-            const horaTxt = data.horaInicio && data.horaFin ? ` entre las ${data.horaInicio} y las ${data.horaFin}` : '';
-            let texto = `Hola ${nombre}, gracias por postular al puesto de ${puesto}. Luego de realizar la revisiÇün documentaria correspondiente, solicitamos de tu tiempo para realizar una entrevista virtual mediante Google Meets cuya duraciÇün serÇ­ de 20 minutos${fechaTxt}${horaTxt}. IndÇ­canos si estÇ­s disponible en ese horario o si deseas reprogramar tu entrevista.`;
-
-            if (data.enlace) {
-                texto += ` Enlace de la reuniÇün: ${data.enlace}.`;
-            }
-            return texto;
-        }
-
-        return `Hola ${nombre}, gracias por postular al puesto de ${puesto}. Lamentamos informarte que en esta oportunidad los puestos han sido cubiertos.`;
-    }
-
-    function mostrarModalWhatsapp(tipo) {
-        const esApto = tipo === 'apto';
-        const titulo = esApto ? 'Mensaje para candidato apto' : 'Mensaje para no apto';
-
-        const horarioInputs = esApto ? `
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
-                <div>
-                    <label class="block text-xs text-gray-600 mb-1">Hora inicio (A)</label>
-                    <input type="time" id="wa-hora-inicio" value="${whatsappConfig.horaInicio || ''}"
-                        class="w-full px-3 py-2 border rounded-lg focus:border-emerald-500 focus:ring-0 text-sm">
-                </div>
-                <div>
-                    <label class="block text-xs text-gray-600 mb-1">Hora fin (B)</label>
-                    <input type="time" id="wa-hora-fin" value="${whatsappConfig.horaFin || ''}"
-                        class="w-full px-3 py-2 border rounded-lg focus:border-emerald-500 focus:ring-0 text-sm">
-                </div>
-            </div>
-            <div class="mb-3">
-                <label class="block text-xs text-gray-600 mb-1">Enlace de Google Meet (opcional)</label>
-                <input type="text" id="wa-enlace" placeholder="https://meet.google.com/..." class="w-full px-3 py-2 border rounded-lg focus:border-emerald-500 focus:ring-0 text-sm">
-            </div>
-        ` : '';
-
-        const previewInicial = construirMensajePreview(tipo, {
-            nombre: whatsappConfig.nombre,
-            puesto: whatsappConfig.puesto,
-            fecha: whatsappConfig.fecha,
-            horaInicio: whatsappConfig.horaInicio,
-            horaFin: whatsappConfig.horaFin,
-        });
-
-        Swal.fire({
-            title: titulo,
-            html: `
-                ${whatsappConfig.fecha ? `<p class="text-xs text-gray-600 mb-2">Fecha de entrevista: ${whatsappConfig.fecha}</p>` : ''}
-                ${horarioInputs}
-                <label class="block text-xs text-gray-600 mb-1 text-left">Vista previa</label>
-                <textarea id="wa-preview" class="w-full border rounded-lg p-3 text-sm" rows="4" readonly>${previewInicial}</textarea>
-            `,
-            showCancelButton: true,
-            confirmButtonColor: '#10b981',
-            cancelButtonColor: '#9ca3af',
-            confirmButtonText: 'Enviar por WhatsApp',
-            cancelButtonText: 'Cancelar',
-            focusConfirm: false,
-            preConfirm: () => {
-                const payload = { tipo };
-
-                if (esApto) {
-                    payload.hora_inicio = document.getElementById('wa-hora-inicio')?.value || '';
-                    payload.hora_fin = document.getElementById('wa-hora-fin')?.value || '';
-                    payload.enlace_meet = document.getElementById('wa-enlace')?.value || '';
-                }
-
-                return payload;
-            },
-            didOpen: () => {
-                if (esApto) {
-                    const inicioInput = document.getElementById('wa-hora-inicio');
-                    const finInput = document.getElementById('wa-hora-fin');
-                    const enlaceInput = document.getElementById('wa-enlace');
-                    const previewEl = document.getElementById('wa-preview');
-
-                    [inicioInput, finInput, enlaceInput].forEach(el => {
-                        el?.addEventListener('input', () => {
-                            const texto = construirMensajePreview(tipo, {
-                                nombre: whatsappConfig.nombre,
-                                puesto: whatsappConfig.puesto,
-                                fecha: whatsappConfig.fecha,
-                                horaInicio: inicioInput?.value || whatsappConfig.horaInicio,
-                                horaFin: finInput?.value || whatsappConfig.horaFin,
-                                enlace: enlaceInput?.value || ''
-                            });
-
-                            if (previewEl) previewEl.value = texto;
-                        });
-                    });
-                }
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                enviarWhatsapp(result.value);
-            }
-        });
-    }
-
-    async function enviarWhatsapp(payload) {
-        if (!payload || !payload.tipo) return;
-
-        Swal.fire({
-            title: 'Enviando...',
-            allowOutsideClick: false,
-            allowEscapeKey: false,
-            didOpen: () => Swal.showLoading(),
-        });
-
-        try {
-            const res = await fetch(whatsappConfig.ruta, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                },
-                body: JSON.stringify(payload)
-            });
-
-            const data = await res.json();
-
-            if (!res.ok || !data.success) {
-                throw new Error(data.message || 'No se pudo enviar el mensaje.');
-            }
-
-            Swal.fire({
-                icon: 'success',
-                title: 'Mensaje enviado',
-                text: data.message || 'El mensaje fue enviado por WhatsApp.',
-                confirmButtonColor: '#10b981',
-            });
-        } catch (error) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: error.message || 'No se pudo enviar el mensaje de WhatsApp.',
-                confirmButtonColor: '#ef4444',
-            });
-        }
-    }
 
     async function guardarBorrador() {
         const form = document.getElementById('evaluacion-form');
