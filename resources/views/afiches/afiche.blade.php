@@ -54,7 +54,7 @@
                             <h3 class="text-xl font-bold text-gray-800">Requerimientos Activos</h3>
                         </div>
                         <div class="space-y-3 max-h-80 overflow-y-auto">
-                            @foreach ($requerimientos as $req)
+                            @foreach ($requerimientos->where('estado', 'aprobado')->where('estado_requerimiento_id', '!=', null) as $req)
                                 @php
                                     $color = match (strtolower($req->urgencia)) {
                                         'alta' => 'bg-red-600 text-white',
@@ -267,9 +267,7 @@
                         <div class="flex justify-between items-center mb-4">
                             <div>
                                 <h2 class="text-xl font-bold text-gray-800">Vista previa del afiche</h2>
-                                <p class="text-sm text-gray-500">
-                                    Selecciona un requerimiento y una plantilla para generar el afiche.
-                                </p>
+                  
                             </div>
 
                             <div class="flex items-center space-x-3">

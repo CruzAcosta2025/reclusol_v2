@@ -13,13 +13,13 @@
                         </h2>
 
                         <p class="text-sm text-white/70 mt-1">
-                            AquÃ­ puedes subir nuevas plantillas, Ã­conos o fuentes para usarlas en el generador de afiches.
+                            Aquí puedes subir nuevas plantillas, í­conos o fuentes para usarlas en el generador de afiches.
                         </p>
                     </div>
                     <div class="flex items-center gap-2 flex-wrap">
                         <a href="{{ route('afiches.assets.upload') }}"
                             class="px-4 py-2 rounded-xl font-semibold text-sm bg-white/10 hover:bg-white/15 transition">
-                            <i class="fas fa-plus mr-2"></i>AÃ±adir recursos
+                            <i class="fas fa-plus mr-2"></i>Añadir recursos
                         </a>
                         <a href="{{ route('dashboard') }}"
                             class="px-4 py-2 rounded-xl font-semibold text-sm bg-white/10 hover:bg-white/15 transition">
@@ -65,13 +65,13 @@
                                     <option value="">-- Selecciona --</option>
                                     <option value="plantilla" {{ old('tipo') === 'plantilla' ? 'selected' : '' }}>Plantilla
                                         de afiche</option>
-                                    <option value="iconG" {{ old('tipo') === 'iconG' ? 'selected' : '' }}>Ãcono principal
+                                    <option value="iconG" {{ old('tipo') === 'iconG' ? 'selected' : '' }}>Ícono principal
                                         (personaje)</option>
-                                    <option value="iconCheck" {{ old('tipo') === 'iconCheck' ? 'selected' : '' }}>Ãcono de
+                                    <option value="iconCheck" {{ old('tipo') === 'iconCheck' ? 'selected' : '' }}>Ícono de
                                         check (requisitos)</option>
-                                    <option value="iconPhone" {{ old('tipo') === 'iconPhone' ? 'selected' : '' }}>Ãcono de
-                                        telÃ©fono</option>
-                                    <option value="iconEmail" {{ old('tipo') === 'iconEmail' ? 'selected' : '' }}>Ãcono de
+                                    <option value="iconPhone" {{ old('tipo') === 'iconPhone' ? 'selected' : '' }}>Ícono de
+                                        teléfono</option>
+                                    <option value="iconEmail" {{ old('tipo') === 'iconEmail' ? 'selected' : '' }}>Ícono de
                                         email</option>
                                     <option value="font" {{ old('tipo') === 'font' ? 'selected' : '' }}>Fuente (TTF/OTF)
                                     </option>
@@ -83,7 +83,7 @@
                                 <input type="file" name="archivo"
                                     class="form-input w-full border-2 border-gray-200 rounded-xl px-3 py-2 bg-white text-gray-900 text-sm focus:border-blue-500 focus:ring-0 transition">
                                 <p class="text-xs text-gray-500 mt-1">
-                                    ImÃ¡genes: PNG/JPG. Fuentes: TTF/OTF. TamaÃ±o mÃ¡ximo: 4 MB.
+                                    Imágenes: PNG/JPG. Fuentes: TTF/OTF. Tamaño máximo: 4 MB.
                                 </p>
                             </div>
 
@@ -104,14 +104,13 @@
                     <div class="bg-white rounded-2xl shadow-lg p-6 card-hover">
                         <div class="flex items-center justify-between">
                             <h2 class="text-lg font-semibold text-gray-800">Plantillas actuales</h2>
-                            <button type="button" class="text-sm text-blue-600 hover:text-blue-800"
+                            <button type="button" class="text-sm text-blue-600 hover:text-blue-800 transition"
                                 onclick="toggleSection('sec-plantillas')">
-                                Mostrar / Ocultar
+                                <span class="toggle-text-plantillas">Mostrar</span>
                             </button>
                         </div>
 
-                        {{-- <-- OJO: hidden agregado --}}
-                        <div id="sec-plantillas" class="mt-3 hidden">
+                        <div id="sec-plantillas" class="mt-4 hidden" style="display: none;">
                             <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
                                 @forelse($plantillas ?? [] as $tpl)
                                     <div
@@ -145,15 +144,14 @@
                     {{-- Ãconos principales --}}
                     <div class="bg-white rounded-2xl shadow-lg p-6 card-hover">
                         <div class="flex items-center justify-between">
-                            <h2 class="text-lg font-semibold text-gray-800">Ãconos principales (iconG)</h2>
-                            <button type="button" class="text-sm text-blue-600 hover:text-blue-800"
+                            <h2 class="text-lg font-semibold text-gray-800">Iconos principales (iconG)</h2>
+                            <button type="button" class="text-sm text-blue-600 hover:text-blue-800 transition"
                                 onclick="toggleSection('sec-iconG')">
-                                Mostrar / Ocultar
+                                <span class="toggle-text-iconG">Mostrar</span>
                             </button>
                         </div>
 
-                        {{-- <-- hidden agregado --}}
-                        <div id="sec-iconG" class="mt-3 hidden">
+                        <div id="sec-iconG" class="mt-4 hidden" style="display: none;">
                             <div class="grid grid-cols-3 lg:grid-cols-5 gap-4">
                                 @forelse($iconosG ?? [] as $icon)
                                     <div
@@ -177,7 +175,7 @@
                                     </div>
                                 @empty
                                     <p class="text-sm text-gray-500 col-span-full">
-                                        No hay Ã­conos principales cargados.
+                                        No hay I­conos principales cargados.
                                     </p>
                                 @endforelse
                             </div>
@@ -187,15 +185,14 @@
                     {{-- Ãconos de check --}}
                     <div class="bg-white rounded-2xl shadow-lg p-6 card-hover">
                         <div class="flex items-center justify-between">
-                            <h2 class="text-lg font-semibold text-gray-800">Ãconos de check</h2>
-                            <button type="button" class="text-sm text-blue-600 hover:text-blue-800"
+                            <h2 class="text-lg font-semibold text-gray-800">Iconos de check</h2>
+                            <button type="button" class="text-sm text-blue-600 hover:text-blue-800 transition"
                                 onclick="toggleSection('sec-iconCheck')">
-                                Mostrar / Ocultar
+                                <span class="toggle-text-iconCheck">Mostrar</span>
                             </button>
                         </div>
 
-                        {{-- <-- hidden agregado --}}
-                        <div id="sec-iconCheck" class="mt-3 hidden">
+                        <div id="sec-iconCheck" class="mt-4 hidden" style="display: none;">
                             <div class="grid grid-cols-3 lg:grid-cols-6 gap-4">
                                 @forelse($iconosCheck ?? [] as $icon)
                                     <div
@@ -216,7 +213,7 @@
                                     </div>
                                 @empty
                                     <p class="text-sm text-gray-500 col-span-full">
-                                        No hay Ã­conos de check cargados.
+                                        No hay I­conos de check cargados.
                                     </p>
                                 @endforelse
                             </div>
@@ -226,15 +223,14 @@
                     {{-- Ãconos de telÃ©fono --}}
                     <div class="bg-white rounded-2xl shadow-lg p-6 card-hover">
                         <div class="flex items-center justify-between">
-                            <h2 class="text-lg font-semibold text-gray-800">Ãconos de telÃ©fono</h2>
-                            <button type="button" class="text-sm text-blue-600 hover:text-blue-800"
+                            <h2 class="text-lg font-semibold text-gray-800">Íconos de teléfono</h2>
+                            <button type="button" class="text-sm text-blue-600 hover:text-blue-800 transition"
                                 onclick="toggleSection('sec-iconPhone')">
-                                Mostrar / Ocultar
+                                <span class="toggle-text-iconPhone">Mostrar</span>
                             </button>
                         </div>
 
-                        {{-- <-- hidden agregado --}}
-                        <div id="sec-iconPhone" class="mt-3 hidden">
+                        <div id="sec-iconPhone" class="mt-4 hidden" style="display: none;">
                             <div class="grid grid-cols-3 lg:grid-cols-6 gap-4">
                                 @forelse($iconosPhone ?? [] as $icon)
                                     <div
@@ -255,7 +251,7 @@
                                     </div>
                                 @empty
                                     <p class="text-sm text-gray-500 col-span-full">
-                                        No hay Ã­conos de telÃ©fono cargados.
+                                        No hay íconos de teléfono cargados.
                                     </p>
                                 @endforelse
                             </div>
@@ -265,15 +261,14 @@
                     {{-- Ãconos de email --}}
                     <div class="bg-white rounded-2xl shadow-lg p-6 card-hover">
                         <div class="flex items-center justify-between">
-                            <h2 class="text-lg font-semibold text-gray-800">Ãconos de email</h2>
-                            <button type="button" class="text-sm text-blue-600 hover:text-blue-800"
+                            <h2 class="text-lg font-semibold text-gray-800">Íconos de email</h2>
+                            <button type="button" class="text-sm text-blue-600 hover:text-blue-800 transition"
                                 onclick="toggleSection('sec-iconEmail')">
-                                Mostrar / Ocultar
+                                <span class="toggle-text-iconEmail">Mostrar</span>
                             </button>
                         </div>
 
-                        {{-- <-- hidden agregado --}}
-                        <div id="sec-iconEmail" class="mt-3 hidden">
+                        <div id="sec-iconEmail" class="mt-4 hidden" style="display: none;">
                             <div class="grid grid-cols-3 lg:grid-cols-6 gap-4">
                                 @forelse($iconosEmail ?? [] as $icon)
                                     <div
@@ -294,7 +289,7 @@
                                     </div>
                                 @empty
                                     <p class="text-sm text-gray-500 col-span-full">
-                                        No hay Ã­conos de email cargados.
+                                        No hay Iconos de email cargados.
                                     </p>
                                 @endforelse
                             </div>
@@ -305,14 +300,13 @@
                     <div class="bg-white rounded-2xl shadow-lg p-6 card-hover">
                         <div class="flex items-center justify-between">
                             <h2 class="text-lg font-semibold text-gray-800">Fuentes cargadas</h2>
-                            <button type="button" class="text-sm text-blue-600 hover:text-blue-800"
+                            <button type="button" class="text-sm text-blue-600 hover:text-blue-800 transition"
                                 onclick="toggleSection('sec-fonts')">
-                                Mostrar / Ocultar
+                                <span class="toggle-text-fonts">Mostrar</span>
                             </button>
                         </div>
 
-                        {{-- <-- hidden agregado --}}
-                        <div id="sec-fonts" class="mt-3 hidden">
+                        <div id="sec-fonts" class="mt-4 hidden" style="display: none;">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 @forelse($fonts ?? [] as $font)
                                     <div
@@ -341,8 +335,6 @@
                         </div>
                     </div>
                 </div>
-
-
             </div>
 
         </div>
@@ -489,7 +481,23 @@
         function toggleSection(id) {
             const el = document.getElementById(id);
             if (!el) return;
-            el.classList.toggle('hidden');
+            
+            const isHidden = el.style.display === 'none' || el.classList.contains('hidden');
+            
+            if (isHidden) {
+                el.classList.remove('hidden');
+                el.style.display = 'block';
+            } else {
+                el.classList.add('hidden');
+                el.style.display = 'none';
+            }
+            
+            // Actualizar el texto del botón
+            const baseId = id.replace('sec-', '');
+            const toggleText = document.querySelector(`.toggle-text-${baseId}`);
+            if (toggleText) {
+                toggleText.textContent = isHidden ? 'Ocultar' : 'Mostrar';
+            }
         }
     </script>
 
