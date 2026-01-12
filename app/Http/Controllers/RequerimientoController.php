@@ -425,7 +425,7 @@ class RequerimientoController extends Controller
         ];
 
         $query->orderBy('created_at', 'desc');
-        $query->with('estadoRequerimiento');
+        $query->with('estadoRequerimiento')->withCount('postulantes');
         $requerimientos = $query->paginate(15)->withQueryString();
 
 

@@ -82,7 +82,7 @@
                                 </label>
                                 <input type="date" id="fecha_postula" name="fecha_postula" readonly
                                     value="{{ date('Y-m-d') }}"
-                                    class="form-input w-full px-4 py-3 border border-gray-300 bg-gray-100 text-gray-800 rounded-lg focus:outline-none cursor-not-allowed">
+                                     class="w-full px-4 py-3 rounded-lg bg-gray-200 border border-gray-400 text-gray-700 shadow-inner cursor-not-allowed appearance-none focus:outline-none focus:ring-0">
                                 <span class="error-message text-red-500 text-sm hidden"></span>
                             </div>
                             <!-- DNI -->

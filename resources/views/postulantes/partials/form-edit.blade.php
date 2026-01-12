@@ -1,23 +1,26 @@
 @php
-    $pad = fn($val, $len) => str_pad(preg_replace('/\D+/', '', (string) $val), $len, '0', STR_PAD_LEFT);
+$pad = fn($val, $len) => str_pad(preg_replace('/\D+/', '', (string) $val), $len, '0', STR_PAD_LEFT);
 
-    $fechaP = old(
-        'fecha_postula',
-        optional(\Illuminate\Support\Carbon::parse($postulante->fecha_postula))->format('Y-m-d'),
-    );
-    $fechaN = old(
-        'fecha_nacimiento',
-        optional(\Illuminate\Support\Carbon::parse($postulante->fecha_nacimiento))->format('Y-m-d'),
-    );
+$fechaP = old(
+'fecha_postula',
+optional(\Illuminate\Support\Carbon::parse($postulante->fecha_postula))->format('Y-m-d'),
+);
+$fechaN = old(
+'fecha_nacimiento',
+optional(\Illuminate\Support\Carbon::parse($postulante->fecha_nacimiento))->format('Y-m-d'),
+);
 
-    $depCod = $pad(old('departamento', $postulante->departamento), 2);
-    $provCod = $pad(old('provincia', $postulante->provincia), 4);
-    $distCod = $pad(old('distrito', $postulante->distrito), 6);
-    $cargoCod = $pad(old('cargo', $postulante->cargo), 4);
+$depCod = $pad(old('departamento', $postulante->departamento), 2);
+$provCod = $pad(old('provincia', $postulante->provincia), 4);
+$distCod = $pad(old('distrito', $postulante->distrito), 6);
+$cargoCod = $pad(old('cargo', $postulante->cargo), 4);
 
-    $tipoPersonalCodigo = $pad($postulante->tipo_personal_codigo ?? $postulante->tipo_cargo, 2);
-    $tipoCargoSeleccionado = $pad(old('tipo_cargo', $tipoPersonalCodigo ?? $postulante->tipo_cargo), 2);
-    $esOperativo = $tipoCargoSeleccionado === '02';
+$tipoCargoSeleccionado = $pad($postulante->tipo_cargo, 2);
+$cargoCod              = $pad($postulante->cargo, 4);
+
+$tipoPersonalCodigo    = $pad($postulante->tipo_personal_codigo, 2);
+$esOperativo           = in_array($tipoPersonalCodigo, ['01','03'], true); // operativos 4º y 5º
+
 @endphp
 
 <div class="relative p-6 bg-white rounded-lg">
@@ -44,7 +47,7 @@
                         <i class="fas fa-id-card text-blue-600"></i> DNI
                     </label>
                     <input type="text" name="dni" value="{{ $postulante->dni }}" readonly
-                        class="mt-1 block w-full bg-gray-100 text-gray-900 border border-gray-400 rounded-lg shadow-sm cursor-not-allowed">
+                        class="w-full px-4 py-3 rounded-lg !bg-gray-200 border !border-gray-400 !text-gray-700 shadow-inner cursor-not-allowed appearance-none focus:outline-none focus:ring-0">
                     <p class="text-xs text-gray-600 mt-1">No editable.</p>
                 </div>
 
@@ -55,7 +58,7 @@
                     </label>
                     <input type="date" id="fecha_postula_edit" name="fecha_postula" value="{{ $fechaP }}" required
                         readonly
-                        class="mt-1 block w-full bg-gray-100 text-gray-900 border border-gray-400 rounded-lg shadow-sm cursor-not-allowed">
+                        class="w-full px-4 py-3 rounded-lg !bg-gray-200 border !border-gray-400 !text-gray-700 shadow-inner cursor-not-allowed appearance-none focus:outline-none focus:ring-0">
                     <p class="text-xs text-gray-600 mt-1">No editable.</p>
                 </div>
 
@@ -67,7 +70,7 @@
                         value="{{ old('nombres', $postulante->nombres) }}" required
                         class="mt-1 block w-full border border-gray-400 text-gray-900 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
                     @error('nombres')
-                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
@@ -79,7 +82,7 @@
                         value="{{ old('apellidos', $postulante->apellidos) }}" required
                         class="mt-1 block w-full border border-gray-400 text-gray-900 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
                     @error('apellidos')
-                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
@@ -91,7 +94,7 @@
                     <input type="date" id="fecha_nacimiento_edit" name="fecha_nacimiento" value="{{ $fechaN }}"
                         class="mt-1 block w-full border border-gray-400 text-gray-900 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
                     @error('fecha_nacimiento')
-                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
@@ -102,7 +105,7 @@
                     <input type="number" id="edad_edit" name="edad" value="{{ old('edad', $postulante->edad) }}"
                         class="mt-1 block w-full border border-gray-400 text-gray-900 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
                     @error('edad')
-                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
@@ -115,12 +118,13 @@
                         class="mt-1 block w-full border border-gray-400 text-gray-900 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
                         data-value="{{ old('nacionalidad', $postulante->nacionalidad) }}">
                         @foreach (['PERUANA', 'EXTRANJERA'] as $nat)
-                            <option value="{{ $nat }}" @selected(old('nacionalidad', $postulante->nacionalidad) === $nat)>
-                                {{ ucfirst(strtolower($nat)) }}</option>
+                        <option value="{{ $nat }}" @selected(old('nacionalidad', $postulante->nacionalidad) === $nat)>
+                            {{ ucfirst(strtolower($nat)) }}
+                        </option>
                         @endforeach
                     </select>
                     @error('nacionalidad')
-                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
             </div>
@@ -133,64 +137,77 @@
             </h3>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
                 <div>
                     <label for="departamento_edit"
                         class="block text-sm font-semibold text-gray-900 flex items-center gap-2">
                         <i class="fas fa-city text-blue-600"></i> Departamento
                     </label>
                     <select id="departamento_edit" disabled
-                        class="mt-1 block w-full bg-gray-100 border border-gray-400 text-gray-900 rounded-lg shadow-sm cursor-not-allowed"
+                        class="w-full px-4 py-3 rounded-lg !bg-gray-300 !border-gray-400 !text-gray-700 shadow-inner cursor-not-allowed appearance-none disabled:opacity-100 focus:outline-none focus:ring-0">
                         data-value="{{ $depCod }}">
                         <option value="">Selecciona...</option>
                         @foreach ($departamentos as $codigo => $desc)
-                            @php $codigo = str_pad($codigo,2,'0',STR_PAD_LEFT); @endphp
-                            <option value="{{ $codigo }}" @selected($depCod === $codigo)>{{ $desc }}</option>
+                        @php $codigo = str_pad($codigo,2,'0',STR_PAD_LEFT); @endphp
+                        <option value="{{ $codigo }}" @selected($depCod===$codigo)>{{ $desc }}</option>
                         @endforeach
                     </select>
                     <input type="hidden" name="departamento" value="{{ $depCod }}">
                     <p class="text-xs text-gray-600 mt-1">No editable.</p>
                     @error('departamento')
-                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
+
+                @php
+                $provList = $provincias->filter(fn($p) => $pad($p->DEPA_CODIGO ?? null, 2) === $depCod);
+                @endphp
 
                 <div>
                     <label for="provincia_edit" class="block text-sm font-semibold text-gray-900 flex items-center gap-2">
                         <i class="fas fa-map-marker-alt text-blue-600"></i> Provincia
                     </label>
                     <select id="provincia_edit" disabled
-                        class="mt-1 block w-full bg-gray-100 border border-gray-400 text-gray-900 rounded-lg shadow-sm cursor-not-allowed"
+                         class="w-full px-4 py-3 rounded-lg !bg-gray-300 !border-gray-400 !text-gray-700 shadow-inner cursor-not-allowed appearance-none disabled:opacity-100 focus:outline-none focus:ring-0">
                         data-value="{{ $provCod }}">
                         <option value="">Selecciona...</option>
-                        @foreach ($provincias->where('DEPA_CODIGO', $depCod) as $codigo => $prov)
-                            <option value="{{ $codigo }}" @selected($provCod === $codigo)>
-                                {{ $prov->PROVI_DESCRIPCION }}</option>
+                        @foreach ($provList as $prov)
+                        @php $provKey = $pad($prov->PROVI_CODIGO ?? null, 4); @endphp
+                        <option value="{{ $provKey }}" @selected($provCod===$provKey)>
+                            {{ $prov->PROVI_DESCRIPCION }}
+                        </option>
                         @endforeach
                     </select>
                     <input type="hidden" name="provincia" value="{{ $provCod }}">
                     <p class="text-xs text-gray-600 mt-1">No editable.</p>
                     @error('provincia')
-                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
+
+                @php
+                $distList = $distritos->filter(fn($d) => $pad($d->PROVI_CODIGO ?? null, 4) === $provCod);
+                @endphp
 
                 <div>
                     <label for="distrito_edit" class="block text-sm font-semibold text-gray-900 flex items-center gap-2">
                         <i class="fas fa-map-pin text-blue-600"></i> Distrito
                     </label>
                     <select id="distrito_edit" disabled
-                        class="mt-1 block w-full bg-gray-100 border border-gray-400 text-gray-900 rounded-lg shadow-sm cursor-not-allowed"
+                         class="w-full px-4 py-3 rounded-lg !bg-gray-300 !border-gray-400 !text-gray-700 shadow-inner cursor-not-allowed appearance-none disabled:opacity-100 focus:outline-none focus:ring-0">
                         data-value="{{ $distCod }}">
                         <option value="">Selecciona...</option>
-                        @foreach ($distritos->where('PROVI_CODIGO', $provCod) as $codigo => $dist)
-                            <option value="{{ $codigo }}" @selected($distCod === $codigo)>
-                                {{ $dist->DIST_DESCRIPCION }}</option>
+                        @foreach ($distList as $dist)
+                        @php $distKey = $pad($dist->DIST_CODIGO, 6); @endphp
+                        <option value="{{ $distKey }}" @selected($distCod===$distKey)>
+                            {{ $dist->DIST_DESCRIPCION }}
+                        </option>
                         @endforeach
                     </select>
                     <input type="hidden" name="distrito" value="{{ $distCod }}">
                     <p class="text-xs text-gray-600 mt-1">No editable.</p>
                     @error('distrito')
-                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
@@ -202,9 +219,10 @@
                         value="{{ old('celular', $postulante->celular) }}" pattern="[0-9]{9}" required
                         class="mt-1 block w-full border border-gray-400 text-gray-900 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
                     @error('celular')
-                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
+
             </div>
         </div>
 
@@ -220,40 +238,44 @@
                         class="block text-sm font-semibold text-gray-900 flex items-center gap-2">
                         <i class="fas fa-briefcase text-blue-600"></i> Tipo de cargo
                     </label>
-                    <select id="tipo_cargo_edit" name="tipo_cargo" required
-                        class="mt-1 block w-full border border-gray-400 text-gray-900 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                        data-value="{{ $tipoCargoSeleccionado }}">
+
+                    <select id="tipo_cargo_edit" disabled
+                        class="w-full px-4 py-3 rounded-lg !bg-gray-300 !border-gray-400 !text-gray-700 shadow-inner cursor-not-allowed appearance-none disabled:opacity-100 focus:outline-none focus:ring-0">
                         <option value="">Selecciona...</option>
                         @foreach ($tipoCargos as $codigo => $desc)
-                            @php $codigoPad = str_pad($codigo, 2, '0', STR_PAD_LEFT); @endphp
-                            <option value="{{ $codigoPad }}" @selected($tipoCargoSeleccionado === $codigoPad)>
-                                {{ $desc }}
-                            </option>
+                        @php $codigoPad = str_pad($codigo, 2, '0', STR_PAD_LEFT); @endphp
+                        <option value="{{ $codigoPad }}" @selected($tipoCargoSeleccionado===$codigoPad)>
+                            {{ $desc }}
+                        </option>
                         @endforeach
                     </select>
-                    @error('tipo_cargo')
-                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                    @enderror
+
+                    {{-- ESTE ES EL QUE SE ENVÍA --}}
+                    <input type="hidden" name="tipo_cargo" value="{{ $tipoCargoSeleccionado }}">
                 </div>
 
                 <div>
                     <label for="cargo_edit" class="block text-sm font-semibold text-gray-900 flex items-center gap-2">
                         <i class="fas fa-briefcase text-blue-600"></i> Cargo solicitado
                     </label>
-                    <select id="cargo_edit" name="cargo" data-value="{{ $cargoCod }}"
-                        class="mt-1 block w-full border border-gray-400 text-gray-900 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
+
+                    <select id="cargo_edit" disabled
+                        class="w-full px-4 py-3 rounded-lg !bg-gray-300 !border-gray-400 !text-gray-700 shadow-inner cursor-not-allowed appearance-none disabled:opacity-100 focus:outline-none focus:ring-0">
                         <option value="">Selecciona...</option>
                         @foreach ($cargos as $codigo => $desc)
-                            @php $codigoPad = $pad($codigo, 4); @endphp
-                            <option value="{{ $codigoPad }}" @selected((string) $codigoPad === (string) $cargoCod)>
-                                {{ $desc }}
-                            </option>
+                        @php $codigoPad = $pad($codigo, 4); @endphp
+                        <option value="{{ $codigoPad }}" @selected((string)$codigoPad===(string)$cargoCod)>
+                            {{ $desc }}
+                        </option>
                         @endforeach
                     </select>
-                    @error('cargo')
-                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                    @enderror
+
+                    {{-- ESTE ES EL QUE SE ENVÍA --}}
+                    <input type="hidden" name="cargo" value="{{ $cargoCod }}">
                 </div>
+
+
+
             </div>
         </div>
 
@@ -264,27 +286,24 @@
             </h3>
 
             @php
-                $opExp = ['Sin experiencia', 'Menos de 1 año', 'Entre 1 y 2 años', 'Entre 3 y 4 años', 'Mas de 4 años'];
-                $opGrado = [
-                    '5to Grado de Secundaria',
-                    'Egresado de la FFAA/FFPP',
-                    'Carrera Tecnica',
-                    'Carrera Universitaria',
-                ];
-                $opArma = ['NO', 'L1', 'L2', 'L3', 'L4', 'L5', 'L6'];
-                $opConducir = [
-                    'NO',
-                    'A-I',
-                    'A-IIa',
-                    'A-IIb',
-                    'A-IIIa',
-                    'A-IIIb',
-                    'A-IIc',
-                    'B-I',
-                    'B-IIa',
-                    'B-IIb',
-                    'B-IIc',
-                ];
+            $opExp = ['Sin experiencia', 'Menos de 1 año', 'Entre 1 y 2 años', 'Entre 3 y 4 años', 'Más de 4 años'];
+
+            $opGrado = ['Universitaria','Carrera Técnica','Egresado de la FFAA/FFPP','5° Grado de Secundaria'];
+
+            $opArma = ['NO', 'L1', 'L2', 'L3', 'L4', 'L5', 'L6'];
+            $opConducir = [
+            'NO',
+            'A-I',
+            'A-IIa',
+            'A-IIb',
+            'A-IIIa',
+            'A-IIIb',
+            'A-IIc',
+            'B-I',
+            'B-IIa',
+            'B-IIb',
+            'B-IIc',
+            ];
             @endphp
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -298,12 +317,12 @@
                         data-value="{{ old('experiencia_rubro', $postulante->experiencia_rubro) }}">
                         <option value="">Selecciona tu experiencia</option>
                         @foreach ($opExp as $opt)
-                            <option value="{{ $opt }}" @selected(old('experiencia_rubro', $postulante->experiencia_rubro) === $opt)>{{ $opt }}
-                            </option>
+                        <option value="{{ $opt }}" @selected(old('experiencia_rubro', $postulante->experiencia_rubro) === $opt)>{{ $opt }}
+                        </option>
                         @endforeach
                     </select>
                     @error('experiencia_rubro')
-                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
@@ -317,12 +336,12 @@
                         data-value="{{ old('grado_instruccion', $postulante->grado_instruccion) }}">
                         <option value="">Selecciona el grado</option>
                         @foreach ($opGrado as $opt)
-                            <option value="{{ $opt }}" @selected(old('grado_instruccion', $postulante->grado_instruccion) === $opt)>{{ $opt }}
-                            </option>
+                        <option value="{{ $opt }}" @selected(old('grado_instruccion', $postulante->grado_instruccion) === $opt)>{{ $opt }}
+                        </option>
                         @endforeach
                     </select>
                     @error('grado_instruccion')
-                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
             </div>
@@ -341,13 +360,13 @@
                             class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
                             data-value="{{ old('sucamec', $postulante->sucamec) }}">
                             @foreach (['Si', 'No'] as $option)
-                                <option value="{{ $option }}" @selected(old('sucamec', $postulante->sucamec) == $option)>
-                                    {{ $option }}
-                                </option>
+                            <option value="{{ $option }}" @selected(old('sucamec', $postulante->sucamec) == $option)>
+                                {{ $option }}
+                            </option>
                             @endforeach
                         </select>
                         @error('sucamec')
-                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
 
@@ -359,13 +378,13 @@
                             class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
                             data-value="{{ old('carne_sucamec', $postulante->carne_sucamec) }}">
                             @foreach (['Si', 'No'] as $option)
-                                <option value="{{ $option }}" @selected(old('carne_sucamec', $postulante->carne_sucamec) == $option)>
-                                    {{ $option }}
-                                </option>
+                            <option value="{{ $option }}" @selected(old('carne_sucamec', $postulante->carne_sucamec) == $option)>
+                                {{ $option }}
+                            </option>
                             @endforeach
                         </select>
                         @error('carne_sucamec')
-                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
 
@@ -378,12 +397,12 @@
                             data-value="{{ old('licencia_arma', $postulante->licencia_arma) }}">
                             <option value="">Seleccione...</option>
                             @foreach ($opArma as $opt)
-                                <option value="{{ $opt }}" @selected(old('licencia_arma', $postulante->licencia_arma) === $opt)>{{ $opt }}
-                                </option>
+                            <option value="{{ $opt }}" @selected(old('licencia_arma', $postulante->licencia_arma) === $opt)>{{ $opt }}
+                            </option>
                             @endforeach
                         </select>
                         @error('licencia_arma')
-                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
 
@@ -396,12 +415,12 @@
                             data-value="{{ old('licencia_conducir', $postulante->licencia_conducir) }}">
                             <option value="">Seleccione...</option>
                             @foreach ($opConducir as $opt)
-                                <option value="{{ $opt }}" @selected(old('licencia_conducir', $postulante->licencia_conducir) === $opt)>{{ $opt }}
-                                </option>
+                            <option value="{{ $opt }}" @selected(old('licencia_conducir', $postulante->licencia_conducir) === $opt)>{{ $opt }}
+                            </option>
                             @endforeach
                         </select>
                         @error('licencia_conducir')
-                            <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
                 </div>

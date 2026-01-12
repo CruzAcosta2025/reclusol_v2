@@ -40,5 +40,11 @@ return [
         'key'            => env('PERUDEVS_KEY'),
     ],
 
+    'whatsapp' => [
+        'endpoint' => env('WHATSAPP_API_URL'),
+        'token'    => env('WHATSAPP_API_TOKEN'),
+        'from'     => env('WHATSAPP_FROM_NUMBER'),
+    ],
+
 
 ];

@@ -1079,8 +1079,8 @@ class PostulanteController extends Controller
             'nacionalidad'      => ['required', 'string', 'max:50'],
 
             // tipo + cargo (no editables, pero se envían en hidden)
-            'tipo_cargo'        => ['required', 'string', 'max:2'],
-            'cargo'             => ['required', 'exists:CARGOS,CODI_CARG'],
+            'tipo_cargo'        => ['nullable', 'string', 'max:2'],
+            'cargo'             => ['nullable', 'exists:CARGOS,CODI_CARG'],
 
             'fecha_postula'     => ['required', 'date'],
             'experiencia_rubro' => ['required', 'string', 'max:50'],

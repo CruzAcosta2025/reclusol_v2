@@ -56,7 +56,7 @@ $otrosCursosTexto = old('otros_cursos', $entrevista->otros_cursos ?? '');
                             {{ in_array('Otros cursos', $formacionSel, true) ? 'checked' : '' }}>
                         <span class="text-sm text-gray-800 mr-2">Otros cursos / especializaciones:</span>
                         <input type="text" name="otros_cursos"
-                            class="flex-1 text-sm border-0 bg-transparent focus:ring-0"
+                            class="flex-1 text-sm border-0 bg-transparent focus:ring-0 text-gray-900 font-semibold"
                             placeholder="Especifique"
                             value="{{ $otrosCursosTexto }}">
                     </div>
@@ -105,13 +105,13 @@ $otrosCursosTexto = old('otros_cursos', $entrevista->otros_cursos ?? '');
                 <div>
                     <h3 class="text-sm font-semibold text-gray-700 mb-2">Fortalezas del postulante</h3>
                     <textarea name="fortalezas" rows="4"
-                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-sky-500 focus:ring-0 bg-white/80 resize-none"
+                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-sky-500 focus:ring-0 bg-white/80 text-gray-900 font-semibold resize-none"
                         placeholder="Describa las principales fortalezas observadas...">{{ $fortalezasTexto }}</textarea>
                 </div>
                 <div>
                     <h3 class="text-sm font-semibold text-gray-700 mb-2">Oportunidades de mejora / Debilidades</h3>
                     <textarea name="oportunidades" rows="4"
-                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-sky-500 focus:ring-0 bg-white/80 resize-none"
+                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-sky-500 focus:ring-0 bg-white/80 text-gray-900 font-semibold resize-none"
                         placeholder="Describa las principales debilidades u oportunidades de mejora...">{{ $oportunidadesTexto }}</textarea>
                 </div>
             </div>

@@ -84,6 +84,11 @@ class Requerimiento extends Model
         return $this->belongsTo(EstadoRequerimiento::class, 'estado', 'id');
     }
 
+    public function postulantes()
+    {
+        return $this->hasMany(Postulante::class);
+    }
+
 
     public function getEstadoAttribute($value)
     {

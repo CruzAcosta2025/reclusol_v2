@@ -101,13 +101,13 @@ $oportunidadesTexto = old('oportunidades', $entrevista->oportunidades ?? '');
                 <div>
                     <h3 class="text-sm font-semibold text-gray-700 mb-2">Fortalezas del postulante</h3>
                     <textarea name="fortalezas" rows="4"
-                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-500 focus:ring-0 bg-white/80 resize-none"
+                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-500 focus:ring-0 bg-white/80 text-gray-900 font-semibold resize-none"
                         placeholder="Describa las principales fortalezas observadas...">{{ $fortalezasTexto }}</textarea>
                 </div>
                 <div>
                     <h3 class="text-sm font-semibold text-gray-700 mb-2">Oportunidades de mejora / Debilidades</h3>
                     <textarea name="oportunidades" rows="4"
-                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-500 focus:ring-0 bg-white/80 resize-none"
+                        class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-500 focus:ring-0 bg-white/80 text-gray-900 font-semibold resize-none"
                         placeholder="Describa las principales debilidades u oportunidades de mejora...">{{ $oportunidadesTexto }}</textarea>
                 </div>
             </div>

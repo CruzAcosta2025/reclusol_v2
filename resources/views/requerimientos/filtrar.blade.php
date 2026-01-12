@@ -344,7 +344,9 @@
                                         title="Editar">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button onclick="eliminarRequerimiento({{ $requerimiento->id }})"
+                                    <button onclick="eliminarRequerimiento({{ $requerimiento->id }}, this)"
+                                        data-estado-id="{{ (int) ($requerimiento->estadoRequerimiento?->id ?? $requerimiento->estado ?? 0) }}"
+                                        data-postulantes="{{ (int) ($requerimiento->postulantes_count ?? 0) }}"
                                         class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-50 hover:bg-red-100 text-red-600 transition"
                                         title="Eliminar">
                                         <i class="fas fa-trash"></i>
@@ -527,8 +529,20 @@
             modal.addEventListener('mousedown', onBackdropClick);
         }
 
-        function eliminarRequerimiento(id) {
-            openDeleteModal(id);
+        function eliminarRequerimiento(id, triggerEl = null) {
+            const estadoId = triggerEl?.dataset?.estadoId ? parseInt(triggerEl.dataset.estadoId, 10) : null;
+            const postulantes = triggerEl?.dataset?.postulantes ? parseInt(triggerEl.dataset.postulantes, 10) : 0;
+
+            if (estadoId === 2 && postulantes > 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'No se puede eliminar',
+                    text: 'Este requerimiento esta aprobado y tiene postulantes asignados.',
+                });
+                return;
+            }
+
+            openDeleteModal(id, triggerEl);
         }
 
         function closeDeleteModal() {

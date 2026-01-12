@@ -18,7 +18,7 @@ Route::get('/', function () {
 Route::get('/dashboard', [HomeController::class, 'index'])
   ->middleware(['auth', 'verified'])
   ->name('dashboard');
-  
+
 // Registro externo (publico)
 Route::get('/postulantes/registro', [PostulanteController::class, 'formExterno'])->name('postulantes.formExterno');
 Route::post('/postulantes/registro', [PostulanteController::class, 'storeExterno'])->name('postulantes.storeExterno');
@@ -87,10 +87,20 @@ Route::middleware('auth')->group(function () {
     Route::get('/entrevistas/evaluar/{postulante}', [EntrevistaController::class, 'evaluar'])->name('entrevistas.evaluar');
     Route::get('/entrevistas-virtuales/aptos', [EntrevistaController::class, 'aptos'])->name('entrevistas-virtuales.aptos');
     Route::post('/entrevistas/{postulante}/guardar', [EntrevistaController::class, 'guardarEvaluacion'])->name('entrevistas.guardar-evaluacion');
+    Route::post('/entrevistas/{postulante}/whatsapp', [EntrevistaController::class, 'enviarWhatsapp'])->name('entrevistas.whatsapp');
     Route::get('/entrevistas/{postulante}/archivo/{tipo}', [EntrevistaController::class, 'verArchivo'])->whereIn('tipo', ['cv', 'cul'])->name('entrevistas.ver-archivo');
     Route::get('/entrevistas/{postulante}/descargar/{tipo}', [EntrevistaController::class, 'descargarArchivo'])
       ->whereIn('tipo', ['cv', 'cul'])
       ->name('entrevistas.descargar-archivo');
+    // ✅ NUEVO: eliminar SOLO entrevistas en BORRADOR (por ID de entrevista)
+    Route::delete('/entrevistas/borrador/{entrevista}', [EntrevistaController::class, 'destroy'])
+      ->name('entrevistas.eliminar-borrador');
+
+    Route::post('/entrevistas/{postulante}/programar', [EntrevistaController::class, 'programar'])
+      ->name('entrevistas.programar');
+
+    Route::patch('/entrevistas/{postulante}/estado', [EntrevistaController::class, 'cambiarEstado'])
+      ->name('entrevistas.cambiar-estado');
   });
 
   // RUTAS PARA GESTIÓN DE USUARIOS

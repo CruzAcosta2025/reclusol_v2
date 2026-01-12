@@ -23,7 +23,7 @@
 </head>
 
 <body>
-    <iframe class="frame" src="{{ $streamUrl }}#view=FitH"></iframe>
+    <iframe class="frame" src="{{ $streamUrl }}#zoom=100"></iframe>
 </body>
 
 </html>
