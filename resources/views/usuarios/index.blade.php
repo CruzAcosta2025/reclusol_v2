@@ -264,35 +264,10 @@
             </div>
         </div>
 
-        {{-- Modal de Eliminación --}}
-        <div id="delete-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full mx-4 p-6">
-                <div class="text-center">
-                    <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-exclamation-triangle text-red-600 text-2xl"></i>
-                    </div>
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">¿Eliminar Usuario?</h3>
-                    <p class="text-sm text-gray-600 mb-6">Esta acción no se puede deshacer. El usuario será eliminado
-                        permanentemente.</p>
-                    <div class="flex space-x-3">
-                        <button onclick="closeDeleteModal()"
-                            class="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-xl transition-colors">
-                            Cancelar
-                        </button>
-                        <button onclick="confirmDelete()"
-                            class="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-colors">
-                            Eliminar
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
     <script>
         // Ruta para consultar DNI (RENIEC simple)
         window.ROUTE_DNI_SIMPLE = "{{ route('usuarios.dni.simple', ['dni' => 'DNI_PLACEHOLDER']) }}";
-
-        let deleteUserId = null;
 
         // ------ Filtros y tabla ------
         function limpiarFiltros() {
@@ -373,9 +348,19 @@
                         })
                         .then(data => {
                             if (data.success) {
-                                window.location.reload();
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Usuario creado',
+                                    text: data.message || 'El usuario se creó correctamente.',
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                }).then(() => window.location.reload());
                             } else {
-                                alert(data.message || 'Error al crear el usuario');
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: data.message || 'Error al crear el usuario'
+                                });
                             }
                         })
                         .catch(error => {
@@ -392,7 +377,11 @@
                                     }
                                 });
                             } else {
-                                alert('Error al crear el usuario');
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: 'Error al crear el usuario'
+                                });
                             }
                         });
                 });
@@ -526,9 +515,19 @@
                         })
                         .then(function(j) {
                             if (j.success) {
-                                window.location.reload();
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Usuario actualizado',
+                                    text: j.message || 'Los cambios se guardaron correctamente.',
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                }).then(() => window.location.reload());
                             } else {
-                                alert(j.message || 'Error al editar');
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: j.message || 'Error al editar'
+                                });
                             }
                         })
                         .catch(function(err) {
@@ -545,7 +544,11 @@
                                     }
                                 });
                             } else {
-                                alert('Error al editar el usuario');
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: 'Error al editar el usuario'
+                                });
                             }
                         });
                 });
@@ -608,56 +611,84 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        window.location.reload();
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'success',
+                            title: data.message || 'Estado actualizado',
+                            showConfirmButton: false,
+                            timer: 1400
+                        }).then(() => window.location.reload());
                     } else {
-                        alert(data.message || 'No se pudo cambiar el estado');
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.message || 'No se pudo cambiar el estado'
+                        });
                     }
-                })
-                .catch(() => {
-                    alert('Ocurrió un error');
                 });
         }
 
         // ------ ELIMINAR USUARIO ------
         function deleteUser(id) {
-            deleteUserId = id;
-            document.getElementById('delete-modal').classList.remove('hidden');
-        }
-
-        function closeDeleteModal() {
-            document.getElementById('delete-modal').classList.add('hidden');
-            deleteUserId = null;
-        }
-
-        function confirmDelete() {
-            if (!deleteUserId) return;
-
             const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-            fetch('/usuarios/' + deleteUserId, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': token,
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-                    },
-                    body: '_method=DELETE'
-                })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        window.location.reload();
-                    } else {
-                        alert(data.message || 'No se pudo eliminar el usuario');
-                    }
-                })
-                .catch(() => alert('Error al eliminar usuario'));
+            Swal.fire({
+                title: 'Eliminar usuario?',
+                text: 'Esta accion no se puede deshacer.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Si, eliminar',
+                cancelButtonText: 'Cancelar',
+            }).then((result) => {
+                if (!result.isConfirmed) return;
+
+                fetch('/usuarios/' + id, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': token,
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                        },
+                        body: '_method=DELETE'
+                    })
+                    .then((r) => {
+                        if (r.ok) return r.json();
+                        return r.json().then((err) => Promise.reject(err));
+                    })
+                    .then((data) => {
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Eliminado',
+                                text: data.message || 'Usuario eliminado correctamente.',
+                                timer: 1500,
+                                showConfirmButton: false
+                            }).then(() => window.location.reload());
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: data.message || 'No se pudo eliminar el usuario'
+                            });
+                        }
+                    })
+                    .catch(() => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Error al eliminar usuario'
+                        });
+                    });
+            });
         }
 
         // ------ Cerrar modales al hacer clic fuera ------
         document.addEventListener('click', function(event) {
-            const modals = ['create-modal', 'edit-modal', 'view-modal', 'delete-modal'];
+            const modals = ['create-modal', 'edit-modal', 'view-modal'];
             modals.forEach(function(modalId) {
                 const modal = document.getElementById(modalId);
                 if (modal && event.target === modal) {

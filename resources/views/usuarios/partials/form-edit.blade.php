@@ -88,19 +88,19 @@
             <div>
                 <label for="rol" class="block text-sm font-medium text-gray-700 mb-2">
                     <i class="fas fa-user-shield mr-1"></i>
-                    Rol *
+                    Rol
                 </label>
+
                 <select name="rol" id="rol" required
                     class="form-input w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-0 transition-colors bg-white text-gray-900">
                     <option value="">Seleccione el rol</option>
-                    <option value="ADMINISTRADOR" {{ old('rol', $rolActual) === 'ADMINISTRADOR' ? 'selected' : '' }}>
-                        Administrador
-                    </option>
-                    <option value="USUARIO OPERATIVO"
-                        {{ old('rol', $rolActual) === 'USUARIO OPERATIVO' ? 'selected' : '' }}>
-                        Usuario Operativo
-                    </option>
+                    @foreach ($roles as $role)
+                        <option value="{{ $role->name }}">{{ $role->name }}</option>
+                    @endforeach
                 </select>
+
+                {{-- IMPORTANTE: para que tu JS muestre el error debajo del select --}}
+                <div class="error-message text-red-500 text-sm mt-1 hidden"></div>
             </div>
 
             {{-- Contraseña (opcional) --}}

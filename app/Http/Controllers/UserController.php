@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
@@ -130,9 +131,10 @@ class UserController extends Controller
 
         $sucursales = Sucursal::forSelect();
         $cargos = Cargo::forSelect();
+        $roles = Role::orderBy('name')->get();
 
         // Pasa el personal y sucursales a la vista
-        return view('usuarios.create', compact('sucursales', 'cargos'));
+        return view('usuarios.create', compact('sucursales', 'cargos', 'roles'));
     }
 
     public function buscarDniSimple(string $dni)
@@ -426,10 +428,13 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
+
+        $roles = Role::orderBy('name')->get();
+
         if (request()->ajax()) {
-            return view('usuarios.partials.form-edit', compact('user'));
+            return view('usuarios.partials.form-edit', compact('user', 'roles'));
         }
-        return view('usuarios.form-edit', compact('user')); // página completa sólo si la navegas directa
+        return view('usuarios.form-edit', compact('user', 'roles')); // página completa sólo si la navegas directa
     }
 
 

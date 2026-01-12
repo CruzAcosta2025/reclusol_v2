@@ -23,6 +23,7 @@
     <!-- Alpine.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js" defer></script>
 
+    <!-- En la sección <head>, agrega: -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
