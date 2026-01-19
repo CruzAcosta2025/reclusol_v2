@@ -51,6 +51,7 @@
             'afiches' => 'Módulo: Afiches',
             'entrevistas' => 'Módulo: Entrevistas',
             'usuarios' => 'Módulo: Usuarios',
+            'notificaciones' => 'Módulo: Notificaciones',
         ];
         $pageTitle = $titles[$module] ?? $titles['dashboard'];
 
@@ -313,7 +314,7 @@
                                         </div>
 
                                         <div class="mt-3 pt-3 border-t border-gray-200">
-                                            <a href="#"
+                                            <a href="{{ route('notificaciones.index') }}"
                                                 class="text-sm text-indigo-600 hover:text-indigo-800 font-semibold">
                                                 Ver todas las notificaciones
                                             </a>

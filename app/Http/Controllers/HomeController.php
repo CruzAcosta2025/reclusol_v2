@@ -10,6 +10,8 @@ use App\Models\Departamento;
 use App\Models\Catalogo;
 use Carbon\Carbon;
 use App\Models\Requerimiento;
+use App\Models\Entrevista;
+use App\Models\Cargo;
 
 class HomeController extends Controller
 {
@@ -60,6 +62,87 @@ class HomeController extends Controller
             $sede->nombre_departamento = $departamentos->get($codigo, 'Sin nombre');
         }
 
+        /* ---------- Estado de postulantes ---------- */
+        $aptoBase = Postulante::query()
+            ->where(function ($q) {
+                $q->where('decision', 'apto')
+                    ->orWhere(function ($q2) {
+                        $q2->whereNull('decision')
+                            ->where('estado', 2);
+                    });
+            });
+
+        $aptoTotal = (clone $aptoBase)->count();
+        $enEntrevista = (clone $aptoBase)->whereHas('entrevistas')->count();
+        $aptoSinEntrevista = max($aptoTotal - $enEntrevista, 0);
+
+        $pendiente = Postulante::query()
+            ->whereNull('decision')
+            ->where(function ($q) {
+                $q->whereNull('estado')
+                    ->orWhereNotIn('estado', [2, 3]);
+            })
+            ->count();
+
+        $noApto = Postulante::query()
+            ->where(function ($q) {
+                $q->where('decision', 'no_apto')
+                    ->orWhere(function ($q2) {
+                        $q2->whereNull('decision')
+                            ->where('estado', 3);
+                    });
+            })
+            ->count();
+
+        $estadoPostulantes = [
+            'Apto' => $aptoSinEntrevista,
+            'Pendiente' => $pendiente,
+            'En entrevista' => $enEntrevista,
+            'No Apto' => $noApto,
+        ];
+
+        /* ---------- Proximas entrevistas ---------- */
+        $estadoEntrevistaNombre = DB::table('estado_entrevista')->pluck('nombre', 'id');
+        $cargos = Cargo::forSelect();
+
+        $proximasEntrevistas = Entrevista::with(['postulante', 'requerimiento'])
+            ->whereNotNull('fecha_entrevista')
+            ->whereDate('fecha_entrevista', '>=', $hoy)
+            ->orderBy('fecha_entrevista')
+            ->limit(6)
+            ->get()
+            ->map(function ($e) use ($estadoEntrevistaNombre, $cargos) {
+                $postulante = $e->postulante;
+                $nombre = trim(($postulante->nombres ?? '') . ' ' . ($postulante->apellidos ?? ''));
+
+                $codigoCargo = null;
+                if (!empty($postulante?->cargo)) {
+                    $codigoCargo = str_pad((string)$postulante->cargo, 4, '0', STR_PAD_LEFT);
+                } elseif (!empty($e->requerimiento?->cargo_solicitado)) {
+                    $codigoCargo = str_pad((string)$e->requerimiento->cargo_solicitado, 4, '0', STR_PAD_LEFT);
+                }
+
+                $cargoNombre = $codigoCargo ? ($cargos->get($codigoCargo) ?? $codigoCargo) : 'N/A';
+
+                $estadoNombre = $e->estado_entrevista_id
+                    ? ($estadoEntrevistaNombre[$e->estado_entrevista_id] ?? 'Programada')
+                    : 'Sin programar';
+
+                return [
+                    'fecha' => optional($e->fecha_entrevista)->format('Y-m-d'),
+                    'hora' => optional($e->fecha_entrevista)->format('H:i'),
+                    'postulante' => $nombre !== '' ? $nombre : 'Sin nombre',
+                    'cargo' => $cargoNombre,
+                    'estado' => $estadoNombre,
+                ];
+            })
+            ->values()
+            ->all();
+
+        $entrevistasHoy = Entrevista::query()
+            ->whereNotNull('fecha_entrevista')
+            ->whereDate('fecha_entrevista', $hoy)
+            ->count();
 
         /* ---------- Enviar a la vista ---------- */
         return view('dashboard', compact(
@@ -70,7 +153,10 @@ class HomeController extends Controller
             'porSede',
             'maxTotalSede',
             'requerimientos',
-            'notificaciones'
+            'notificaciones',
+            'estadoPostulantes',
+            'proximasEntrevistas',
+            'entrevistasHoy'
         ));
     }
 }

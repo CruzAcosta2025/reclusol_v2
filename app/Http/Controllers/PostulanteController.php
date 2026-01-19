@@ -22,6 +22,8 @@ use Illuminate\Support\Facades\Response;
 use App\Models\User;
 use Illuminate\Support\Str;
 use App\Notifications\PostulanteEnListaNegra;
+use Illuminate\Support\Facades\Http;
+use Carbon\Carbon;
 
 
 class PostulanteController extends Controller
@@ -182,6 +184,15 @@ class PostulanteController extends Controller
         ]);
 
         /* ================= VALIDACIÓN ================= */
+
+        /* ================= DNI (CONSULTA COMPLETA) ================= */
+        try {
+            $this->mergeDatosDniEnRequest($request);
+        } catch (\Throwable $e) {
+            return back()->withInput()->withErrors([
+                'dni' => $e->getMessage() ?: 'No se pudo consultar el DNI.'
+            ]);
+        }
 
         $validated = $request->validate([
             'fecha_postula'      => ['required', 'date'],
@@ -709,6 +720,15 @@ class PostulanteController extends Controller
         ]);
 
         /* ================= VALIDACIÓN ================= */
+
+        /* ================= DNI (CONSULTA COMPLETA) ================= */
+        try {
+            $this->mergeDatosDniEnRequest($request);
+        } catch (\Throwable $e) {
+            return back()->withInput()->withErrors([
+                'dni' => $e->getMessage() ?: 'No se pudo consultar el DNI.'
+            ]);
+        }
 
         $validated = $request->validate([
             'fecha_postula'      => ['required', 'date'],
@@ -1830,5 +1850,152 @@ class PostulanteController extends Controller
             'estado' => $postulante->estado,
         ]);
     }
-}
 
+    /**
+     * Consulta DNI (consulta completa) vía PERUDEVS y normaliza la respuesta.
+     * Se consume desde BACKEND para proteger el token.
+     */
+
+    private function perudevsDniComplete(string $dni): array
+    {
+        $dni = preg_replace('/\D/', '', $dni);
+
+        if (strlen($dni) !== 8) {
+            throw new \InvalidArgumentException('DNI inválido (8 dígitos).');
+        }
+
+        $url = config('services.perudevs.dni_complete_url'); // agrega esta config (te la dejo abajo)
+        $key = config('services.perudevs.key');
+
+        if (!$url || !$key) {
+            throw new \RuntimeException('Falta configurar services.perudevs.dni_complete_url o services.perudevs.key');
+        }
+
+        return Cache::remember("perudevs:dni:complete:$dni", now()->addHours(12), function () use ($dni, $url, $key) {
+
+            // ✅ IMPORTANTE: COMPLETE es GET (POST te da 405)
+            $resp = Http::timeout(12)->acceptJson()->get($url, [
+                'document' => $dni,   // igual que tu SIMPLE
+                'key'      => $key,   // igual que tu SIMPLE
+            ]);
+
+            if (!$resp->ok()) {
+                Log::warning('PERUDEVS COMPLETE HTTP fail', [
+                    'dni' => $dni,
+                    'status' => $resp->status(),
+                    'body' => mb_substr((string) $resp->body(), 0, 500),
+                ]);
+                throw new \RuntimeException('No se pudo consultar el DNI (complete).');
+            }
+
+            $j = $resp->json() ?? [];
+
+            // 🔎 Manejo parecido a tu SIMPLE (estado/resultado)
+            $estado = $j['estado'] ?? $j['success'] ?? null;
+            if ($estado === false) {
+                Log::warning('PERUDEVS COMPLETE estado=false', ['dni' => $dni, 'json' => $j]);
+                throw new \RuntimeException('DNI no encontrado (complete).');
+            }
+
+            $r = $j['resultado'] ?? $j['data'] ?? $j['result'] ?? [];
+
+            $nombres = $r['nombres'] ?? $r['name'] ?? '';
+            $apellidos = $r['apellidos']
+                ?? trim(($r['apellido_paterno'] ?? '') . ' ' . ($r['apellido_materno'] ?? ''));
+
+            $fechaRaw = $r['fecha_nacimiento'] ?? $r['fechaNacimiento'] ?? $r['fec_nacimiento'] ?? $r['fecha_nac'] ?? null;
+
+            // Normaliza fecha a Y-m-d si viene
+            $fecha = null;
+            if ($fechaRaw) {
+                try {
+                    $fecha = Carbon::parse($fechaRaw)->format('Y-m-d');
+                } catch (\Throwable $e) {
+                    try {
+                        $fecha = Carbon::createFromFormat('d/m/Y', (string)$fechaRaw)->format('Y-m-d');
+                    } catch (\Throwable $e2) {
+                        $fecha = null;
+                    }
+                }
+            }
+
+            if (!$nombres || !$apellidos) {
+                Log::warning('PERUDEVS COMPLETE sin nombres/apellidos', ['dni' => $dni, 'json' => $j]);
+                throw new \RuntimeException('La API no devolvió nombres/apellidos en complete.');
+            }
+
+            // Si tú EXIGES fecha nacimiento sí o sí, deja esto así:
+            if (!$fecha) {
+                Log::warning('PERUDEVS COMPLETE sin fecha_nacimiento', ['dni' => $dni, 'json' => $j]);
+                throw new \RuntimeException('La API no devolvió fecha de nacimiento en complete.');
+            }
+
+            $edad = Carbon::parse($fecha)->age;
+
+            return [
+                'dni'              => $dni,
+                'nombres'          => strtoupper(trim($nombres)),
+                'apellidos'        => strtoupper(trim($apellidos)),
+                'fecha_nacimiento' => $fecha,
+                'edad'             => $edad,
+                'raw'              => $j, // si quieres debug, luego lo quitas
+            ];
+        });
+    }
+
+
+    /**
+     * Endpoint para autocompletar DNI (lo consume el formulario).
+     */
+    public function apiDniComplete($dni)
+    {
+        $dni = preg_replace('/\D+/', '', (string) $dni);
+
+        if (strlen($dni) !== 8) {
+            return response()->json(['ok' => false, 'message' => 'DNI inválido.'], 422);
+        }
+
+        try {
+            $data = $this->perudevsDniComplete($dni);
+
+            return response()->json([
+                'ok'               => true,
+                'dni'              => $data['dni'],
+                'nombres'          => $data['nombres'],
+                'apellidos'        => $data['apellidos'],
+                'fecha_nacimiento' => $data['fecha_nacimiento'],
+                'edad'             => $data['edad'],
+            ]);
+        } catch (\Throwable $e) {
+            Log::warning('PERUDEVS DNI COMPLETE - fallo', ['dni' => $dni, 'err' => $e->getMessage()]);
+
+            return response()->json([
+                'ok'      => false,
+                'message' => 'No se pudo consultar el DNI.',
+            ], 404);
+        }
+    }
+
+    /**
+     * Mete nombres/apellidos/fecha/edad al Request ANTES de validar.
+     * Así aunque el input esté disabled, pasa igual.
+     */
+    private function mergeDatosDniEnRequest(Request $request): void
+    {
+        $dni = preg_replace('/\D+/', '', (string) $request->input('dni'));
+
+        if (strlen($dni) !== 8) {
+            return; // deja que la validación normal lo maneje
+        }
+
+        $data = $this->perudevsDniComplete($dni);
+
+        $request->merge([
+            'dni'              => $data['dni'],
+            'nombres'          => $data['nombres'],
+            'apellidos'        => $data['apellidos'],
+            'fecha_nacimiento' => $data['fecha_nacimiento'],
+            'edad'             => $data['edad'],
+        ]);
+    }
+}

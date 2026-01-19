@@ -1,5 +1,11 @@
 @php
     use Illuminate\Support\Str;
+
+    // Solo mostrar requerimientos con estado "Aprobado" (id = 2 segÇ§n la tabla estado_requerimiento)
+    $requerimientosAprobados = $requerimientos->filter(function ($req) {
+        $estadoId = is_object($req->estado) ? ($req->estado->id ?? null) : $req->estado;
+        return (string) $estadoId === '2';
+    });
 @endphp
 
 @extends('layouts.app')
@@ -54,7 +60,7 @@
                             <h3 class="text-xl font-bold text-gray-800">Requerimientos Activos</h3>
                         </div>
                         <div class="space-y-3 max-h-80 overflow-y-auto">
-                            @foreach ($requerimientos->where('estado', 'aprobado')->where('estado_requerimiento_id', '!=', null) as $req)
+                            @forelse ($requerimientosAprobados as $req)
                                 @php
                                     $color = match (strtolower($req->urgencia)) {
                                         'alta' => 'bg-red-600 text-white',
@@ -85,14 +91,16 @@
                                             Límite: {{ \Carbon\Carbon::parse($req->fecha_limite)->format('Y/m/d') }}
                                         </span>
                                     </div>
-                                </div>
-                            @endforeach
-                        </div>
+                                  </div>
+                              @empty
+                                  <p class="text-sm text-gray-500">No hay requerimientos aprobados para mostrar.</p>
+                              @endforelse
+                          </div>
                     </div>
 
                     {{-- JS DATA --}}
                     @php
-                        $jsRequerimientos = $requerimientos
+                        $jsRequerimientos = $requerimientosAprobados
                             ->mapWithKeys(function ($req) {
                                 $badgeColor = match (strtolower($req->urgencia)) {
                                     'alta' => 'bg-red-700 text-red-700',
@@ -143,12 +151,7 @@
                             <button
                                 class="option-tab px-4 py-2 font-semibold text-gray-700 border-b-2 border-transparent focus:outline-none"
                                 onclick="showTab('tab-iconCheck', this)">Ícono Check</button>
-                            <button
-                                class="option-tab px-4 py-2 font-semibold text-gray-700 border-b-2 border-transparent focus:outline-none"
-                                onclick="showTab('tab-iconPhone', this)">Ícono Celular</button>
-                            <button
-                                class="option-tab px-4 py-2 font-semibold text-gray-700 border-b-2 border-transparent focus:outline-none"
-                                onclick="showTab('tab-iconEmail', this)">Ícono Email</button>
+
                             <button
                                 class="option-tab px-4 py-2 font-semibold text-gray-700 border-b-2 border-transparent focus:outline-none"
                                 onclick="showTab('tab-font', this)">Fuente</button>
@@ -499,7 +502,7 @@
             }
 
             mensaje += `
-📩 ¡Postula ahora! Ingresa a link, envíanos tu CV a 📧 informes@gruposolmar.com.pe o contáctanos al 📞 946 343 555.
+ Contáctanos al 📞 946 343 555.
 
 👉 ¡No dejes pasar esta oportunidad de ser parte de nuestro equipo!
 
@@ -532,7 +535,11 @@
             if (selectedFont) url += `&font=${encodeURIComponent(selectedFont)}`;
 
             posterImage.classList.remove('hidden');
-            posterImage.onerror = () => posterImage.src = '/assets/plantillas/placeholder.png';
+            posterImage.onerror = () => {
+                posterImage.onerror = null;
+                posterImage.classList.add('hidden');
+                posterImage.removeAttribute('src');
+            };
             posterImage.src = url;
         }
 

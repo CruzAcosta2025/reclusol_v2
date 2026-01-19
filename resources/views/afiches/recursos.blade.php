@@ -69,10 +69,7 @@
                                         (personaje)</option>
                                     <option value="iconCheck" {{ old('tipo') === 'iconCheck' ? 'selected' : '' }}>Ícono de
                                         check (requisitos)</option>
-                                    <option value="iconPhone" {{ old('tipo') === 'iconPhone' ? 'selected' : '' }}>Ícono de
-                                        teléfono</option>
-                                    <option value="iconEmail" {{ old('tipo') === 'iconEmail' ? 'selected' : '' }}>Ícono de
-                                        email</option>
+                                    
                                     <option value="font" {{ old('tipo') === 'font' ? 'selected' : '' }}>Fuente (TTF/OTF)
                                     </option>
                                 </select>
@@ -97,7 +94,6 @@
                     </div>
                 </div>
 
-                {{-- COL 2â€“3: LISTAS CON TOGGLES --}}
                 {{-- COL 2â€“3: LISTAS --}}
                 <div class="md:col-span-2 space-y-6">
                     {{-- Plantillas --}}
@@ -220,82 +216,6 @@
                         </div>
                     </div>
 
-                    {{-- Ãconos de telÃ©fono --}}
-                    <div class="bg-white rounded-2xl shadow-lg p-6 card-hover">
-                        <div class="flex items-center justify-between">
-                            <h2 class="text-lg font-semibold text-gray-800">Íconos de teléfono</h2>
-                            <button type="button" class="text-sm text-blue-600 hover:text-blue-800 transition"
-                                onclick="toggleSection('sec-iconPhone')">
-                                <span class="toggle-text-iconPhone">Mostrar</span>
-                            </button>
-                        </div>
-
-                        <div id="sec-iconPhone" class="mt-4 hidden" style="display: none;">
-                            <div class="grid grid-cols-3 lg:grid-cols-6 gap-4">
-                                @forelse($iconosPhone ?? [] as $icon)
-                                    <div
-                                        class="border border-gray-200 rounded-lg p-2 flex flex-col items-center bg-gray-50">
-                                        <img src="{{ asset($icon->path) }}" alt="{{ $icon->name }}"
-                                            class="w-full h-12 object-contain mb-2">
-
-                                        <form action="{{ route('afiches.assets.delete') }}" method="POST"
-                                            onsubmit="return confirmarEliminar(this, '{{ $icon->name }}');">
-                                            @csrf
-                                            <input type="hidden" name="tipo" value="iconPhone">
-                                            <input type="hidden" name="filename" value="{{ $icon->filename }}">
-                                            <button type="submit"
-                                                class="text-[11px] bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded transition">
-                                                Eliminar
-                                            </button>
-                                        </form>
-                                    </div>
-                                @empty
-                                    <p class="text-sm text-gray-500 col-span-full">
-                                        No hay íconos de teléfono cargados.
-                                    </p>
-                                @endforelse
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Ãconos de email --}}
-                    <div class="bg-white rounded-2xl shadow-lg p-6 card-hover">
-                        <div class="flex items-center justify-between">
-                            <h2 class="text-lg font-semibold text-gray-800">Íconos de email</h2>
-                            <button type="button" class="text-sm text-blue-600 hover:text-blue-800 transition"
-                                onclick="toggleSection('sec-iconEmail')">
-                                <span class="toggle-text-iconEmail">Mostrar</span>
-                            </button>
-                        </div>
-
-                        <div id="sec-iconEmail" class="mt-4 hidden" style="display: none;">
-                            <div class="grid grid-cols-3 lg:grid-cols-6 gap-4">
-                                @forelse($iconosEmail ?? [] as $icon)
-                                    <div
-                                        class="border border-gray-200 rounded-lg p-2 flex flex-col items-center bg-gray-50">
-                                        <img src="{{ asset($icon->path) }}" alt="{{ $icon->name }}"
-                                            class="w-full h-12 object-contain mb-2">
-
-                                        <form action="{{ route('afiches.assets.delete') }}" method="POST"
-                                            onsubmit="return confirmarEliminar(this, '{{ $icon->name }}');">
-                                            @csrf
-                                            <input type="hidden" name="tipo" value="iconEmail">
-                                            <input type="hidden" name="filename" value="{{ $icon->filename }}">
-                                            <button type="submit"
-                                                class="text-[11px] bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded transition">
-                                                Eliminar
-                                            </button>
-                                        </form>
-                                    </div>
-                                @empty
-                                    <p class="text-sm text-gray-500 col-span-full">
-                                        No hay Iconos de email cargados.
-                                    </p>
-                                @endforelse
-                            </div>
-                        </div>
-                    </div>
-
                     {{-- Fuentes --}}
                     <div class="bg-white rounded-2xl shadow-lg p-6 card-hover">
                         <div class="flex items-center justify-between">
@@ -402,11 +322,11 @@
                     Swal.fire({
                         icon: 'error',
                         title: 'Formato de archivo no válido',
-                        html: <div class="text-left">
-                            <p class="mb-3"><strong>Archivo:</strong> </p>
-                            <p class="mb-3"><strong>Formato recibido:</strong> .</p>
-                            <p><strong>Formatos permitidos:</strong> </p>
-                        </div>,
+                        html: `<div class="text-left">
+                                <p class="mb-3"><strong>Archivo:</strong> ${archivo?.name || 'N/D'}</p>
+                                <p class="mb-3"><strong>Formato recibido:</strong> .${extension}</p>
+                                <p><strong>Formatos permitidos:</strong> ${tiposPermitidos.map(ext => '.' + ext).join(', ')}</p>
+                            </div>`,
                         confirmButtonColor: '#ef4444',
                     });
                     return false;
@@ -425,10 +345,10 @@
                 Swal.fire({
                     icon: 'question',
                     title: '¿Confirmar carga?',
-                    html: <div class="text-left space-y-2">
-                            <p><strong>Tipo:</strong> </p>
-                            <p><strong>Archivo:</strong> </p>
-                        </div>,
+                    html: `<div class="text-left space-y-2">
+                            <p><strong>Tipo:</strong> ${tipoLabel}</p>
+                            <p><strong>Archivo:</strong> ${archivo?.name || 'N/D'}</p>
+                        </div>`,
                     showCancelButton: true,
                     confirmButtonColor: '#3b82f6',
                     cancelButtonColor: '#6b7280',
@@ -459,10 +379,10 @@
 
             Swal.fire({
                 title: '¿Eliminar recurso?',
-                html: <div class="text-left space-y-2">
-                        <p><strong>Tipo:</strong> </p>
-                        <p><strong>Nombre:</strong> </p>
-                    </div>,
+                html: `<div class="text-left space-y-2">
+                        <p><strong>Tipo:</strong> ${tipoLabel}</p>
+                        <p><strong>Nombre:</strong> ${nombre}</p>
+                    </div>`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#e11d48',
@@ -520,4 +440,3 @@
         }
     </style>
 @endsection
-

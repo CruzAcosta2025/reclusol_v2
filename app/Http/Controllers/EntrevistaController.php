@@ -22,6 +22,9 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use App\Notifications\Entrevistas\EntrevistaProgramada;
+use App\Notifications\Entrevistas\EntrevistaEvaluada;
+use App\Notifications\Entrevistas\EntrevistaEstadoActualizado;
 
 
 class EntrevistaController extends Controller
@@ -365,13 +368,14 @@ class EntrevistaController extends Controller
 
         $entrevista->save();
 
-
         if ($esBorrador) {
             return response()->json([
                 'success'       => true,
                 'entrevista_id' => $entrevista->id,
             ]);
         }
+
+        Auth::user()?->notify(new EntrevistaEvaluada($postulante, $entrevista));
 
         return redirect()
             ->route('entrevistas.index')
@@ -415,6 +419,8 @@ class EntrevistaController extends Controller
 
         $entrevista->save();
 
+        Auth::user()?->notify(new EntrevistaProgramada($postulante, $entrevista));
+
         return response()->json(['success' => true]);
     }
 
@@ -441,6 +447,8 @@ class EntrevistaController extends Controller
         }
 
         $entrevista->save();
+
+        Auth::user()?->notify(new EntrevistaEstadoActualizado($postulante, $data['estado']));
 
         return response()->json(['success' => true]);
     }

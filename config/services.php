@@ -35,9 +35,12 @@ return [
         ],
     ],
 
+
     'perudevs' => [
+        'key' => env('PERUDEVS_KEY'),
         'dni_simple_url' => env('PERUDEVS_DNI_URL'),
-        'key'            => env('PERUDEVS_KEY'),
+        'dni_complete_url' => env('PERUDEVS_DNI_COMPLETE_URL'), // ✅ agrega esto
     ],
+
 
 ];

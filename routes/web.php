@@ -10,6 +10,7 @@ use App\Http\Controllers\HistorialController;
 use App\Http\Controllers\PosterController;
 use App\Http\Controllers\EntrevistaController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\NotificacionController;
 
 Route::get('/', function () {
   return view('welcome');
@@ -27,7 +28,17 @@ Route::get('/api-publico/provincias/{depa}', [PostulanteController::class, 'getP
 Route::get('/api-publico/distritos/{prov}',  [PostulanteController::class, 'getDistritos']);
 Route::get('/api-publico/cargo-tipo/{codiCarg}', [PostulanteController::class, 'cargoTipo']);
 
+Route::get('/api-publico/dni/complete/{dni}', [PostulanteController::class, 'apiDniComplete'])
+  ->middleware('throttle:30,1');
+
 Route::middleware('auth')->group(function () {
+  Route::get('/notificaciones', [NotificacionController::class, 'index'])
+    ->name('notificaciones.index');
+  Route::patch('/notificaciones/{id}/leer', [NotificacionController::class, 'markAsRead'])
+    ->name('notificaciones.leer');
+  Route::patch('/notificaciones/leer-todas', [NotificacionController::class, 'markAllAsRead'])
+    ->name('notificaciones.leer-todas');
+
   Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
   Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
   Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
