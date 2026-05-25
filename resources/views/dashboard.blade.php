@@ -5,32 +5,24 @@
 @section('content')
 @php
 // =========================
-// Preparación de datos
+// Preparación de datos (obtenidos del DashboardController)
 // =========================
 
-// Postulaciones por sede (desde tu controller: $porSede, $maxTotalSede)
+
+// Postulaciones por departamento
 $labelsSede = collect($porSede ?? [])->map(function ($s) {
-return ucwords(strtolower($s->nombre_departamento ?? 'Sin sede'));
+    return ucwords(strtolower($s->nombre_departamento ?? 'Sin sede'));
 })->values();
 
 $totalesSede = collect($porSede ?? [])->map(function ($s) {
-return (int) ($s->total ?? 0);
+    return (int) ($s->total ?? 0);
 })->values();
 
-// Estado de postulantes (ideal: pásalo desde controller como array asociativo)
-// Ejemplo esperado:
-// $estadoPostulantes = ['Apto'=>140,'Pendiente'=>40,'En entrevista'=>53,'No Apto'=>15];
-$estadoPostulantes = $estadoPostulantes ?? null;
-
+// Estado de postulantes (ya viene como array asociativo del controller)
 $estadoLabels = is_array($estadoPostulantes) ? array_keys($estadoPostulantes) : [];
 $estadoValues = is_array($estadoPostulantes) ? array_values($estadoPostulantes) : [];
 
-// Próximas entrevistas (ideal: pásalo desde controller)
-// Ejemplo: [['fecha'=>'2025-01-22','hora'=>'10:00','postulante'=>'...','cargo'=>'...','estado'=>'Pendiente'], ...]
-$proximasEntrevistas = $proximasEntrevistas ?? null;
-
-// Alertas (ideal: pásalo desde controller)
-$alertas = $alertas ?? null;
+// Próximas entrevistas y alertas (ya vienen del controller)
 @endphp
 
 <!-- =========================
@@ -49,12 +41,6 @@ $alertas = $alertas ?? null;
                 <i class="fas fa-users text-blue-600 text-lg"></i>
             </div>
         </div>
-        <div class="mt-4 flex items-center justify-between">
-            <span class="text-xs text-gray-500">Variación</span>
-            <span class="text-sm font-semibold {{ ($variacionPostulantes ?? 0) >= 0 ? 'text-green-600' : 'text-red-600' }}">
-                {{ ($variacionPostulantes ?? 0) > 0 ? '+' : '' }}{{ $variacionPostulantes ?? 0 }}%
-            </span>
-        </div>
     </div>
 
     <!-- Requerimientos -->
@@ -68,12 +54,6 @@ $alertas = $alertas ?? null;
             <div class="h-12 w-12 rounded-2xl flex items-center justify-center" style="background:#fff7ed;">
                 <i class="fas fa-briefcase text-yellow-600 text-lg"></i>
             </div>
-        </div>
-        <div class="mt-4 flex items-center justify-between">
-            <span class="text-xs text-gray-500">Variación</span>
-            <span class="text-sm font-semibold {{ ($variacionRequerimientos ?? 0) >= 0 ? 'text-green-600' : 'text-red-600' }}">
-                {{ ($variacionRequerimientos ?? 0) > 0 ? '+' : '' }}{{ $variacionRequerimientos ?? 0 }}%
-            </span>
         </div>
     </div>
 
@@ -89,7 +69,6 @@ $alertas = $alertas ?? null;
                 <i class="fas fa-calendar-day text-green-600 text-lg"></i>
             </div>
         </div>
-        <div class="mt-4 text-xs text-gray-500">Indicador diario</div>
     </div>
 
     <!-- Operativo -->
@@ -104,10 +83,6 @@ $alertas = $alertas ?? null;
                 <i class="fas fa-user-shield text-indigo-600 text-lg"></i>
             </div>
         </div>
-        <div class="mt-4 flex items-center justify-between">
-            <span class="text-xs text-gray-500">Nuevos</span>
-            <span class="text-sm font-semibold text-green-600">+{{ $operativoNuevos ?? 0 }}</span>
-        </div>
     </div>
 
     <!-- Administrativo -->
@@ -121,10 +96,6 @@ $alertas = $alertas ?? null;
             <div class="h-12 w-12 rounded-2xl flex items-center justify-center" style="background:#f5f3ff;">
                 <i class="fas fa-user-tie text-purple-600 text-lg"></i>
             </div>
-        </div>
-        <div class="mt-4 flex items-center justify-between">
-            <span class="text-xs text-gray-500">Nuevos</span>
-            <span class="text-sm font-semibold text-green-600">+{{ $administrativoNuevos ?? 0 }}</span>
         </div>
     </div>
 </div>
@@ -167,11 +138,8 @@ $alertas = $alertas ?? null;
     <div class="card glass-strong p-6 shadow-soft">
         <div class="flex items-center justify-between mb-4">
             <div>
-                <div class="text-sm font-semibold">Postulaciones por Sede</div>
+                <div class="text-sm font-semibold">Postulaciones por Departamento</div>
                 <div class="text-xs" style="opacity:.75;">Comparativo por ubicación</div>
-            </div>
-            <div class="px-3 py-1.5 rounded-xl text-xs bg-white bg-opacity-10">
-                <i class="fas fa-chart-bar mr-2"></i>Chart.js
             </div>
         </div>
 
@@ -192,9 +160,6 @@ $alertas = $alertas ?? null;
             <div>
                 <div class="text-sm font-semibold">Estado de Postulantes</div>
                 <div class="text-xs" style="opacity:.75;">Distribución del pipeline</div>
-            </div>
-            <div class="px-3 py-1.5 rounded-xl text-xs bg-white bg-opacity-10">
-                <i class="fas fa-chart-pie mr-2"></i>Chart.js
             </div>
         </div>
 
@@ -245,60 +210,83 @@ $alertas = $alertas ?? null;
 <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
     <!-- Próximas entrevistas -->
     <div class="card glass-strong p-6 shadow-soft">
-        <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center justify-between mb-5">
             <div>
-                <div class="text-sm font-semibold">Próximas Entrevistas</div>
-                <div class="text-xs" style="opacity:.75;">Agenda programada</div>
+                <h3 class="text-sm font-semibold">Próximas Entrevistas</h3>
+                <p class="text-xs" style="opacity:.75;" >{{ count($proximasEntrevistas) ?? 0 }} entrevistas programadas</p>
             </div>
-            <a href="{{ route('entrevistas.index') }}" class="text-xs font-semibold bg-white bg-opacity-10 hover:bg-opacity-15 px-3 py-2 rounded-xl">
-                Ver entrevistas <i class="fas fa-arrow-right ml-2"></i>
+            <a href="{{ route('entrevistas.index') }}" class="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
+                Ver todas
             </a>
         </div>
 
-        <div class="bg-white rounded-2xl overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="min-w-full text-sm text-gray-700">
-                    <thead class="bg-gray-50 text-gray-600">
-                        <tr>
-                            <th class="text-left px-4 py-3">Fecha</th>
-                            <th class="text-left px-4 py-3">Hora</th>
-                            <th class="text-left px-4 py-3">Postulante</th>
-                            <th class="text-left px-4 py-3">Cargo</th>
-                            <th class="text-left px-4 py-3">Estado</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100">
-                        @if (is_array($proximasEntrevistas) && count($proximasEntrevistas))
-                        @foreach ($proximasEntrevistas as $row)
-                        <tr>
-                            <td class="px-4 py-3">{{ $row['fecha'] ?? '-' }}</td>
-                            <td class="px-4 py-3">{{ $row['hora'] ?? '-' }}</td>
-                            <td class="px-4 py-3 font-semibold text-gray-900">{{ $row['postulante'] ?? '-' }}</td>
-                            <td class="px-4 py-3">{{ $row['cargo'] ?? '-' }}</td>
-                            <td class="px-4 py-3">
-                                @php
-                                $estado = strtolower($row['estado'] ?? '');
-                                $badge = 'background:#eef2ff;color:#3730a3;';
-                                if (str_contains($estado, 'pend')) $badge = 'background:#fffbeb;color:#92400e;';
-                                if (str_contains($estado, 'comp')) $badge = 'background:#ecfdf5;color:#166534;';
-                                @endphp
-                                <span class="px-2 py-1 rounded-full text-xs font-semibold" style="{{ $badge }}">
-                                    {{ $row['estado'] ?? '—' }}
-                                </span>
-                            </td>
-                        </tr>
-                        @endforeach
-                        @else
-                        <tr>
-                            <td colspan="5" class="px-4 py-8 text-center text-gray-500">
-                                Sin entrevistas programadas (o aún no estás enviando <b>$proximasEntrevistas</b>).
-                            </td>
-                        </tr>
+        @if (is_array($proximasEntrevistas) && count($proximasEntrevistas))
+            <div class="space-y-2 max-h-80 overflow-y-auto">
+                @foreach ($proximasEntrevistas as $row)
+                @php
+                    $estadoLower = strtolower($row['estado'] ?? '');
+                    
+                    // Colores simples por estado
+                    $colorMap = [
+                        'programada' => '#3b82f6',      // Azul
+                        'reprogramada' => '#8b5cf6',    // Púrpura
+                        'entrevistada' => '#10b981',    // Verde
+                        'completada' => '#10b981',      // Verde
+                        'no asistió' => '#f59e0b',      // Naranja
+                        'cancelada' => '#ef4444',       // Rojo
+                    ];
+                    
+                    $estilo_color = $colorMap[$estadoLower] ?? '#6b7280';
+                @endphp
+                
+                <div class="flex items-center gap-3 p-3 rounded-lg border-l-4 bg-white hover:shadow-md transition-shadow"
+                     style="border-left-color: {{ $estilo_color }};">
+                    
+                    <!-- Fecha/Hora destacada -->
+                    <div class="flex-shrink-0 text-center min-w-16">
+                        <div class="text-sm font-bold text-gray-900">{{ $row['fecha'] ?? '-' }}</div>
+                        <div class="text-xs font-semibold rounded px-2 py-1 mt-1" style="background-color: {{ $estilo_color }}; color: white;">
+                            {{ $row['hora'] ?? '-' }}
+                        </div>
+                    </div>
+
+                    <!-- Información principal -->
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between gap-2">
+                            <div class="min-w-0">
+                                <h5 class="text-sm font-bold text-gray-900 truncate">{{ $row['postulante'] ?? '-' }}</h5>
+                                <p class="text-xs text-gray-500">{{ $row['cargo'] ?? '-' }} • {{ $row['departamento'] ?? '-' }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Estado badge -->
+                    <div class="flex-shrink-0">
+                        <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap" style="background-color: {{ $estilo_color }}; color: white;">
+                            {{ ucfirst($row['estado'] ?? 'Pendiente') }}
+                        </span>
+                    </div>
+
+                    <!-- Acciones -->
+                    @if(strtolower($row['estado'] ?? '') !== 'cancelada')
+                        @if(strtolower($row['estado'] ?? '') === 'programada' || strtolower($row['estado'] ?? '') === 'reprogramada')
+                            <a href="{{ route('entrevistas.evaluar', $row['postulante_id']) }}" 
+                               class="p-2 rounded-lg hover:bg-blue-100 transition-colors flex-shrink-0" 
+                               title="Evaluar">
+                                <i class="fas fa-edit text-blue-600"></i>
+                            </a>
                         @endif
-                    </tbody>
-                </table>
+                    @endif
+                </div>
+                @endforeach
             </div>
-        </div>
+        @else
+            <div class="bg-gray-50 rounded-lg p-8 text-center border border-dashed border-gray-300">
+                <i class="fas fa-calendar-check text-3xl text-gray-300 mb-2 block"></i>
+                <p class="text-gray-600 font-medium">No hay entrevistas programadas</p>
+                <p class="text-sm text-gray-500 mt-1">Comienza a programar entrevistas</p>
+            </div>
+        @endif
     </div>
 
     <!-- Alertas -->
@@ -307,9 +295,6 @@ $alertas = $alertas ?? null;
             <div>
                 <div class="text-sm font-semibold">Alertas Recientes</div>
                 <div class="text-xs" style="opacity:.75;">Eventos a revisar</div>
-            </div>
-            <div class="px-3 py-1.5 rounded-xl text-xs bg-white bg-opacity-10">
-                <i class="fas fa-bell mr-2"></i>Live
             </div>
         </div>
 

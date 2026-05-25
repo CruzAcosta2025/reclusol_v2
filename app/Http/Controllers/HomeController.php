@@ -105,13 +105,15 @@ class HomeController extends Controller
         $estadoEntrevistaNombre = DB::table('estado_entrevista')->pluck('nombre', 'id');
         $cargos = Cargo::forSelect();
 
-        $proximasEntrevistas = Entrevista::with(['postulante', 'requerimiento'])
+        $departamentos_select = Departamento::forSelect();
+        
+        $proximasEntrevistas = Entrevista::with(['postulante', 'requerimiento', 'entrevistador'])
             ->whereNotNull('fecha_entrevista')
             ->whereDate('fecha_entrevista', '>=', $hoy)
             ->orderBy('fecha_entrevista')
             ->limit(6)
             ->get()
-            ->map(function ($e) use ($estadoEntrevistaNombre, $cargos) {
+            ->map(function ($e) use ($estadoEntrevistaNombre, $cargos, $departamentos_select) {
                 $postulante = $e->postulante;
                 $nombre = trim(($postulante->nombres ?? '') . ' ' . ($postulante->apellidos ?? ''));
 
@@ -128,12 +130,26 @@ class HomeController extends Controller
                     ? ($estadoEntrevistaNombre[$e->estado_entrevista_id] ?? 'Programada')
                     : 'Sin programar';
 
+                // Departamento
+                $departamentoCodigo = str_pad(ltrim((string)$postulante->departamento, '0'), 2, '0', STR_PAD_LEFT);
+                $departamentoNombre = $departamentos_select->get($departamentoCodigo, 'N/A');
+
+                // Entrevistador
+                $entrevistadorNombre = $e->entrevistador?->name ?? '-';
+
                 return [
-                    'fecha' => optional($e->fecha_entrevista)->format('Y-m-d'),
+                    'id' => $e->id,
+                    'postulante_id' => $postulante->id,
+                    'fecha' => optional($e->fecha_entrevista)->format('d/m/Y'),
+                    'fecha_completa' => optional($e->fecha_entrevista)->format('Y-m-d H:i'),
                     'hora' => optional($e->fecha_entrevista)->format('H:i'),
                     'postulante' => $nombre !== '' ? $nombre : 'Sin nombre',
+                    'dni' => $postulante->dni ?? '-',
                     'cargo' => $cargoNombre,
+                    'departamento' => $departamentoNombre,
                     'estado' => $estadoNombre,
+                    'entrevistador' => $entrevistadorNombre,
+                    'resultado' => $e->resultado ?? null,
                 ];
             })
             ->values()
@@ -143,6 +159,18 @@ class HomeController extends Controller
             ->whereNotNull('fecha_entrevista')
             ->whereDate('fecha_entrevista', $hoy)
             ->count();
+
+        // Personal Operativo y Administrativo
+        $personalOperativo = Postulante::whereIn('tipo_personal_codigo', ['01', '03'])
+            ->where('estado', 2)
+            ->count();
+
+        $personalAdministrativo = Postulante::where('tipo_personal_codigo', '02')
+            ->where('estado', 2)
+            ->count();
+
+        /* ---------- ALERTAS ---------- */
+        $alertas = $this->generarAlertas($hoy);
 
         /* ---------- Enviar a la vista ---------- */
         return view('dashboard', compact(
@@ -156,7 +184,79 @@ class HomeController extends Controller
             'notificaciones',
             'estadoPostulantes',
             'proximasEntrevistas',
-            'entrevistasHoy'
+            'entrevistasHoy',
+            'personalOperativo',
+            'personalAdministrativo',
+            'alertas'
         ));
+    }
+
+    /**
+     * Generar alertas basadas en el estado del sistema
+     */
+    private function generarAlertas($hoy)
+    {
+        $alertas = [];
+
+        // Alerta 1: Entrevistas sin programar (aptos que no tienen entrevista)
+        $entrevistacionPendiente = Postulante::where('estado', 2)
+            ->where('decision', 'apto')
+            ->whereDoesntHave('entrevistas')
+            ->count();
+
+        if ($entrevistacionPendiente > 0) {
+            $alertas[] = [
+                'tipo' => 'warning',
+                'titulo' => 'Entrevistas pendientes',
+                'detalle' => $entrevistacionPendiente . ' postulante' . ($entrevistacionPendiente > 1 ? 's' : '') . ' apto' . ($entrevistacionPendiente > 1 ? 's' : '') . ' sin programar entrevista',
+                'cuando' => 'Requiere atención',
+            ];
+        }
+
+        // Alerta 2: Postulantes en lista negra (si tienes ese campo)
+        /*
+        $enListaNegra = Postulante::where('lista_negra', true)->count();
+        if ($enListaNegra > 0) {
+            $alertas[] = [
+                'tipo' => 'danger',
+                'titulo' => 'Postulantes en lista negra',
+                'detalle' => $enListaNegra . ' postulante' . ($enListaNegra > 1 ? 's' : '') . ' registrado' . ($enListaNegra > 1 ? 's' : '') . ' en lista negra',
+                'cuando' => 'Información',
+            ];
+        }
+        */
+
+        // Alerta 3: Entrevistas próximas (en las próximas 24 horas)
+        $entrevistasProximas = Entrevista::whereBetween('fecha_entrevista', [
+            $hoy,
+            $hoy->copy()->addDay()
+        ])->count();
+
+        if ($entrevistasProximas > 0) {
+            $alertas[] = [
+                'tipo' => 'success',
+                'titulo' => 'Entrevistas programadas',
+                'detalle' => $entrevistasProximas . ' entrevista' . ($entrevistasProximas > 1 ? 's' : '') . ' en las próximas 24 horas',
+                'cuando' => 'Próximo evento',
+            ];
+        }
+
+        // Alerta 4: Requerimientos sin cubrir
+        $requerimientosSinCubrir = Requerimiento::where('estado', '1')
+            ->whereDoesntHave('postulantes', function ($query) {
+                $query->where('decision', 'apto');
+            })
+            ->count();
+
+        if ($requerimientosSinCubrir > 0) {
+            $alertas[] = [
+                'tipo' => 'info',
+                'titulo' => 'Requerimientos sin cubrir',
+                'detalle' => $requerimientosSinCubrir . ' requerimiento' . ($requerimientosSinCubrir > 1 ? 's' : '') . ' activo' . ($requerimientosSinCubrir > 1 ? 's' : '') . ' esperando candidatos aptos',
+                'cuando' => 'En revisión',
+            ];
+        }
+
+        return count($alertas) > 0 ? $alertas : null;
     }
 }
